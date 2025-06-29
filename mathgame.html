@@ -1,0 +1,1451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multi-Grade Math Challenge</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts for Luckiest Guy and Fredoka One -->
+    <link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&family=Fredoka+One&display=swap" rel="stylesheet">
+    <!-- Lottie Web Player for animations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.12.2/lottie.min.js"></script>
+    <!-- Anime.js Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <style>
+        /* Apply border-box globally for consistent sizing */
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Fredoka One', cursive;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px; /* Overall padding for the body content */
+            background-color: #f0f8ff; /* Fallback color for body if no theme is set yet */
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed; /* Keep background fixed when scrolling, if content overflows */
+            transition: background-image 0.5s ease-in-out, background-color 0.5s ease-in-out;
+            display: flex; /* Use flexbox to easily center content top-to-bottom */
+            flex-direction: column; /* Stack content vertically */
+            align-items: center; /* Center content horizontally */
+            justify-content: flex-start; /* Align content to the start (top) of the page */
+        }
+
+        /* Specific background images for the BODY based on theme */
+        /* IMPORTANT: Ensure these image files are present in the same directory (or correct relative path)
+           on your GitHub Pages server. File names are case-sensitive on GitHub! */
+        .body-theme-underwater {
+            background-image: url('underwaterBG.png'); 
+        }
+        .body-theme-undergroundcity {
+            background-image: url('undergroundcityBG.png'); 
+        }
+        .body-theme-ice {
+            background-image: url('iceBG.png'); 
+        }
+        .body-theme-rainforest {
+            background-image: url('rainforestBG.png'); 
+        }
+        .body-theme-cybercity {
+            background-image: url('cybercityBG.png'); 
+        }
+        .body-theme-lava {
+            background-image: url('lavaBG.png'); 
+        }
+
+        /* Elements that were inside the game-container now styled individually */
+        h1 {
+            font-family: 'Luckiest Guy', cursive;
+            color: #007bff; /* Changed color to match primary theme */
+            font-size: 9rem; /* Adjusted font size for better responsiveness */
+            margin-top: 100px; /* Add some top margin */
+            margin-bottom: 25px;
+            font-weight: 800;
+            text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.5); /* Stronger shadow for readability */
+            background-color: rgba(255, 255, 255, 0.8); /* Lighter background for text */
+            padding: 10px 25px;
+            border-radius: 15px;
+            animation: fadeInDown 1s ease-out; /* Animation for title */
+            max-width: 650px; /* Limit width */
+            width: 90%;
+            text-align: center;
+        }
+
+        @keyframes fadeInDown {
+            0% { opacity: 0; transform: translateY(-30px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        .settings-group, .progress-display, .problem-area, .input-group, .feedback-area, .score-timer {
+            background-color: rgba(255, 255, 255, 0.9); /* Consistent semi-transparent background */
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            max-width: 650px; /* Match h1 width */
+            width: 90%;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative; /* For animations and absolute positioning of fire canvas */
+            z-index: 1; /* Ensure elements stack correctly */
+            overflow: hidden; /* Hide overflow of fire canvas */
+        }
+
+        .settings-group {
+            padding: 15px;
+            border: 1px solid #e0e0e0;
+            flex-direction: column;
+            gap: 15px;
+            animation: fadeInUp 0.8s ease-out 0.2s backwards; /* Delayed animation */
+        }
+
+        @keyframes fadeInUp {
+            0% { opacity: 0; transform: translateY(30px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeIn {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+
+        @keyframes scaleIn {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        @keyframes pulseGlow {
+            0% { box-shadow: 0 0 15px 8px rgba(255, 165, 0, 0.7), 0 0 25px 15px rgba(255, 69, 0, 0.5); }
+            50% { box-shadow: 0 0 25px 12px rgba(255, 165, 0, 0.9), 0 0 40px 20px rgba(255, 69, 0, 0.7); }
+            100% { box-shadow: 0 0 15px 8px rgba(255, 165, 0, 0.7), 0 0 25px 15px rgba(255, 69, 0, 0.5); }
+        }
+
+
+        .settings-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        .settings-row label {
+            font-family: 'Fredoka One', cursive;
+            font-weight: 600;
+            color: #555;
+            font-size: 1.1rem;
+        }
+
+        #difficultySelect, #timeLimitToggle {
+            font-family: 'Fredoka One', cursive;
+            padding: 12px 20px;
+            border: 2px solid #8a2be2;
+            border-radius: 12px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #6c5ce7;
+            background-color: #f0e6ff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            background-image: url('data:image/svg+xml;utf8,<svg fill="%236c5ce7" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>');
+            background-repeat: no-repeat;
+            background-position: right 15px center;
+            background-size: 20px;
+        }
+        #difficultySelect:hover, #difficultySelect:focus,
+        #timeLimitToggle:hover, #timeLimitToggle:focus {
+            border-color: #d633ff;
+            box-shadow: 0 0 0 4px rgba(214, 51, 255, 0.2);
+            outline: none;
+        }
+
+        #questionTimeInput {
+            font-family: 'Fredoka One', cursive;
+            -webkit-appearance: none;
+            width: 200px;
+            height: 10px;
+            background: #ddd;
+            outline: none;
+            opacity: 0.7;
+            transition: opacity .2s;
+            border-radius: 5px;
+        }
+
+        #questionTimeInput::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            background: #8a2be2;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        #questionTimeInput::-moz-range-thumb {
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            background: #8a2be2;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .problem-area {
+            background: linear-gradient(45deg, #aaffff, #e7feff);
+            border-radius: 20px;
+            padding: 30px;
+            font-family: 'Fredoka One', cursive;
+            font-size: 2.8rem;
+            font-weight: 400;
+            color: #007bff;
+            box-shadow: inset 0 3px 8px rgba(0, 0, 0, 0.1);
+            min-height: 120px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border: 2px dashed #00c8ff;
+            animation: scaleIn 0.8s ease-out 0.4s backwards; /* Delayed animation */
+        }
+
+        #perQuestionTimerDisplay {
+            font-family: 'Fredoka One', cursive;
+            font-size: 1.4rem;
+            color: #d32f2f;
+            margin-top: 10px;
+            font-weight: 600;
+        }
+        .progress-display {
+            font-family: 'Fredoka One', cursive;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #666;
+            margin-bottom: 20px; /* Adjusted margin */
+            display: flex;
+            justify-content: space-between;
+            width: 90%; /* Adjusted for new full-width approach */
+            max-width: 650px;
+            padding: 15px 25px; /* Added padding */
+            animation: fadeIn 0.8s ease-out 0.3s backwards; /* Delayed animation */
+        }
+
+        .input-group {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 20px; /* Adjusted margin */
+            flex-wrap: wrap;
+            animation: fadeInUp 0.8s ease-out 0.5s backwards; /* Delayed animation */
+            position: relative; /* Crucial for positioning the fire canvas inside */
+            /* overflow: hidden; /* This is already set in the combined .settings-group, .progress-display etc. */
+        }
+        /* New: Styles for "on fire" input group */
+        .input-group-on-fire {
+            box-shadow: 0 0 15px 8px rgba(255, 165, 0, 0.7),
+                        0 0 25px 15px rgba(255, 69, 0, 0.5); /* Fiery glow */
+            border-color: #ff4500 !important; /* Stronger border */
+            animation: pulseGlow 1.5s infinite alternate; /* Pulsing effect */
+        }
+
+        #answerInput {
+            font-family: 'Fredoka One', cursive;
+            padding: 18px 25px;
+            border: 3px solid #ff69b4;
+            border-radius: 15px;
+            font-size: 2rem;
+            width: 220px;
+            text-align: center;
+            color: #8a2be2;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+            position: relative; /* To ensure it's above the canvas */
+            z-index: 2; /* Set a higher z-index for input and button */
+            background-color: white; /* Explicitly set background color */
+        }
+        #answerInput::placeholder {
+            color: #6a0dad;
+            opacity: 1;
+            font-size: 1.5rem;
+        }
+        #answerInput:focus {
+            outline: none;
+            border-color: #8a2be2;
+            box-shadow: 0 0 0 5px rgba(138, 43, 226, 0.4);
+        }
+
+        .btn {
+            font-family: 'Fredoka One', cursive;
+            padding: 18px 35px;
+            font-size: 1.4rem;
+            font-weight: 700;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.25);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative; /* To ensure it's above the canvas */
+            z-index: 2; /* Set a higher z-index for input and button */
+        }
+        .btn-primary {
+            background: linear-gradient(45deg, #00c8ff, #007bff);
+            color: white;
+        }
+        .btn-primary:hover {
+            background: linear-gradient(45deg, #007bff, #0056b3);
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+        }
+        .btn-secondary {
+            background: linear-gradient(45deg, #ff69b4, #ff1493);
+            color: white;
+        }
+        .btn-secondary:hover {
+            background: linear-gradient(45deg, #ff1493, #c71585);
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+        }
+        .btn-tertiary {
+            background: linear-gradient(45deg, #cccccc, #999999);
+            color: #333;
+        }
+        .btn-tertiary:hover {
+            background: linear-gradient(45deg, #999999, #666666);
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+        }
+        .feedback-area {
+            font-family: 'Fredoka One', cursive;
+            min-height: 50px;
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-top: 25px;
+            margin-bottom: 25px;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.05);
+            padding: 15px; /* Added padding */
+            text-align: center; /* Ensure text is centered */
+            animation: fadeIn 0.8s ease-out 0.6s backwards; /* Delayed animation */
+            position: relative; /* Keep for potential future use or other effects */
+            /* overflow: hidden; /* Keep for potential future use or other effects */
+        }
+
+        .feedback-correct {
+            color: #28a745;
+        }
+        .feedback-incorrect {
+            color: #dc3545;
+        }
+        .feedback-round-pass {
+            color: #007bff;
+        }
+        .feedback-round-fail {
+            color: #ff8c00;
+        }
+        .score-timer {
+            font-family: 'Fredoka One', cursive;
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+            padding: 15px 25px; /* Added padding */
+            border-top: 2px solid #eee;
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #424242;
+            animation: fadeInUp 0.8s ease-out 0.7s backwards; /* Delayed animation */
+        }
+        .score-timer span {
+            background: linear-gradient(45deg, #ffe0b2, #ffd700);
+            padding: 10px 20px;
+            border-radius: 12px;
+            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.15);
+            color: #333;
+        }
+        /* Applied Fredoka One to labels, selects, and input values */
+        label, #difficultySelect, #timeLimitToggle, #questionTimeInput, #questionTimeValueDisplay, #answerInput {
+            font-family: 'Fredoka One', cursive;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 3.5rem; /* Adjusted for smaller screens */
+                padding: 8px 20px;
+            }
+            .settings-group, .progress-display, .problem-area, .input-group, .feedback-area, .score-timer {
+                padding: 20px;
+                margin-bottom: 15px;
+            }
+            .problem-area {
+                font-size: 2.2rem;
+                padding: 25px;
+                min-height: 100px;
+            }
+            #answerInput {
+                width: 180px;
+                font-size: 1.8rem;
+                padding: 15px 20px;
+            }
+            .btn {
+                padding: 15px 30px;
+                font-size: 1.2rem;
+            }
+        }
+
+        @media (max-width: 640px) {
+            body {
+                padding: 10px; /* Less overall padding on very small screens */
+            }
+            h1 {
+                font-size: 2.5rem; /* Adjusted for very small screens */
+                padding: 5px 15px;
+            }
+            .settings-group, .progress-display, .problem-area, .input-group, .feedback-area, .score-timer {
+                padding: 15px;
+                border-radius: 15px;
+                width: 95%; /* Ensure it scales down on very small screens */
+                margin-bottom: 10px;
+            }
+            .problem-area {
+                font-size: 1.8rem;
+                padding: 20px;
+                min-height: 90px;
+            }
+            .settings-group {
+                gap: 10px;
+            }
+            .settings-row {
+                flex-direction: column;
+                gap: 10px;
+            }
+            #difficultySelect, #timeLimitToggle, #questionTimeInput {
+                width: 100%;
+            }
+            .progress-display {
+                width: 100%;
+            }
+            #answerInput {
+                width: 100%; /* Full width on small screens */
+                font-size: 1.6rem;
+                padding: 15px;
+            }
+            .btn {
+                padding: 15px 25px;
+                font-size: 1.1rem;
+                width: 100%; /* Full width on small screens */
+            }
+            .input-group {
+                flex-direction: column;
+                gap: 15px;
+            }
+            .feedback-area {
+                font-size: 1.4rem;
+                min-height: 40px;
+            }
+            .score-timer {
+                flex-direction: column;
+                gap: 10px;
+                font-size: 1.2rem;
+            }
+            .score-timer span {
+                padding: 8px 15px;
+            }
+        }
+
+        /* Fire effect canvas positioning and initial state */
+        #fireCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0; /* Behind the input and button */
+            display: none; /* Hidden by default */
+            border-radius: 15px; /* Match parent's border-radius */
+            background-color: rgba(0,0,0,0); /* Transparent background for fire effect */
+        }
+
+        /* Confetti container styles */
+        #confetti-container {
+            position: fixed; /* Makes it stay in place on the screen */
+            top: 0;
+            left: 0;
+            width: 100%; /* Makes it cover the full width */
+            height: 100%; /* Makes it cover the full height */
+            z-index: 1000; /* Puts it on top of almost everything else */
+            pointer-events: none; /* IMPORTANT: Lets you click *through* the confetti so your game buttons still work */
+            opacity: 0; /* Starts completely invisible */
+            transition: opacity 0.5s ease-out; /* Makes it fade in/out smoothly */
+            display: flex; /* Helps center the animation if it's smaller than the screen */
+            justify-content: center;
+            align-items: center;
+        }
+        #confetti-container.active {
+            opacity: 1; /* When we add the 'active' class, it becomes visible */
+        }
+    </style>
+</head>
+<body>
+    <h1>Math Challenge!</h1>
+
+    <div class="settings-group">
+        <div class="settings-row">
+            <label for="difficultySelect">Difficulty:</label>
+            <select id="difficultySelect">
+                <option value="1st">1st Grade</option>
+                <option value="2nd">2nd Grade</option>
+                <option value="3rd">3rd Grade</option>
+                <option value="4th" selected>4th Grade</option>
+                <option value="5th">5th Grade</option>
+                <option value="6th">6th Grade</option>
+            </select>
+        </div>
+
+        <div class="settings-row">
+            <label for="timeLimitToggle">Time Limit Per Question:</label>
+            <select id="timeLimitToggle">
+                <option value="no">No</option>
+                <option value="yes">Yes</option>
+            </select>
+        </div>
+
+        <div id="questionTimeSettings" class="settings-row hidden">
+            <label for="questionTimeInput">Time per Question:</label>
+            <input type="range" id="questionTimeInput" min="10" max="300" value="30">
+            <span id="questionTimeValueDisplay">30 seconds</span>
+        </div>
+    </div>
+
+    <div class="progress-display">
+        <span id="roundDisplay">Round: 1 / 10</span>
+        <span id="questionCountDisplay">Question: 0 / 20</span>
+    </div>
+
+    <div id="problemDisplay" class="problem-area">
+        <span>Select difficulty and click "Start Game"!</span>
+        <span id="perQuestionTimerDisplay"></span>
+    </div>
+
+    <div class="input-group">
+        <input type="number" id="answerInput" placeholder="Your Answer" disabled>
+        <button id="submitBtn" class="btn btn-primary" disabled>Submit Answer</button>
+        <canvas id="fireCanvas"></canvas> <!-- Fire effect canvas moved here -->
+    </div>
+
+    <div id="feedback" class="feedback-area">
+        <span id="feedbackMessage"></span> <!-- Text for feedback -->
+    </div>
+    <button id="startGameBtn" class="btn btn-secondary">Start Game</button>
+    <button id="endGameBtn" class="btn btn-tertiary" style="margin-top: 15px; display: none;">End Game</button>
+
+
+    <div class="score-timer">
+        <span id="scoreDisplay">Score: 0</span>
+        <span id="overallGameTimerDisplay">Total Time: 0s</span>
+    </div>
+
+    <!-- Confetti animation container -->
+    <div id="confetti-container"></div>
+
+    <!-- Hidden audio elements for click, correct, wrong, clap, and horn sounds -->
+    <audio id="correctSoundElement" preload="auto">
+        <source src="correct.wav" type="audio/wav">
+        <source src="correct.mp3" type="audio/mpeg">
+        <source src="correct.ogg" type="audio/ogg">
+    </audio>
+    <audio id="wrongSoundElement" preload="auto">
+        <source src="wrong.wav" type="audio/wav">
+        <source src="wrong.mp3" type="audio/mpeg">
+        <source src="wrong.ogg" type="audio/ogg">
+    </audio>
+    <audio id="clickSoundElement" preload="auto">
+        <source src="click.mp3" type="audio/mpeg">
+        <source src="click.ogg" type="audio/ogg">
+        <source src="click.wav" type="audio/wav">
+    </audio>
+    <audio id="clapSoundElement" preload="auto">
+        <source src="clap.mp3" type="audio/mpeg">
+        <source src="clap.ogg" type="audio/ogg">
+        <source src="clap.wav" type="audio/wav">
+    </audio>
+    <audio id="hornSoundElement" preload="auto">
+        <source src="horn.mp3" type="audio/mpeg">
+        <source src="horn.ogg" type="audio/ogg">
+        <source src="horn.wav" type="audio/wav">
+    </audio>
+
+
+    <script>
+        // --- DOM Elements ---
+        const problemDisplay = document.getElementById('problemDisplay');
+        const perQuestionTimerDisplay = document.getElementById('perQuestionTimerDisplay');
+        const answerInput = document.getElementById('answerInput');
+        const submitBtn = document.getElementById('submitBtn');
+        const feedback = document.getElementById('feedback');
+        const feedbackMessage = document.getElementById('feedbackMessage');
+        const scoreDisplay = document.getElementById('scoreDisplay');
+        const overallGameTimerDisplay = document.getElementById('overallGameTimerDisplay');
+        const startGameBtn = document.getElementById('startGameBtn');
+        const endGameBtn = document.getElementById('endGameBtn');
+        const difficultySelect = document.getElementById('difficultySelect');
+        const timeLimitToggle = document.getElementById('timeLimitToggle');
+        const questionTimeSettings = document.getElementById('questionTimeSettings');
+        const questionTimeInput = document.getElementById('questionTimeInput');
+        const questionTimeValueDisplay = document.getElementById('questionTimeValueDisplay');
+        const roundDisplay = document.getElementById('roundDisplay');
+        const questionCountDisplay = document.getElementById('questionCountDisplay');
+        const body = document.body;
+        const inputGroup = document.querySelector('.input-group'); // Get the input group element
+        const confettiContainer = document.getElementById('confetti-container'); // Confetti container
+
+        // --- Game Variables ---
+        let score = 0;
+        let overallGameElapsedTime = 0;
+        let currentProblem = {};
+        let overallGameTimerInterval;
+        let isGameRunning = false;
+        let currentDifficulty = '4th';
+
+        let isPerQuestionTimeLimitEnabled = false;
+        let selectedPerQuestionTime = parseInt(questionTimeInput.value);
+        let currentQuestionTimeLeft = selectedPerQuestionTime;
+        let perQuestionTimerInterval;
+
+        // Round and Question Tracking
+        let currentRound = 1;
+        const totalRounds = 10;
+        let questionsAnsweredInRound = 0;
+        let questionsPerRound = 20; // Number of questions per round
+        let correctAnswersInRound = 0;
+        const passingPercentage = 80; // 80% to pass a round
+
+        // Fire effect variables
+        const fireCanvas = document.getElementById('fireCanvas');
+        const fireCtx = fireCanvas.getContext('2d');
+        // Increased fireWidth and fireHeight, decreased firePixelSize for less pixelated look
+        let fireWidth = 160; // Base width for simulation grid (will be recalculated)
+        let fireHeight = 40; // Base height for simulation grid (will be recalculated)
+        let firePixelSize = 2; // Smaller "pixel" size to render fire
+        let fire = []; // Array to store heat values for the fire simulation
+        let fireColors = []; // Color palette for fire
+        let isFireEffectActive = false; // Controls if fire animation runs
+        let fireAnimationId; // Stores the requestAnimationFrame ID for fire
+
+        // Lottie animation instance for confetti
+        let confettiAnimation = null; // Initialize as null
+
+        // --- Difficulty Settings (base values for each grade) ---
+        const difficultySettings = {
+            '1st': {
+                themeClass: 'body-theme-underwater', // Class for background image
+                addSubtractRange: { min: 1, max: 20 },
+                multiplyRange: { min1: 0, max1: 0, min2: 0, max2: 0 }, // Not applicable for 1st grade
+                divideRange: { divisorMin: 0, divisorMax: 0, quotientMin: 0, quotientMax: 0 }, // Not applicable for 1st grade
+                operators: ['+'],
+                addSubtractMaxIncrement: 5 // Max value increases by 5 each round
+            },
+            '2nd': {
+                themeClass: 'body-theme-undergroundcity',
+                addSubtractRange: { min: 1, max: 100 },
+                multiplyRange: { min1: 2, max1: 5, min2: 2, max2: 5 },
+                divideRange: { divisorMin: 2, divisorMax: 5, quotientMin: 2, quotientMax: 5 },
+                operators: ['+', '-', '*'],
+                addSubtractMaxIncrement: 10,
+                multiplyMaxIncrement: 1 // Max factor for multiplication/division increases by 1
+            },
+            '3rd': {
+                themeClass: 'body-theme-ice',
+                addSubtractRange: { min: 10, max: 1000 },
+                multiplyRange: { min1: 2, max1: 12, min2: 2, max2: 12 },
+                divideRange: { divisorMin: 2, divisorMax: 12, quotientMin: 2, quotientMax: 12 },
+                operators: ['+', '-', '*', '/'],
+                addSubtractMaxIncrement: 50,
+                multiplyMaxIncrement: 2,
+                divideMaxIncrement: 2
+            },
+            '4th': {
+                themeClass: 'body-theme-rainforest',
+                addSubtractRange: { min: 10, max: 500 },
+                multiplyRange: { min1: 2, max1: 12, min2: 2, max2: 100 },
+                divideRange: { divisorMin: 2, divisorMax: 12, quotientMin: 2, quotientMax: 100 },
+                operators: ['+', '-', '*', '/'],
+                addSubtractMaxIncrement: 100,
+                multiplyMaxIncrement: 5,
+                divideMaxIncrement: 5
+            },
+            '5th': {
+                themeClass: 'body-theme-cybercity',
+                addSubtractRange: { min: 100, max: 5000 },
+                multiplyRange: { min1: 10, max1: 100, min2: 10, max2: 100 },
+                divideRange: { divisorMin: 5, divisorMax: 20, quotientMin: 10, quotientMax: 200 },
+                operators: ['+', '-', '*', '/'],
+                addSubtractMaxIncrement: 200,
+                multiplyMaxIncrement: 10,
+                divideMaxIncrement: 10
+            },
+            '6th': {
+                themeClass: 'body-theme-lava',
+                addSubtractRange: { min: 1000, max: 10000 },
+                multiplyRange: { min1: 100, max1: 500, min2: 10, max2: 100 },
+                divideRange: { divisorMin: 10, divisorMax: 30, quotientMin: 20, quotientMax: 300 },
+                operators: ['+', '-', '*', '/'],
+                addSubtractMaxIncrement: 500,
+                multiplyMaxIncrement: 20,
+                divideMaxIncrement: 20
+            }
+        };
+
+        // Track consecutive correct answers for the "on fire" effect
+        let consecutiveCorrectAnswers = 0;
+
+        // --- Fire Effect Functions ---
+
+        /**
+         * Initializes the fire simulation canvas and related variables.
+         * This function should be called whenever the parent element's size might change,
+         * or when the fire effect is activated/deactivated.
+         */
+        function initFireCanvas() {
+            const inputGroupRect = inputGroup.getBoundingClientRect();
+
+            // Log dimensions for debugging, especially when deployed on a server like GitHub Pages
+            console.log(`initFireCanvas: Input Group Rect - Width: ${inputGroupRect.width}, Height: ${inputGroupRect.height}`);
+
+            // Always update canvas dimensions based on the input group's current size.
+            // This ensures the canvas drawing buffer matches its display size.
+            // Only set if dimensions are valid, to prevent issues with zero-sized canvases.
+            if (inputGroupRect.width > 0 && inputGroupRect.height > 0) {
+                fireCanvas.width = inputGroupRect.width;
+                fireCanvas.height = inputGroupRect.height;
+
+                // Recalculate fireWidth and fireHeight (simulation grid size) based on
+                // the new actual canvas dimensions and the desired firePixelSize.
+                fireWidth = Math.floor(fireCanvas.width / firePixelSize);
+                fireHeight = Math.floor(fireCanvas.height / firePixelSize);
+
+                // Initialize the fire array with zeros (no heat) if it's not already
+                // the correct size or if it's the very first initialization.
+                if (!fire || fire.length !== (fireWidth * fireHeight)) {
+                    fire = new Array(fireWidth * fireHeight).fill(0);
+                }
+            } else {
+                console.warn('Input group has zero dimensions. Fire canvas might not be initialized correctly.');
+                // In a production scenario, you might want to retry this after a short delay
+                // or after a resize event if this warning appears frequently on load.
+            }
+
+            // Define a color palette for the fire effect
+            // This maps heat values (0-255) to RGB colors
+            fireColors = []; // Clear previous colors if any
+            for (let i = 0; i < 256; i++) {
+                let r = 0, g = 0, b = 0;
+                if (i < 85) { // Dark to red
+                    r = i * 3;
+                } else if (i < 170) { // Red to yellow
+                    r = 255;
+                    g = (i - 85) * 3;
+                } else { // Yellow to white
+                    r = 255;
+                    g = 255;
+                    b = (i - 170) * 3;
+                }
+                fireColors[i] = `rgb(${r},${g},${b})`;
+            }
+        }
+
+        /**
+         * Gets the heat value of a pixel at (x, y) in the fire array.
+         * Handles out-of-bounds access by returning 0.
+         * @param {number} x - The x-coordinate of the pixel.
+         * @param {number} y - The y-coordinate of the pixel.
+         * @returns {number} The heat value of the pixel, or 0 if out of bounds.
+         */
+        function getFireHeat(x, y) {
+            // Check boundaries
+            if (x < 0 || x >= fireWidth || y < 0 || y >= fireHeight) {
+                return 0;
+            }
+            return fire[y * fireWidth + x];
+        }
+
+        /**
+         * Sets the heat value of a pixel at (x, y) in the fire array.
+         * @param {number} x - The x-coordinate of the pixel.
+         * @param {number} y - The y-coordinate of the pixel.
+         * @param {number} v - The heat value to set.
+         */
+        function setFireHeat(x, y, v) {
+            // Ensure heat value is within 0-255 range
+            fire[y * fireWidth + x] = Math.max(0, Math.min(255, Math.floor(v)));
+        }
+
+        /**
+         * Draws a single "pixel" on the fire canvas with the specified color.
+         * @param {number} x - The x-coordinate of the simulation pixel.
+         * @param {number} y - The y-coordinate of the simulation pixel.
+         * @param {string} color - The CSS color string to draw the pixel.
+         */
+        function drawFirePixel(x, y, color) {
+            fireCtx.fillStyle = color;
+            fireCtx.fillRect(x * firePixelSize, y * firePixelSize, firePixelSize, firePixelSize);
+        }
+
+        /**
+         * Generates and renders a single frame of the fire animation.
+         */
+        function fireFrame() {
+            if (!isFireEffectActive) {
+                // If the effect is deactivated, ensure the animation loop stops
+                cancelAnimationFrame(fireAnimationId);
+                return;
+            }
+
+            // Clear the canvas for the new frame
+            fireCtx.clearRect(0, 0, fireCanvas.width, fireCanvas.height);
+
+            // Step 1: Generate heat at the bottom row (source of fire)
+            for (var x = 0; x < fireWidth; x++) {
+                // Randomly assign a high heat value to the bottom-most pixels
+                setFireHeat(x, fireHeight - 1, Math.floor(Math.random() * 255));
+            }
+
+            // Step 2: Propagate heat upwards and apply dissipation
+            // Iterate from the second-to-last row up to the top
+            for (var y = 0; y < fireHeight - 1; y++) {
+                for (var x = 0; x < fireWidth; x++) {
+                    // Average heat from surrounding lower pixels to simulate heat rising and spreading
+                    // The division by 4.1 ensures a slight decay in heat, making the fire dissipate as it rises
+                    var c = (
+                        getFireHeat(x - 1, y + 1) + // Bottom-left
+                        getFireHeat(x, y + 1) +    // Directly below
+                        getFireHeat(x + 1, y + 1) + // Bottom-right
+                        getFireHeat(x, y + 2)       // Two steps below (to give more upward momentum)
+                    ) / 4.1;
+                    
+                    setFireHeat(x, y, c); // Update the current pixel's heat
+
+                    // Step 3: Render the pixel using the calculated heat value and color palette
+                    drawFirePixel(x, y, fireColors[Math.floor(c)]); // Use the palette for coloring
+                }
+            }
+            // Request the next animation frame
+            fireAnimationId = window.requestAnimationFrame(fireFrame);
+        }
+
+        /**
+         * Activates the "on fire" visual effect.
+         */
+        function activateFireEffect() {
+            if (isFireEffectActive) return; // Already active
+
+            isFireEffectActive = true;
+            inputGroup.classList.add('input-group-on-fire'); // Apply fire glow to the input group
+            // Ensure initFireCanvas is called before starting the animation frame
+            // so fireCanvas has correct dimensions relative to its parent inputGroup
+            initFireCanvas(); 
+            fireCanvas.style.display = 'block'; // Show the fire canvas
+            feedbackMessage.textContent = "YOU'RE ON FIRE! 🔥"; // Update the feedback message
+            fireAnimationId = window.requestAnimationFrame(fireFrame); // Start fire animation
+        }
+
+        /**
+         * Deactivates the "on fire" visual effect.
+         */
+        function deactivateFireEffect() {
+            if (!isFireEffectActive) return; // Not active
+
+            isFireEffectActive = false;
+            inputGroup.classList.remove('input-group-on-fire'); // Remove fire glow from the input group
+            fireCanvas.style.display = 'none'; // Hide the fire canvas
+            cancelAnimationFrame(fireAnimationId); // Stop fire animation
+            fireCtx.clearRect(0, 0, fireCanvas.width, fireCanvas.height); // Clear the canvas
+            fire = new Array(fireWidth * fireHeight).fill(0); // Reset fire heat values
+        }
+
+        // --- Game Logic Functions ---
+
+        /**
+         * Generates a random integer within a specified range.
+         * @param {number} min - The minimum value (inclusive).
+         * @param {number} max - The maximum value (inclusive).
+         * @returns {number} A random integer.
+         */
+        function getRandomInt(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        /**
+         * Updates the background image of the body based on the selected difficulty.
+         */
+        function updateBackground() {
+            // Remove all existing theme classes from body
+            for (const key in difficultySettings) {
+                if (difficultySettings.hasOwnProperty(key)) {
+                    body.classList.remove(difficultySettings[key].themeClass);
+                }
+            }
+            // Add the new theme class to body
+            body.classList.add(difficultySettings[currentDifficulty].themeClass);
+        }
+
+        /**
+         * Adjusts problem generation ranges based on the current round.
+         * @param {object} baseSettings - The base difficulty settings for the current grade.
+         * @param {number} round - The current round number (1-10).
+         * @returns {object} Adjusted difficulty ranges for the current round.
+         */
+        function adjustDifficultyForRound(baseSettings, round) {
+            const adjustedSettings = JSON.parse(JSON.stringify(baseSettings));
+
+            adjustedSettings.addSubtractRange.max += (round - 1) * (baseSettings.addSubtractMaxIncrement || 0);
+
+            if (adjustedSettings.multiplyRange.max1 > 0) {
+                adjustedSettings.multiplyRange.max1 += (round - 1) * (baseSettings.multiplyMaxIncrement || 0);
+                adjustedSettings.multiplyRange.max2 += (round - 1) * (baseSettings.multiplyMaxIncrement || 0);
+            }
+            if (adjustedSettings.divideRange.divisorMax > 0) {
+                adjustedSettings.divideRange.divisorMax += (round - 1) * (baseSettings.divideMaxIncrement || 0);
+                adjustedSettings.divideRange.quotientMax += (round - 1) * (baseSettings.divideMaxIncrement || 0);
+            }
+
+            // Ensure min values do not exceed max values after incrementing
+            if (adjustedSettings.addSubtractRange.min > adjustedSettings.addSubtractRange.max) adjustedSettings.addSubtractRange.min = adjustedSettings.addSubtractRange.max - 1;
+            if (adjustedSettings.multiplyRange.max1 > 0 && adjustedSettings.multiplyRange.min1 > adjustedSettings.multiplyRange.max1) adjustedSettings.multiplyRange.min1 = adjustedSettings.multiplyRange.max1 - 1;
+            if (adjustedSettings.multiplyRange.max2 > 0 && adjustedSettings.multiplyRange.min2 > adjustedSettings.multiplyRange.max2) adjustedSettings.multiplyRange.min2 = adjustedSettings.multiplyRange.max2 - 1;
+            if (adjustedSettings.divideRange.divisorMax > 0 && adjustedSettings.divideRange.divisorMin > adjustedSettings.divideRange.divisorMax) adjustedSettings.divideRange.divisorMin = adjustedSettings.divideRange.divisorMax - 1;
+            if (adjustedSettings.divideRange.quotientMax > 0 && adjustedSettings.divideRange.quotientMin > adjustedSettings.divideRange.quotientMax) adjustedSettings.divideRange.quotientMin = adjustedSettings.divideRange.quotientMax - 1;
+
+            return adjustedSettings;
+        }
+
+        /**
+         * Updates the round and question count displays.
+         */
+        function updateProgressDisplay() {
+            roundDisplay.textContent = `Round: ${currentRound} / ${totalRounds}`;
+            questionCountDisplay.textContent = `Question: ${questionsAnsweredInRound} / ${questionsPerRound}`;
+        }
+
+        /**
+         * Starts the countdown timer for the current question.
+         */
+        function startPerQuestionTimer() {
+            clearInterval(perQuestionTimerInterval);
+
+            if (!isPerQuestionTimeLimitEnabled) {
+                perQuestionTimerDisplay.textContent = '';
+                return;
+            }
+
+            currentQuestionTimeLeft = selectedPerQuestionTime;
+            perQuestionTimerDisplay.textContent = `Time: ${currentQuestionTimeLeft}s`;
+
+            perQuestionTimerInterval = setInterval(() => {
+                currentQuestionTimeLeft--;
+                perQuestionTimerDisplay.textContent = `Time: ${currentQuestionTimeLeft}s`;
+
+                if (currentQuestionTimeLeft <= 0) {
+                    clearInterval(perQuestionTimerInterval);
+                    feedbackMessage.textContent = `Time's up! The answer was ${currentProblem.answer}. 🙁`;
+                    feedback.className = "feedback-area feedback-incorrect";
+                    consecutiveCorrectAnswers = 0; // Reset consecutive answers on time out
+                    deactivateFireEffect(); // Deactivate fire if time runs out
+                    playWrongSound(); 
+                    questionsAnsweredInRound++;
+                    updateProgressDisplay();
+                    setTimeout(nextQuestionOrRound, 1000);
+                }
+            }, 1000);
+        }
+
+        /**
+         * Generates a new math problem based on the current difficulty level and round.
+         */
+        function generateProblem() {
+            console.log('--- Generating problem ---');
+            const baseSettings = difficultySettings[currentDifficulty];
+            const adjustedSettings = adjustDifficultyForRound(baseSettings, currentRound);
+            const operators = adjustedSettings.operators;
+            let operator = operators[getRandomInt(0, operators.length - 1)]; // Use 'let' to allow re-assignment
+            let displayOperator = operator; // Initialize display operator for human-readable symbols
+
+            let num1, num2, answer;
+
+            switch (operator) {
+                case '+':
+                    num1 = getRandomInt(adjustedSettings.addSubtractRange.min, adjustedSettings.addSubtractRange.max);
+                    num2 = getRandomInt(adjustedSettings.addSubtractRange.min, adjustedSettings.addSubtractRange.max);
+                    answer = num1 + num2;
+                    break;
+                case '-':
+                    num1 = getRandomInt(adjustedSettings.addSubtractRange.min, adjustedSettings.addSubtractRange.max);
+                    // Ensure num1 is greater than or equal to num2 for non-negative answers
+                    num2 = getRandomInt(adjustedSettings.addSubtractRange.min, num1);
+                    answer = num1 - num2;
+                    break;
+                case '*':
+                    if (adjustedSettings.multiplyRange.max1 > 0) {
+                        num1 = getRandomInt(adjustedSettings.multiplyRange.min1, adjustedSettings.multiplyRange.max1);
+                        num2 = getRandomInt(adjustedSettings.multiplyRange.min2, adjustedSettings.multiplyRange.max2);
+                        answer = num1 * num2;
+                        displayOperator = '×'; // Set for display
+                    } else {
+                        // Fallback to addition if multiplication not applicable (e.g., 1st grade)
+                        console.warn('Multiplication not applicable for current settings. Falling back to addition.');
+                        operator = '+'; // Change internal operator to '+'
+                        num1 = getRandomInt(adjustedSettings.addSubtractRange.min, adjustedSettings.addSubtractRange.max);
+                        num2 = getRandomInt(adjustedSettings.addSubtractRange.min, adjustedSettings.addSubtractRange.max);
+                        answer = num1 + num2;
+                        displayOperator = '+'; // Reset display operator for fallback
+                    }
+                    break;
+                case '/':
+                    if (adjustedSettings.divideRange.divisorMax > 0) {
+                        // Generate an answer first, then calculate num1 to ensure whole numbers
+                        num2 = getRandomInt(adjustedSettings.divideRange.divisorMin, adjustedSettings.divideRange.divisorMax);
+                        answer = getRandomInt(adjustedSettings.divideRange.quotientMin, adjustedSettings.divideRange.quotientMax);
+                        num1 = num2 * answer; // Ensure num1 is a multiple of num2
+                        displayOperator = '÷'; // Set for display
+                    } else {
+                        // Fallback to addition if division not applicable (e.g., 1st grade)
+                        console.warn('Division not applicable for current settings. Falling back to addition.');
+                        operator = '+'; // Change internal operator to '+'
+                        num1 = getRandomInt(adjustedSettings.addSubtractRange.min, adjustedSettings.addSubtractRange.max);
+                        num2 = getRandomInt(adjustedSettings.addSubtractRange.min, adjustedSettings.addSubtractRange.max);
+                        answer = num1 + num2;
+                        displayOperator = '+'; // Reset display operator for fallback
+                    }
+                    break;
+            }
+
+            currentProblem = { num1, num2, operator, answer };
+            console.log('Generated problem:', currentProblem);
+            console.log('Problem text to display:', `${num1} ${displayOperator} ${num2} = ?`);
+
+            // Update the problem display with the human-readable operator
+            if (problemDisplay.querySelector('span:first-child')) {
+                problemDisplay.querySelector('span:first-child').textContent = `${num1} ${displayOperator} ${num2} = ?`;
+            } else {
+                console.error('Could not find the first span in problemDisplay to update text.');
+            }
+            
+            answerInput.value = '';
+            answerInput.focus();
+            feedbackMessage.textContent = ''; // Clear text feedback
+            feedback.className = "feedback-area"; // Reset feedback class
+            startPerQuestionTimer();
+            console.log('--- Problem generation complete ---');
+        }
+
+        /**
+         * Ends the entire game session.
+         */
+        function endGame() {
+            console.log('--- Ending Game ---');
+            problemDisplay.querySelector('span:first-child').textContent = `Game Over! Your final score is: ${score} points!`;
+            feedbackMessage.textContent = `Game completed! You spent a total of ${overallGameElapsedTime} seconds over ${currentRound - 1} rounds. Click "Play Again" to restart!`;
+            feedback.className = "feedback-area";
+            deactivateFireEffect(); // Ensure fire is off at game end
+            
+            isGameRunning = false;
+            clearInterval(overallGameTimerInterval);
+            clearInterval(perQuestionTimerInterval);
+            perQuestionTimerDisplay.textContent = '';
+
+            answerInput.disabled = true;
+            submitBtn.disabled = true;
+
+            difficultySelect.disabled = false;
+            timeLimitToggle.disabled = false;
+            questionTimeInput.disabled = false;
+            startGameBtn.textContent = 'Play Again';
+            endGameBtn.style.display = 'none';
+
+            updateProgressDisplay();
+            console.log('Game ended. UI reset to initial state.');
+        }
+
+        /**
+         * Resets all game state variables and UI elements to their initial state.
+         * This function is used when starting a new game, ending a game, or going back to main.
+         */
+        function resetGameToInitialState() {
+            console.log('resetGameToInitialState called.');
+            isGameRunning = false;
+            score = 0;
+            overallGameElapsedTime = 0;
+            currentRound = 1;
+            questionsAnsweredInRound = 0;
+            correctAnswersInRound = 0;
+            consecutiveCorrectAnswers = 0; // Reset consecutive correct answers
+
+            clearInterval(overallGameTimerInterval);
+            clearInterval(perQuestionTimerInterval);
+            perQuestionTimerDisplay.textContent = '';
+            deactivateFireEffect(); // Ensure fire is off
+
+            scoreDisplay.textContent = `Score: ${score}`;
+            overallGameTimerDisplay.textContent = `Total Time: ${overallGameElapsedTime}s`;
+            feedbackMessage.textContent = ''; // Clear text feedback
+            feedback.className = "feedback-area"; // Reset feedback class
+
+            problemDisplay.querySelector('span:first-child').textContent = `Select difficulty and click "Start Game"!`;
+
+            answerInput.value = '';
+            answerInput.disabled = true;
+            submitBtn.disabled = true;
+
+            difficultySelect.disabled = false;
+            timeLimitToggle.disabled = false;
+            questionTimeInput.disabled = false;
+            
+            startGameBtn.textContent = 'Start Game';
+            startGameBtn.disabled = false;
+
+            endGameBtn.style.display = 'none';
+
+            updateProgressDisplay();
+            updateBackground(); // Call update background to set the theme when resetting
+            console.log('Game state reset complete.');
+        }
+
+        /**
+         * Starts a new round, resetting question count and correct answers for the round.
+         */
+        function startNewRound() {
+            console.log('startNewRound called.');
+            questionsAnsweredInRound = 0;
+            correctAnswersInRound = 0;
+            consecutiveCorrectAnswers = 0; // Reset consecutive answers for new round
+            deactivateFireEffect(); // Ensure fire is off at start of new round
+            updateProgressDisplay();
+            generateProblem(); // Generate the first question of the new round
+            answerInput.disabled = false;
+            submitBtn.disabled = false;
+        }
+
+        /**
+         * Determines whether to generate the next question or end the round.
+         */
+        function nextQuestionOrRound() {
+            if (questionsAnsweredInRound < questionsPerRound) {
+                generateProblem();
+            } else {
+                endRound();
+            }
+        }
+
+        /**
+         * Checks the user's answer against the correct answer.
+         */
+        function checkAnswer() {
+            if (!isGameRunning) return;
+
+            // Animate submit button click (Anime.js)
+            anime({
+                targets: submitBtn,
+                scale: [1, 0.9, 1], // Shrink slightly then return
+                duration: 200,
+                easing: 'easeInOutQuad'
+            });
+
+            clearInterval(perQuestionTimerInterval);
+
+            const userAnswer = parseInt(answerInput.value);
+
+            if (isNaN(userAnswer)) {
+                feedbackMessage.textContent = "Please enter a number!";
+                feedback.className = "feedback-area feedback-incorrect";
+                consecutiveCorrectAnswers = 0; // Reset consecutive answers on invalid input
+                deactivateFireEffect(); // Deactivate fire on invalid input
+                playWrongSound(); 
+                return;
+            }
+
+            questionsAnsweredInRound++;
+
+            if (userAnswer === currentProblem.answer) {
+                score += 10;
+                correctAnswersInRound++;
+                consecutiveCorrectAnswers++; // Increment consecutive correct answers
+                feedbackMessage.textContent = "Correct! ✅";
+                feedback.className = "feedback-area feedback-correct";
+                playCorrectSound(); 
+
+                // Animate score display (Anime.js)
+                anime({
+                    targets: scoreDisplay,
+                    scale: [1, 1.2, 1], // Grow and shrink
+                    color: ['#424242', '#28a745', '#424242'], // Flash green
+                    duration: 500,
+                    easing: 'easeInOutQuad'
+                });
+
+                if (consecutiveCorrectAnswers >= 5) {
+                    activateFireEffect(); // Activate fire effect
+                }
+            } else {
+                consecutiveCorrectAnswers = 0; // Reset consecutive correct answers on incorrect answer
+                deactivateFireEffect(); // Deactivate fire effect
+                feedbackMessage.textContent = `Incorrect. The answer was ${currentProblem.answer}. 🙁`; 
+                feedback.className = "feedback-area feedback-incorrect";
+                playWrongSound(); 
+            }
+            scoreDisplay.textContent = `Score: ${score}`;
+            updateProgressDisplay();
+            setTimeout(nextQuestionOrRound, 1000);
+        }
+
+        /**
+         * Ends the current round, checks pass/fail, and progresses the game.
+         */
+        function endRound() {
+            const percentageCorrect = (correctAnswersInRound / questionsPerRound) * 100;
+            clearInterval(perQuestionTimerInterval);
+            deactivateFireEffect(); // Ensure fire is off at round end
+
+            if (percentageCorrect >= passingPercentage) {
+                feedbackMessage.textContent = `Round ${currentRound} Passed! Great job with ${percentageCorrect.toFixed(0)}%!`;
+                feedback.className = "feedback-area feedback-round-pass";
+                
+                // --- Lottie Confetti Trigger ---
+                confettiContainer.classList.add('active'); // Show confetti container
+                // Ensure confettiAnimation is loaded before attempting to play
+                if (confettiAnimation) {
+                    confettiAnimation.goToAndPlay(0, true); // Play confetti from beginning
+                    console.log("Attempting to play confetti animation.");
+                } else {
+                    console.warn("Confetti animation object is not loaded or null. Cannot play.");
+                }
+                // Play clap and horn sounds along with confetti
+                playClapSound(); 
+                playHornSound();
+                // --- End Lottie Confetti Trigger ---
+
+                currentRound++;
+                if (currentRound > totalRounds) {
+                    setTimeout(endGame, 2000);
+                } else {
+                    setTimeout(startNewRound, 2000);
+                }
+            } else {
+                feedbackMessage.textContent = `Round ${currentRound} Failed. You got ${percentageCorrect.toFixed(0)}% correct. Try again!`;
+                feedback.className = "feedback-area feedback-round-fail";
+                setTimeout(startNewRound, 2000); // Retry current round
+            }
+        }
+
+        /**
+         * Starts or restarts the game.
+         */
+        function startGame() {
+            console.log('--- Starting Game ---');
+            resetGameToInitialState(); // Ensure a clean slate for new games or restarts
+            console.log('Game state reset.');
+
+            // Enable game controls
+            answerInput.disabled = false;
+            submitBtn.disabled = false;
+            // Disable settings during game
+            difficultySelect.disabled = true;
+            timeLimitToggle.disabled = true;
+            questionTimeInput.disabled = true;
+            // Update button text and display End Game button
+            startGameBtn.textContent = 'Restart Game';
+            endGameBtn.style.display = 'block';
+
+            isGameRunning = true;
+            console.log('Game running flag set to true.');
+
+            // Start overall game timer
+            overallGameTimerInterval = setInterval(() => {
+                overallGameElapsedTime++;
+                overallGameTimerDisplay.textContent = `Total Time: ${overallGameElapsedTime}s`;
+            }, 1000);
+            console.log('Overall game timer started.');
+
+            startNewRound(); // Begin the first round and question
+            console.log('Attempting to start new round.');
+        }
+
+        // --- Sound Functions ---
+        // Get references to the HTML audio elements
+        const correctSoundElement = document.getElementById('correctSoundElement');
+        const wrongSoundElement = document.getElementById('wrongSoundElement');
+        const clickSoundElement = document.getElementById('clickSoundElement');
+        const clapSoundElement = document.getElementById('clapSoundElement'); 
+        const hornSoundElement = document.getElementById('hornSoundElement'); 
+
+        /**
+         * Generic play sound function to handle multiple audio elements
+         * @param {HTMLAudioElement} audioElement - The audio element to play
+         * @param {string} soundName - A descriptive name for console logs
+         */
+        function playSound(audioElement, soundName) {
+            if (audioElement) {
+                audioElement.currentTime = 0; // Rewind to start
+                audioElement.play().catch(e => console.warn(`Error playing ${soundName} sound:`, e, "Browser might be blocking autoplay or format not supported."));
+            } else {
+                console.warn(`${soundName} sound element not found.`);
+            }
+        }
+
+        function playCorrectSound() {
+            playSound(correctSoundElement, 'correct');
+        }
+
+        function playWrongSound() {
+            playSound(wrongSoundElement, 'wrong');
+        }
+
+        function playClickSound() {
+            playSound(clickSoundElement, 'click');
+        }
+
+        function playClapSound() {
+            playSound(clapSoundElement, 'clap');
+        }
+
+        function playHornSound() {
+            playSound(hornSoundElement, 'horn');
+        }
+
+        // --- Event Listeners ---
+
+        // Handle difficulty selection change
+        difficultySelect.addEventListener('change', (event) => {
+            playClickSound(); // Play click sound on difficulty change
+            currentDifficulty = event.target.value;
+            updateBackground(); // Change background based on new difficulty
+            if (!isGameRunning) {
+                // Update problem display text only if game is not running
+                problemDisplay.querySelector('span:first-child').textContent = `Ready for ${currentDifficulty} grade math! Click "Start Game".`;
+            }
+        });
+
+        // Handle time limit toggle change
+        timeLimitToggle.addEventListener('change', (event) => {
+            playClickSound(); // Play click sound on time limit toggle change
+            isPerQuestionTimeLimitEnabled = (event.target.value === 'yes');
+            if (isPerQuestionTimeLimitEnabled) {
+                questionTimeSettings.classList.remove('hidden'); // Show time slider
+                selectedPerQuestionTime = parseInt(questionTimeInput.value); // Set initial time
+            } else {
+                questionTimeSettings.classList.add('hidden'); // Hide time slider
+                clearInterval(perQuestionTimerInterval); // Stop any running per-question timer
+                perQuestionTimerDisplay.textContent = ''; // Clear timer display
+            }
+        });
+
+        // Update display when time limit slider is adjusted
+        questionTimeInput.addEventListener('input', (event) => {
+            selectedPerQuestionTime = parseInt(event.target.value);
+            questionTimeValueDisplay.textContent = `${selectedPerQuestionTime} seconds`;
+        });
+
+        // Submit answer on button click
+        submitBtn.addEventListener('click', checkAnswer);
+
+        // Submit answer on Enter key press in input field
+        answerInput.addEventListener('keypress', (event) => {
+            if (event.key === 'Enter') {
+                checkAnswer();
+            }
+        });
+
+        // START GAME BUTTON EVENT LISTENER
+        startGameBtn.addEventListener('click', () => {
+            playClickSound(); // Play click sound on Start Game
+            startGame();
+        });
+
+        // END GAME BUTTON EVENT LISTENER
+        endGameBtn.addEventListener('click', () => {
+            playClickSound(); // Play click sound on End Game
+            feedbackMessage.textContent = "Game ended by user. Click 'Play Again' to restart.";
+            feedback.className = "feedback-area feedback-round-fail";
+            setTimeout(resetGameToInitialState, 2000);
+        });
+
+        // Handle window resize to adjust fire canvas
+        window.addEventListener('resize', () => {
+            if (isFireEffectActive) {
+                // Re-initialize fire canvas to adjust dimensions for realistic look
+                initFireCanvas();
+            }
+        });
+
+        // Initial setup on page load
+        window.onload = function() {
+            // Defer the initial canvas initialization slightly using requestAnimationFrame
+            // This helps ensure the DOM elements (like input-group) have their final
+            // calculated dimensions before we try to measure them for the canvas.
+            requestAnimationFrame(() => {
+                try {
+                    initFireCanvas(); // Initialize the fire canvas for the fire effect
+                } catch (e) {
+                    console.error("Error during initial fire canvas setup:", e);
+                }
+
+                // Initialize Lottie Confetti Animation
+                // IMPORTANT: 'Confetti.json' must be accessible in the same directory as this HTML file
+                // on your GitHub Pages server for the animation to load.
+                console.log("Attempting to load Lottie animation from 'Confetti.json'");
+                confettiAnimation = lottie.loadAnimation({
+                    container: confettiContainer, // the dom element that will contain the animation
+                    renderer: 'svg', // Use 'svg' for better scalability and transparency handling
+                    loop: false,     // Do not loop the confetti animation
+                    autoplay: false, // Do not autoplay, we will control it programmatically
+                    path: 'Confetti.json' // the path to your animation json file
+                });
+
+                // Add event listeners for Lottie animation loading status/errors
+                confettiAnimation.addEventListener('data_failed', (e) => {
+                    console.error("Lottie animation data failed to load! This often means 'Confetti.json' is not found or corrupted.");
+                    console.error("Check the Network tab in developer tools for a 404 error on Confetti.json.");
+                    console.error("Ensure 'Confetti.json' exists at the correct path and its name matches exactly (case-sensitive) on GitHub.");
+                });
+                confettiAnimation.addEventListener('error', (e) => {
+                    console.error("Lottie animation encountered an error:", e);
+                });
+                confettiAnimation.addEventListener('DOMLoaded', () => {
+                    console.log("Lottie animation DOM loaded successfully.");
+                });
+                confettiAnimation.addEventListener('loaded_ready', () => {
+                    console.log("Lottie animation loaded and ready.");
+                });
+
+                // Event listener for when the confetti animation completes
+                if (confettiAnimation) {
+                    confettiAnimation.addEventListener('complete', () => {
+                        console.log("Confetti animation completed.");
+                        confettiContainer.classList.remove('active'); // Hide confetti container
+                        confettiAnimation.stop(); // Stop the animation
+                    });
+                } else {
+                    console.warn("confettiAnimation object is still null after lottie.loadAnimation call. Confetti might not work.");
+                }
+
+                currentDifficulty = difficultySelect.value;
+                updateBackground();
+                problemDisplay.querySelector('span:first-child').textContent = `Ready for ${currentDifficulty} grade math! Click "Start Game".`;
+                
+                if (timeLimitToggle.value === 'yes') {
+                    questionTimeSettings.classList.remove('hidden');
+                } else {
+                    questionTimeSettings.classList.add('hidden');
+                }
+                questionTimeValueDisplay.textContent = `${selectedPerQuestionTime} seconds`;
+                updateProgressDisplay();
+                deactivateFireEffect(); // Ensure fire is off initially
+            });
+        };
+    </script>
+</body>
+</html>

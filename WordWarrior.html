@@ -1,0 +1,2400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Word Weaver</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f0f0; /* Light gray background */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            box-sizing: border-box;
+            overflow: auto; /* Allow scrolling for smaller screens */
+
+            /* Re-applied: Full-screen background image */
+            background-image: url('wordweaver.png');
+            background-size: cover; /* Back to 'cover' to fill the screen */
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed; /* Keeps background fixed on scroll, though body is 100vh */
+        }
+
+        /* Re-applied: Full-screen dark overlay for readability */
+        body::before {
+            content: '';
+            position: fixed; /* Fixed to viewport */
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.4); /* Dark overlay */
+            z-index: -1; /* Place behind other content */
+        }
+
+
+        .main-menu, .game-wrapper, .difficulty-menu {
+            /* Common styles for main containers */
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            max-width: 1200px;
+            width: 100%;
+            align-items: center;
+            justify-content: center;
+            min-height: 400px; /* Default min-height, adjusted for main-menu below */
+        }
+
+        /* Updated main-menu specific styling to be transparent and fill screen */
+        .main-menu {
+            background-color: transparent; /* Make background transparent to show body image */
+            box-shadow: none; /* Remove shadow */
+            min-height: 100%; /* Make it fill the height of its flex container (body) */
+            padding: 0; /* Remove padding as it's just a container for buttons */
+            position: relative; /* Ensure it creates a stacking context for its children */
+            z-index: 0; /* Ensure it's above the body::before overlay */
+        }
+
+        .main-menu h1, .difficulty-menu h1 {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #f49c20;
+            margin-bottom: 30px;
+            position: relative; /* Ensure title is above the overlay */
+            z-index: 2;
+             /* Enhanced 3D text shadow */
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.8), 
+                         -1px -1px 2px rgba(255,255,255,0.2);
+        }
+        /* For the main menu's h1, let's make it white for better contrast */
+        .main-menu h1 {
+            color: white;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.7), 
+                         -1px -1px 2px rgba(255,255,255,0.3); /* Lighter shadow for white text */
+        }
+
+
+        .menu-buttons-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            width: 80%;
+            max-width: 300px;
+            position: relative; /* Ensure buttons are above any potential internal overlays */
+            z-index: 2;
+        }
+
+        .menu-button {
+            background-color: #007bff;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 30px;
+            border: none;
+            cursor: pointer;
+            font-size: 1.2rem;
+            font-weight: bold;
+            transition: background-color 0.3s ease, transform 0.1s ease, box-shadow 0.3s ease;
+            /* Enhanced 3D box-shadow for buttons */
+            box-shadow: 0 6px 12px rgba(0, 123, 255, 0.4), 
+                        0 2px 4px rgba(0, 123, 255, 0.2);
+            text-align: center;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5); /* Text shadow for button text */
+        }
+
+        .menu-button:hover {
+            background-color: #0056b3;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 16px rgba(0, 123, 255, 0.5), 
+                        0 4px 8px rgba(0, 123, 255, 0.3);
+        }
+
+        .menu-button:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 4px rgba(0, 123, 255, 0.2);
+            background-color: #004085;
+        }
+
+        /* New layout for the main game screen */
+        .game-wrapper {
+            flex-direction: column; /* Stack elements vertically */
+        }
+
+        .game-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+            width: 100%; /* Occupy full width */
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3); /* General text shadow for header */
+        }
+
+        .player-score {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: #f49c20;
+        }
+
+        .player-score span {
+            font-size: 1.8rem;
+            color: #4CAF50; /* Green for scores */
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3); /* Text shadow for scores */
+        }
+
+        .board-container {
+            display: grid;
+            grid-template-columns: repeat(15, minmax(0, 1fr));
+            grid-template-rows: repeat(15, minmax(0, 1fr));
+            gap: 2px;
+            background-color: #ccc; /* Grid lines */
+            border-radius: 10px;
+            overflow: hidden;
+            width: clamp(300px, 80vw, 750px); /* Responsive board size */
+            height: clamp(300px, 80vw, 750px); /* Keep aspect ratio */
+            margin: 0 auto; /* Center the board */
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .board-cell {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #d1b899; /* Standard cell color */
+            font-size: 0.75rem;
+            font-weight: bold;
+            color: rgba(0, 0, 0, 0.4);
+            position: relative;
+            user-select: none; /* Prevent text selection */
+            border-radius: 3px;
+            text-align: center; /* Center bonus labels */
+        }
+
+        /* Bonus Cell Colors and Styles */
+        .double-letter { background-color: #a8d6e0; color: #007bb6; } /* Light blue */
+        .triple-letter { background-color: #a7d9ab; color: #28a745; } /* Light green */
+        .double-word { background-color: #e0a8a8; color: #dc3545; } /* Light red */
+        .triple-word { background-color: #d8a8e0; color: #6f42c1; } /* Light purple */
+        .quadruple-letter { background-color: #f7e2a5; color: #ffc107; } /* Light yellow */
+        .quadruple-word { background-color: #facd89; color: #fd7e14; } /* Orange */
+        .wild-card { background-color: #c9c9c9; color: #555; } /* Gray */
+        .start-cell { background-color: #ffd700; color: #daaa00; } /* Gold for start */
+
+        .tile {
+            width: 90%; /* Slightly smaller than cell to show cell background */
+            height: 90%;
+            background-color: #ffe0b2; /* Tile color */
+            border: 1px solid #e0b284;
+            border-radius: 5px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            /* Changed to relative positioning to allow for absolute positioning of score */
+            position: relative;
+            user-select: none;
+            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+            cursor: grab;
+            transition: transform 0.1s ease-out, box-shadow 0.1s ease-out;
+            /* Added depth to tiles */
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3), 0 1px 2px rgba(0,0,0,0.2);
+        }
+
+        .tile:hover {
+            transform: translateY(-2px);
+            box-shadow: 3px 3px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .tile.dragging {
+            opacity: 0.7;
+            cursor: grabbing;
+            transform: scale(1.05);
+            z-index: 1000; /* Bring to front while dragging */
+        }
+
+        .tile .tile-letter-display {
+            /* Styles for the main letter on the tile */
+            font-size: 1.8rem; /* Large font for the letter */
+            font-weight: bold;
+            color: #5d4037; /* Dark brown text */
+            line-height: 1; /* Adjust line height to prevent extra space */
+            margin-bottom: -0.2em; /* Pull letter up slightly to account for score */
+            text-shadow: 1px 1px 1px rgba(0,0,0,0.2); /* Text shadow for letter */
+        }
+
+        .tile-score {
+            /* Styles for the small score in the corner */
+            position: absolute;
+            bottom: 3px;
+            right: 5px;
+            font-size: 0.7em; /* Smaller font for score */
+            font-weight: bold;
+            color: #795548; /* Slightly lighter brown */
+            line-height: 1; /* Compact line height */
+            text-shadow: 0.5px 0.5px 1px rgba(0,0,0,0.2); /* Text shadow for score */
+        }
+
+        .rack {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            padding: 15px;
+            background-color: #f8f8f8;
+            border-radius: 10px;
+            box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.05);
+            min-height: 80px; /* Ensure rack has height even if empty */
+            align-items: center;
+            flex-wrap: wrap; /* Allow tiles to wrap on smaller screens */
+            width: 100%;
+            max-width: 750px; /* Match board max-width */
+        }
+
+        .rack .tile {
+            width: 55px; /* Fixed size for rack tiles */
+            height: 55px;
+            font-size: 1.5rem; /* This affects the .tile-letter-display indirectly due to em units */
+        }
+
+        .buttons-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+            width: 100%;
+            max-width: 750px; /* Match board max-width */
+        }
+
+        .game-button {
+            background-color: #007bff; /* Blue */
+            color: white;
+            padding: 12px 25px;
+            border-radius: 25px;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+            transition: background-color 0.3s ease, transform 0.1s ease, box-shadow 0.3s ease;
+            /* Enhanced 3D box-shadow for game buttons */
+            box-shadow: 0 5px 10px rgba(0, 123, 255, 0.5), 
+                        0 2px 4px rgba(0, 123, 255, 0.3);
+            text-align: center;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5); /* Text shadow for button text */
+        }
+
+        .game-button:hover {
+            background-color: #0056b3;
+            transform: translateY(-3px);
+            box-shadow: 0 7px 14px rgba(0, 123, 255, 0.6), 
+                        0 3px 6px rgba(0, 123, 255, 0.4);
+        }
+
+        .game-button:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 4px rgba(0, 123, 255, 0.2);
+            background-color: #004085;
+        }
+
+        .game-button.pass { 
+            background-color: #6c757d; 
+            box-shadow: 0 5px 10px rgba(108, 117, 125, 0.5), 
+                        0 2px 4px rgba(108, 117, 125, 0.3); 
+        }
+        .game-button.pass:hover { 
+            background-color: #5a6268; 
+            box-shadow: 0 7px 14px rgba(108, 117, 125, 0.6), 
+                        0 3px 6px rgba(108, 117, 125, 0.4); 
+        }
+
+        .game-button.shuffle { 
+            background-color: #ffc107; 
+            color: #333; 
+            box-shadow: 0 5px 10px rgba(255, 193, 7, 0.5), 
+                        0 2px 4px rgba(255, 193, 7, 0.3); 
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5); 
+        }
+        .game-button.shuffle:hover { 
+            background-color: #e0a800; 
+            box-shadow: 0 7px 14px rgba(255, 193, 7, 0.6), 
+                        0 3px 6px rgba(255, 193, 7, 0.4); 
+        }
+
+        .game-button.exchange { 
+            background-color: #17a2b8; 
+            box-shadow: 0 5px 10px rgba(23, 162, 184, 0.5), 
+                        0 2px 4px rgba(23, 162, 184, 0.3); 
+        }
+        .game-button.exchange:hover { 
+            background-color: #138496; 
+            box-shadow: 0 7px 14px rgba(23, 162, 184, 0.6), 
+                        0 3px 6px rgba(23, 162, 184, 0.4); 
+        }
+
+        .message-box {
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid #f5c6cb;
+            margin-top: 20px;
+            font-weight: bold;
+            text-align: center;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+            min-height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            max-width: 750px; /* Match board max-width */
+            text-shadow: 0.5px 0.5px 1px rgba(0,0,0,0.2); /* Text shadow for message box */
+        }
+
+        .message-box.show {
+            opacity: 1;
+        }
+
+        .current-player-indicator {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #333;
+            text-align: center;
+            margin-bottom: 10px;
+            width: fit-content; /* Make it fit its content */
+            padding: 8px 15px; /* Add padding */
+            border-radius: 10px; /* Rounded corners */
+            background-color: rgba(255, 255, 255, 0.7); /* Slightly transparent white background */
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2); /* Subtle shadow */
+            margin-left: auto; /* Center horizontally */
+            margin-right: auto; /* Center horizontally */
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3); /* Text shadow for player indicator */
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000; /* Ensure modal is on top */
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: auto;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            width: 80%;
+            max-width: 500px;
+            text-align: center;
+             /* Text shadow for modal content */
+            text-shadow: 0.5px 0.5px 1px rgba(0,0,0,0.2);
+        }
+
+        .close-button {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close-button:hover,
+        .close-button:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        /* Specific styling for exchange modal tiles */
+        .rack-tile-for-exchange {
+            cursor: pointer;
+            border: 1px solid #e0b284; /* Default border */
+        }
+
+        .rack-tile-for-exchange.selected-for-exchange {
+            border: 4px solid #007bff; /* Highlight selected tiles */
+            box-shadow: 0 0 10px rgba(0, 123, 255, 0.5);
+        }
+
+        /* Responsive adjustments for overall layout */
+        @media (min-width: 768px) {
+            .game-wrapper {
+                flex-direction: column; /* Maintain column for elements */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="main-menu" class="main-menu">
+        <h1></h1> <!-- Restored title -->
+        <div class="menu-buttons-container">
+            <button class="menu-button" id="one-player-btn">One Player (vs. AI)</button>
+            <button class="menu-button" id="two-player-btn">Two Players</button>
+        </div>
+    </div>
+
+    <div id="difficulty-menu" class="difficulty-menu hidden">
+        <h1>Choose AI Difficulty</h1>
+        <div class="menu-buttons-container">
+            <button class="menu-button" id="difficulty-easy-btn">Easy</button>
+            <button class="menu-button" id="difficulty-medium-btn">Medium</button>
+            <button class="menu-button" id="difficulty-hard-btn">Hard</button>
+            <button class="menu-button" id="difficulty-back-btn">Back to Main Menu</button>
+        </div>
+    </div>
+
+    <div id="game-wrapper" class="game-wrapper hidden">
+        <div class="game-header">
+            <div class="player-score">
+                Player 1 Score: <span id="player1-score">0</span>
+            </div>
+            <div class="player-score">
+                Player <span id="player2-label">2</span> Score: <span id="player2-score">0</span>
+            </div>
+        </div>
+
+        <div id="game-board" class="board-container">
+        </div>
+
+        <div class="current-player-indicator" id="current-player-display">Player 1's Turn</div>
+
+        <div class="rack" id="player-rack">
+        </div>
+
+        <div class="buttons-container">
+            <button class="game-button" id="submit-word-btn">Submit Word</button>
+            <button class="game-button pass" id="pass-turn-btn">Pass Turn</button>
+            <button class="game-button shuffle" id="shuffle-tiles-btn">Shuffle Rack</button>
+            <button class="game-button exchange" id="exchange-tiles-btn">Exchange Tiles</button>
+            <button class="game-button" id="new-game-btn">New Game</button>
+        </div>
+
+        <div class="message-box" id="message-box"></div>
+    </div>
+
+    <div id="game-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" id="close-modal-btn">&times;</span>
+            <p id="modal-message"></p>
+            <button class="game-button mt-4" id="modal-ok-btn">OK</button>
+        </div>
+    </div>
+
+    <div id="exchange-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" id="close-exchange-modal-btn">&times;</span>
+            <h2 class="text-2xl font-bold mb-4 text-gray-800">Select Tiles to Exchange</h2>
+            <p class="mb-4 text-gray-600">Click on tiles to select/deselect them. You must exchange at least one tile.</p>
+            <div id="exchange-tile-selection-container" class="flex flex-wrap justify-center gap-2 p-4 border rounded-lg bg-gray-50 mb-4">
+            </div>
+            <div class="flex justify-center gap-4">
+                <button class="game-button bg-green-500 hover:bg-green-600 focus:ring-green-500" id="confirm-exchange-btn" disabled>Confirm Exchange</button>
+                <button class="game-button pass" id="cancel-exchange-btn">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- NEW: Blank Tile Letter Selection Modal -->
+    <div id="blank-tile-modal" class="modal">
+        <div class="modal-content">
+            <h2 class="text-2xl font-bold mb-4 text-gray-800">Choose a letter for the blank tile</h2>
+            <p class="mb-4 text-gray-600">This blank tile will take on the properties of the letter you choose, but will always score 0 points.</p>
+            <div id="blank-tile-letter-selection" class="flex flex-wrap justify-center gap-2 p-4 border rounded-lg bg-gray-50 mb-4">
+                <!-- Letter buttons will be inserted here by JS -->
+            </div>
+            <button class="game-button pass" id="cancel-blank-tile-selection-btn">Cancel</button>
+        </div>
+    </div>
+
+    <!-- Audio elements for sounds -->
+    <audio id="tileClickSound" src="tileclick.mp3" preload="auto"></audio>
+    <audio id="gotWordSound" src="gotword.mp3" preload="auto"></audio>
+    <audio id="notWordSound" src="notword.mp3" preload="auto"></audio>
+    <audio id="fiftyPointsSound" src="50points.mp3" preload="auto"></audio>
+    <audio id="hundredPointsSound" src="100points.mp3" preload="auto"></audio>
+
+    <script>
+        // Game configuration
+        const BOARD_SIZE = 15;
+        const RACK_SIZE = 7;
+        const ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"; // For blank tile handling
+
+        // Tile values and distribution (letter: [count, points])
+        const TILE_DISTRIBUTION = {
+            'A': [9, 1], 'B': [2, 3], 'C': [2, 3], 'D': [4, 2], 'E': [12, 1],
+            'F': [2, 4], 'G': [3, 2], 'H': [2, 4], 'I': [9, 1], 'J': [1, 8],
+            'K': [1, 5], 'L': [4, 1], 'M': [2, 3], 'N': [6, 1], 'O': [8, 1],
+            'P': [2, 3], 'Q': [1, 10], 'R': [6, 1], 'S': [4, 1], 'T': [6, 1],
+            'U': [4, 1], 'V': [2, 4], 'W': [2, 4], 'X': [1, 8], 'Y': [2, 4],
+            'Z': [1, 10], '_': [2, 0] // Added blank tiles for realism
+        };
+
+        // Bonus square counts for random generation (per game)
+        const BONUS_COUNTS = {
+            'triple-word': 8,
+            'double-word': 16, // Includes the start cell's DW effect
+            'triple-letter': 12,
+            'double-letter': 24,
+            'quadruple-letter': 4, // Custom
+            'quadruple-word': 4,    // Custom
+            'wild-card': 4          // Custom
+        };
+
+        // This will be populated from an external file
+        let VALID_WORDS = new Set();
+
+        // Game State Variables
+        let tileBag = [];
+        // Board stores objects {letter, points, assignedLetter?} for permanent tiles
+        // and for temporarily placed tiles during the current turn.
+        let board = Array(BOARD_SIZE).fill(null).map(() => Array(BOARD_SIZE).fill(null));
+        // playerRacks store objects {letter, points, assignedLetterForTurn?}
+        let playerRacks = [[], []];
+        let playerScores = [0, 0];
+        let currentPlayer = 0; // 0 for Player 1, 1 for Player 2
+        let gameMode = 'two-player'; // 'one-player' or 'two-player'
+        let aiDifficulty = 'easy'; // 'easy', 'medium', 'hard'
+        let currentBonusSquares = {}; // Will be generated per game
+
+        let draggedTile = null; // The DOM element being dragged
+        let draggedTileData = null; // The actual tile object from playerRacks being dragged
+        let originalParent = null; // To put tile back if invalid move
+        // placedTiles stores { r, c, tileObj: {letter, points, assignedLetterForTurn?}, tileElement: DOM_ELEMENT }
+        let placedTiles = []; // Tiles placed in the current turn for validation
+
+        // DOM Elements
+        const mainMenu = document.getElementById('main-menu');
+        const difficultyMenu = document.getElementById('difficulty-menu');
+        const gameWrapper = document.getElementById('game-wrapper');
+        const onePlayerBtn = document.getElementById('one-player-btn');
+        const twoPlayerBtn = document.getElementById('two-player-btn');
+        const difficultyEasyBtn = document.getElementById('difficulty-easy-btn');
+        const difficultyMediumBtn = document.getElementById('difficulty-medium-btn');
+        const difficultyHardBtn = document.getElementById('difficulty-hard-btn');
+        const difficultyBackBtn = document.getElementById('difficulty-back-btn');
+        const gameBoardElement = document.getElementById('game-board');
+        const playerRackElement = document.getElementById('player-rack');
+        const player1ScoreElement = document.getElementById('player1-score');
+        const player2ScoreElement = document.getElementById('player2-score');
+        const player2Label = document.getElementById('player2-label');
+        const submitWordBtn = document.getElementById('submit-word-btn');
+        const passTurnBtn = document.getElementById('pass-turn-btn');
+        const shuffleTilesBtn = document.getElementById('shuffle-tiles-btn');
+        const exchangeTilesBtn = document.getElementById('exchange-tiles-btn');
+        const newGameBtn = document.getElementById('new-game-btn');
+        const messageBox = document.getElementById('message-box');
+        const currentPlayerDisplay = document.getElementById('current-player-display');
+
+        // Modal Elements
+        const gameModal = document.getElementById('game-modal');
+        const modalMessage = document.getElementById('modal-message');
+        const closeModalBtn = document.getElementById('close-modal-btn');
+        const modalOkBtn = document.getElementById('modal-ok-btn');
+
+        // Exchange Modal Elements
+        const exchangeModal = document.getElementById('exchange-modal');
+        const closeExchangeModalBtn = document.getElementById('close-exchange-modal-btn'); 
+        const exchangeTileSelectionContainer = document.getElementById('exchange-tile-selection-container');
+        const confirmExchangeBtn = document.getElementById('confirm-exchange-btn');
+        const cancelExchangeBtn = document.getElementById('cancel-exchange-btn');
+
+        let selectedTilesForExchange = []; // Stores the actual tile objects from player's rack
+
+        // Blank Tile Modal Elements
+        const blankTileModal = document.getElementById('blank-tile-modal');
+        const blankTileLetterSelectionContainer = document.getElementById('blank-tile-letter-selection');
+        const cancelBlankTileSelectionBtn = document.getElementById('cancel-blank-tile-selection-btn');
+        let currentBlankTileElement = null; // Stores the actual blank tile DOM element being processed
+
+        // Flag to ensure dictionary is loaded before starting a game
+        let isDictionaryLoaded = false;
+
+        // --- Audio Functions ---
+        const tileClickAudio = document.getElementById('tileClickSound');
+        const gotWordAudio = document.getElementById('gotWordSound');
+        const notWordAudio = document.getElementById('notWordSound');
+        const fiftyPointsAudio = document.getElementById('fiftyPointsSound'); // New audio element
+        const hundredPointsAudio = document.getElementById('hundredPointsSound'); // New audio element
+
+        /**
+         * Plays the tile click sound from the audio element.
+         */
+        function playMP3Sound() {
+            if (tileClickAudio) {
+                // Ensure the audio is loaded and can be played
+                tileClickAudio.load(); // Reload to ensure it's ready
+                tileClickAudio.currentTime = 0; // Rewind to the start
+                tileClickAudio.volume = 0.3; // Set volume to 30%
+                tileClickAudio.play().catch(e => console.warn("Error playing tile click sound:", e)); // Play and catch potential errors
+            }
+        }
+
+        /**
+         * Plays the sound for a valid word submission.
+         */
+        function playGotWordSound() {
+            if (gotWordAudio) {
+                gotWordAudio.load();
+                gotWordAudio.currentTime = 0;
+                gotWordAudio.volume = 0.5; // Adjust volume as needed
+                gotWordAudio.play().catch(e => console.warn("Error playing got word sound:", e));
+            }
+        }
+
+        /**
+         * Plays the sound for an invalid word submission.
+         */
+        function playNotWordSound() {
+            if (notWordAudio) {
+                notWordAudio.load();
+                notWordAudio.currentTime = 0;
+                notWordAudio.volume = 0.5; // Adjust volume as needed
+                notWordAudio.play().catch(e => console.warn("Error playing not word sound:", e));
+            }
+        }
+
+        /**
+         * Plays the sound for a 50+ point word submission.
+         */
+        function playFiftyPointsSound() {
+            if (fiftyPointsAudio) {
+                fiftyPointsAudio.load();
+                fiftyPointsAudio.currentTime = 0;
+                fiftyPointsAudio.volume = 0.5;
+                fiftyPointsAudio.play().catch(e => console.warn("Error playing 50 points sound:", e));
+            }
+        }
+
+        /**
+         * Plays the sound for a 100+ point word submission.
+         */
+        function playHundredPointsSound() {
+            if (hundredPointsAudio) {
+                hundredPointsAudio.load();
+                hundredPointsAudio.currentTime = 0;
+                hundredPointsAudio.volume = 0.5;
+                hundredPointsAudio.play().catch(e => console.warn("Error playing 100 points sound:", e));
+            }
+        }
+
+        // --- Utility Functions ---
+
+        /**
+         * Shuffles an array in place using the Fisher-Yates (Knuth) shuffle algorithm.
+         * @param {Array} array The array to shuffle.
+         */
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        /**
+         * Shows a message in the game's message box temporarily.
+         * @param {string} message The message to display.
+         * @param {string} type 'success', 'error', or 'info' (optional, defaults to error for now)
+         */
+        function showMessageBox(message, type = 'error') {
+            messageBox.textContent = message;
+            messageBox.className = `message-box show`; // Reset classes
+            if (type === 'success') {
+                messageBox.classList.add('bg-green-100', 'text-green-700', 'border-green-400');
+            } else if (type === 'info') {
+                messageBox.classList.add('bg-blue-100', 'text-blue-700', 'border-blue-400');
+            } else { // error
+                messageBox.classList.add('bg-red-100', 'text-red-700', 'border-red-400');
+            }
+
+            // Hide after 3 seconds
+            setTimeout(() => {
+                messageBox.classList.remove('show');
+            }, 3000);
+        }
+
+        /**
+         * Displays a message in a modal dialog.
+         * @param {string} message The message to display in the modal.
+         * @param {function} onOkCallback Function to call when OK is clicked (optional).
+         */
+        function showModal(message, onOkCallback = null) {
+            modalMessage.textContent = message;
+            gameModal.style.display = 'flex'; // Show the modal
+
+            modalOkBtn.onclick = () => {
+                gameModal.style.display = 'none'; // Hide the modal
+                if (onOkCallback) {
+                    onOkCallback();
+                }
+            };
+
+            closeModalBtn.onclick = () => {
+                gameModal.style.display = 'none'; // Hide the modal
+            };
+
+            // Close modal if clicked outside
+            gameModal.onclick = (event) => {
+                if (event.target === gameModal) {
+                    gameModal.style.display = 'none';
+                }
+            };
+        }
+
+        /**
+         * Helper for bonus labels.
+         * @param {string} bonusType The type of bonus.
+         * @returns {string} The text label for the bonus.
+         */
+        function getBonusLabel(bonusType) {
+            switch (bonusType) {
+                case 'double-letter': return 'DL';
+                case 'triple-letter': return 'TL';
+                case 'double-word': return 'DW';
+                case 'triple-word': return 'TW';
+                case 'quadruple-letter': return 'QL';
+                case 'quadruple-word': return 'QW';
+                case 'wild-card': return 'WC';
+                case 'start-cell': return '⭐';
+                default: return '';
+            }
+        }
+
+
+        // --- Dictionary Loading ---
+        async function loadDictionary() {
+            try {
+                // Adjust the path if your dictionary file is in a subfolder
+                const response = await fetch('scrabble_dictionary.txt');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const text = await response.text();
+                // Split by newline, filter out empty lines, and convert to uppercase
+                const words = text.split('\n').map(word => word.trim().toUpperCase()).filter(word => word.length > 0);
+                VALID_WORDS = new Set(words);
+                isDictionaryLoaded = true;
+                showMessageBox(`Dictionary loaded with ${VALID_WORDS.size} words!`, 'success');
+                // Enable game start buttons after dictionary loads
+                onePlayerBtn.disabled = false;
+                twoPlayerBtn.disabled = false;
+            } catch (error) {
+                console.error("Failed to load dictionary:", error);
+                showMessageBox("Error: Failed to load dictionary. Game cannot start. Check console for details.", 'error');
+                // Disable game start buttons if dictionary fails to load
+                onePlayerBtn.disabled = true;
+                twoPlayerBtn.disabled = true;
+            }
+        }
+
+
+        // --- Game Initialization ---
+
+        /**
+         * Creates the initial tile bag based on TILE_DISTRIBUTION.
+         */
+        function createTileBag() {
+            tileBag = [];
+            for (const letter in TILE_DISTRIBUTION) {
+                const [count, points] = TILE_DISTRIBUTION[letter];
+                for (let i = 0; i < count; i++) {
+                    tileBag.push({ letter: letter, points: points });
+                }
+            }
+            shuffleArray(tileBag); // Shuffle the bag
+        }
+
+        /**
+         * Draws tiles for a player's rack.
+         * @param {number} playerIdx Index of the player (0 or 1).
+         * @param {number} count Number of tiles to draw.
+         */
+        function drawTilesToRack(playerIdx, count) {
+            for (let i = 0; i < count && tileBag.length > 0; i++) {
+                const tile = tileBag.pop();
+                playerRacks[playerIdx].push(tile);
+            }
+            renderRack(playerIdx);
+        }
+
+        /**
+         * Generates a new set of random bonus squares for the board.
+         * The start cell (7,7) is always a 'start-cell' and acts as a double word score.
+         */
+        function generateRandomBonusSquares() {
+            currentBonusSquares = {};
+            const availableCells = [];
+            for (let r = 0; r < BOARD_SIZE; r++) {
+                for (let c = 0; c < BOARD_SIZE; c++) {
+                    if (!(r === 7 && c === 7)) { // Exclude center cell for random assignment
+                        availableCells.push(`${r},${c}`);
+                    }
+                }
+            }
+            shuffleArray(availableCells); // Randomize the order of available cells
+
+            // Assign the start cell
+            currentBonusSquares['7,7'] = 'start-cell';
+
+            // Assign other bonus squares based on counts
+            for (const bonusType in BONUS_COUNTS) {
+                let count = BONUS_COUNTS[bonusType];
+                if (bonusType === 'double-word') { // One DW is explicitly the start cell
+                    count -= 1;
+                }
+
+                for (let i = 0; i < count; i++) {
+                    if (availableCells.length > 0) {
+                        const cellCoords = availableCells.pop(); // Take a random available cell
+                        currentBonusSquares[cellCoords] = bonusType;
+                    } else {
+                        console.warn(`Not enough unique cells to place all ${bonusType} bonuses.`);
+                        break;
+                    }
+                }
+            }
+        }
+
+        /**
+         * Renders the game board cells with their bonus types.
+         */
+        function renderBoard() {
+            gameBoardElement.innerHTML = ''; // Clear existing board
+            for (let r = 0; r < BOARD_SIZE; r++) {
+                for (let c = 0; c < BOARD_SIZE; c++) {
+                    const cell = document.createElement('div');
+                    cell.classList.add('board-cell');
+                    cell.dataset.row = r;
+                    cell.dataset.col = c;
+                    cell.id = `cell-${r}-${c}`;
+
+                    const bonusType = currentBonusSquares[`${r},${c}`];
+                    if (bonusType) {
+                        cell.classList.add(bonusType);
+                        // Add text label for bonus squares
+                        cell.textContent = getBonusLabel(bonusType);
+                    }
+
+                    // If a tile is already on the board, render it
+                    if (board[r][c]) {
+                        const tileElement = createTileElement(board[r][c]); // Pass the tile object
+                        tileElement.dataset.permanent = 'true'; // Mark as permanent
+                        tileElement.draggable = false; // Permanent tiles cannot be dragged
+                        tileElement.removeEventListener('click', handleTileClick); // Remove click listener for permanent tiles
+                        cell.innerHTML = ''; // Clear bonus label if a tile is on top
+                        cell.appendChild(tileElement);
+                    }
+
+                    // Drag and Drop Event Listeners for cell
+                    cell.addEventListener('dragover', handleDragOver);
+                    cell.addEventListener('drop', handleDrop);
+                    gameBoardElement.appendChild(cell);
+                }
+            }
+        }
+
+        /**
+         * Creates a draggable HTML element for a tile.
+         * Also adds a click listener for temporarily placed tiles.
+         * @param {Object} tileObject The tile data ({ letter, points, assignedLetterForTurn? }).
+         * @returns {HTMLElement} The tile element.
+         */
+        function createTileElement(tileObject) {
+            const tile = document.createElement('div');
+            tile.classList.add('tile');
+            tile.draggable = true;
+
+            // Store original letter (A-Z or _) and points from the tile object
+            tile.dataset.originalLetter = tileObject.letter;
+            // Corrected: Access points directly from tileObject, not tileObject.dataset
+            tile.dataset.points = tileObject.points; 
+
+            let displayLetter = tileObject.letter;
+            if (tileObject.letter === '_') {
+                if (tileObject.assignedLetterForTurn) {
+                    displayLetter = tileObject.assignedLetterForTurn;
+                    tile.dataset.assignedLetter = tileObject.assignedLetterForTurn; // For DOM tracking of current display
+                } else {
+                    displayLetter = ''; // Initial display for unassigned blank
+                }
+            }
+            
+            // Create separate elements for letter and score to control their positioning
+            const letterDisplay = document.createElement('div');
+            letterDisplay.classList.add('tile-letter-display');
+            letterDisplay.textContent = displayLetter;
+
+            const scoreDisplay = document.createElement('div');
+            scoreDisplay.classList.add('tile-score');
+            scoreDisplay.textContent = tileObject.points;
+
+            tile.appendChild(letterDisplay);
+            tile.appendChild(scoreDisplay);
+
+            tile.addEventListener('dragstart', handleDragStart);
+            tile.addEventListener('dragend', handleDragEnd);
+            tile.addEventListener('click', handleTileClick);
+            return tile;
+        }
+
+        /**
+         * Renders the current player's rack.
+         * @param {number} playerIdx Index of the player (0 or 1).
+         */
+        function renderRack(playerIdx) {
+            playerRackElement.innerHTML = ''; // Clear current rack
+            playerRacks[playerIdx].forEach(tileObject => { // Pass the whole tile object
+                const tileElement = createTileElement(tileObject);
+                playerRackElement.appendChild(tileElement);
+            });
+            updateCurrentPlayerDisplay();
+        }
+
+        /**
+         * Updates the display for the current player's turn and scores.
+         */
+        function updateGameDisplay() {
+            player1ScoreElement.textContent = playerScores[0];
+            player2ScoreElement.textContent = playerScores[1];
+            if (gameMode === 'one-player') {
+                player2Label.textContent = 'AI';
+            } else {
+                player2Label.textContent = '2';
+            }
+            renderRack(currentPlayer); // Re-render the current player's rack
+        }
+
+        /**
+         * Updates the current player display text.
+         */
+        function updateCurrentPlayerDisplay() {
+            if (gameMode === 'one-player' && currentPlayer === 1) {
+                currentPlayerDisplay.textContent = `AI's Turn (${aiDifficulty.toUpperCase()})`;
+                currentPlayerDisplay.style.color = '#dc3545';
+            } else {
+                currentPlayerDisplay.textContent = `Player ${currentPlayer + 1}'s Turn`;
+                if (currentPlayer === 0) {
+                    currentPlayerDisplay.style.color = '#007bff'; // Blue for Player 1
+                } else {
+                    currentPlayerDisplay.style.color = '#dc3545'; // Red for Player 2
+                }
+            }
+        }
+
+        /**
+         * Initializes a new game, resetting state and UI.
+         */
+        function initializeGame() {
+            // Reset game state
+            tileBag = [];
+            board = Array(BOARD_SIZE).fill(null).map(() => Array(BOARD_SIZE).fill(null));
+            playerRacks = [[], []];
+            playerScores = [0, 0];
+            currentPlayer = 0;
+            placedTiles = [];
+
+            createTileBag();
+            generateRandomBonusSquares(); // Generate new bonus squares for this game
+            drawTilesToRack(0, RACK_SIZE); // Player 1 draws tiles
+            drawTilesToRack(1, RACK_SIZE); // Player 2 (or AI) draws tiles
+            renderBoard(); // Render empty board with new random bonus cells
+            updateGameDisplay();
+
+            // If AI's turn first (unlikely but possible if we change initial player)
+            if (gameMode === 'one-player' && currentPlayer === 1) {
+                setTimeout(makeAIMove, 1000); // Give a slight delay for AI's turn
+            }
+            showMessageBox('Game Started!', 'info');
+        }
+
+
+        // --- Drag and Drop Handlers ---
+
+        /**
+         * Handles the start of a drag operation for a tile.
+         * @param {Event} e The dragstart event.
+         */
+        function handleDragStart(e) {
+            const tileElement = e.target;
+            // Prevent dragging if it's not the current player's turn or it's AI's turn
+            if ((gameMode === 'one-player' && currentPlayer === 1) || (tileElement.dataset.permanent === 'true')) {
+                e.preventDefault();
+                return;
+            }
+
+            // Find the actual tile object in the current player's rack based on its DOM element
+            // This is crucial to modify the underlying game state
+            const originalRackIndex = Array.from(playerRackElement.children).indexOf(tileElement);
+
+            // If the tile is not in the rack, it must be a temporarily placed tile on the board
+            if (originalRackIndex === -1) {
+                if (tileElement.dataset.tempRow && tileElement.dataset.tempCol) {
+                    // Get the tile data from the board's temporary spot
+                    const r = parseInt(tileElement.dataset.tempRow);
+                    const c = parseInt(tileElement.dataset.tempCol);
+                    // Find the tile object from placedTiles, which contains the original object reference
+                    const foundPlacedTile = placedTiles.find(p => p.r === r && p.c === c && p.tileElement === tileElement);
+                    if (foundPlacedTile) {
+                        draggedTileData = foundPlacedTile.tileObj;
+                    } else {
+                        // This case can happen if the tile was dropped on a valid spot but then dragged away
+                        // before being "committed" or added to placedTiles.
+                        // Or if placedTiles was cleared unexpectedly.
+                        // For now, prevent drag if data can't be reliably found.
+                        console.error("Dragged tile on board not found in placedTiles array. Preventing drag.");
+                        e.preventDefault();
+                        return;
+                    }
+                } else {
+                    // This scenario should ideally not happen if logic is correct
+                    console.error("Dragged tile not found in current player's rack or not a valid temporary board tile. Preventing drag.");
+                    e.preventDefault();
+                    return;
+                }
+            } else {
+                draggedTileData = playerRacks[currentPlayer][originalRackIndex]; // Store reference to the actual tile object
+            }
+
+            // For blanks, we don't prevent default drag anymore. Letter selection happens on drop.
+            // Just ensure the tile is visually set up for drag.
+            draggedTile = tileElement;
+            originalParent = tileElement.parentNode;
+            const letterToTransfer = draggedTileData.assignedLetterForTurn || draggedTileData.letter;
+            e.dataTransfer.setData('text/plain', letterToTransfer);
+            tileElement.classList.add('dragging');
+            // Remove the tile from its original parent visually to avoid ghosting issues
+            setTimeout(() => { tileElement.style.opacity = '0'; }, 0);
+            playMP3Sound();
+        }
+
+        /**
+         * Handles the end of a drag operation for a tile.
+         * @param {Event} e The dragend event.
+         */
+        function handleDragEnd(e) {
+            // This function should primarily handle visual cleanup after the drag *visual* ends.
+            // State cleanup (draggedTile, draggedTileData, originalParent) will be handled
+            // by handleDrop or the blank tile modal callbacks to ensure correct asynchronous flow.
+            if (e.target) {
+                e.target.classList.remove('dragging');
+                e.target.style.opacity = '1'; // Make it visible again
+            }
+            // Do NOT nullify draggedTile, draggedTileData, originalParent here.
+            // That's handled in handleDrop or the blank tile modal callbacks.
+        }
+
+        /**
+         * Handles the dragover event, allowing a drop.
+         * @param {Event} e The dragover event.
+         */
+        function handleDragOver(e) {
+            e.preventDefault(); // Necessary to allow dropping
+        }
+
+        /**
+         * Handles the drop event on a board cell or rack.
+         * @param {Event} e The drop event.
+         */
+        function handleDrop(e) {
+            e.preventDefault();
+            const target = e.target.closest('.board-cell, .rack');
+
+            // This condition is crucial for cases where a drag operation might be aborted or
+            // dropped on an invalid area, ensuring `draggedTile` and `draggedTileData` are valid.
+            if (!draggedTile || !draggedTileData || !target) {
+                // If there's no dragged tile or data, or no valid target, revert the visual position.
+                if (draggedTile && originalParent) {
+                    originalParent.appendChild(draggedTile);
+                    // If it was a blank that was temporarily assigned for dragging, clear it on invalid drop.
+                    if (draggedTileData && draggedTileData.letter === '_') {
+                        draggedTileData.assignedLetterForTurn = null;
+                        draggedTile.querySelector('.tile-letter-display').textContent = '';
+                        delete draggedTile.dataset.assignedLetter;
+                    }
+                }
+                showMessageBox('Invalid drop target or operation.', 'error');
+                // Clear drag state on invalid drop to prevent issues with subsequent drags.
+                draggedTile = null;
+                draggedTileData = null;
+                originalParent = null;
+                return;
+            }
+
+            const currentRack = playerRackElement;
+
+            // Case 1: Dropping on a board cell
+            if (target.classList.contains('board-cell')) {
+                const row = parseInt(target.dataset.row);
+                const col = parseInt(target.dataset.col);
+
+                // Prevent dropping on occupied cells or permanent tiles
+                if (board[row][col] !== null) {
+                    showMessageBox('Cell already occupied!');
+                    originalParent.appendChild(draggedTile); // Revert to original place
+                    // Important: If it was a blank that had an assignedLetterForTurn, clear it
+                    if (draggedTileData && draggedTileData.letter === '_') {
+                        draggedTileData.assignedLetterForTurn = null;
+                        draggedTile.querySelector('.tile-letter-display').textContent = '';
+                        delete draggedTile.dataset.assignedLetter;
+                    }
+                    // Clear drag state on invalid drop
+                    draggedTile = null;
+                    draggedTileData = null;
+                    originalParent = null;
+                    return;
+                }
+
+                // Handle blank tile specific logic: Prompt for letter selection AFTER dropping on a board cell
+                if (draggedTileData.letter === '_') { // Check if it's a blank (original letter is '_')
+                    // Temporarily move the DOM element to the target cell first for visual continuity
+                    // But don't update the `board` array or `placedTiles` until letter is chosen
+                    target.innerHTML = '';
+                    target.appendChild(draggedTile);
+                    playMP3Sound(); // Play sound immediately on drop
+
+                    showLetterSelectionModal(draggedTile, (chosenLetter) => {
+                        // Success: Letter chosen, now update game state and make permanent
+                        draggedTileData.assignedLetterForTurn = chosenLetter; // Update the actual tile object
+                        draggedTile.querySelector('.tile-letter-display').textContent = chosenLetter; // Update DOM display
+                        draggedTile.dataset.assignedLetter = chosenLetter; // Store chosen letter in DOM dataset
+
+                        // Remove from player's rack array if it came from there
+                        if (originalParent === currentRack) {
+                            const indexInRack = playerRacks[currentPlayer].indexOf(draggedTileData);
+                            if (indexInRack > -1) {
+                                playerRacks[currentPlayer].splice(indexInRack, 1);
+                            }
+                        }
+                        // If moving from one board cell to another, clean up old spot
+                        else if (draggedTile.dataset.tempRow && draggedTile.dataset.tempCol) {
+                            const oldRow = parseInt(draggedTile.dataset.tempRow);
+                            const oldCol = parseInt(draggedTile.dataset.tempCol);
+                            board[oldRow][oldCol] = null;
+                            const oldCellElement = document.getElementById(`cell-${oldRow}-${oldCol}`);
+                            oldCellElement.innerHTML = '';
+                            const oldBonusType = currentBonusSquares[`${oldRow},${oldCol}`];
+                            if (oldBonusType) { oldCellElement.textContent = getBonusLabel(oldBonusType); }
+                            placedTiles = placedTiles.filter(p => p.tileElement !== draggedTile);
+                        }
+
+                        // Update board state with the now-assigned blank tile
+                        board[row][col] = {
+                            letter: draggedTileData.letter, // Original '_'
+                            points: draggedTileData.points, // Original 0
+                            assignedLetter: draggedTileData.assignedLetterForTurn // The chosen letter
+                        };
+                        draggedTile.dataset.tempRow = row;
+                        draggedTile.dataset.col = col;
+                        placedTiles.push({ r: row, c: col, tileObj: draggedTileData, tileElement: draggedTile });
+                        showMessageBox(`Blank tile assigned to '${chosenLetter}' and placed at (${row},${col})`, 'info');
+
+                        // Clear drag state after successful blank tile placement
+                        // This block executes after letter selection, so it's safe to clear.
+                        draggedTile = null;
+                        draggedTileData = null;
+                        originalParent = null;
+
+                    }, () => {
+                        // Cancel: User cancelled letter selection. Revert tile to original parent.
+                        if (originalParent) {
+                            originalParent.appendChild(draggedTile);
+                            draggedTileData.assignedLetterForTurn = null; // Clear assignment
+                            draggedTile.querySelector('.tile-letter-display').textContent = ''; // Clear visual
+                            delete draggedTile.dataset.assignedLetter;
+                            showMessageBox('Blank tile placement cancelled. Returned to rack.', 'info');
+                        } else {
+                             // This case should ideally not happen if originalParent is always set
+                             console.error("Original parent missing after blank tile cancel.");
+                             // Fallback: Just clear temp assignment and remove from wherever it was.
+                             draggedTileData.assignedLetterForTurn = null;
+                             draggedTile.remove(); // Remove from DOM
+                        }
+                        // Clear drag state after cancelled blank tile placement
+                        draggedTile = null;
+                        draggedTileData = null;
+                        originalParent = null;
+
+                        renderRack(currentPlayer); // Re-render rack to ensure consistent state
+                        renderBoard(); // Re-render board for visual consistency
+                    });
+                    return; // Exit handleDrop for blank tiles, as the async modal callback will continue the flow
+                }
+
+                // --- Original logic for non-blank tiles or already assigned blanks ---
+                // If dragging from rack
+                if (originalParent === currentRack) {
+                    const indexInRack = playerRacks[currentPlayer].indexOf(draggedTileData);
+                    if (indexInRack > -1) {
+                        playerRacks[currentPlayer].splice(indexInRack, 1);
+                    }
+                }
+                // If dragging from another spot on the board
+                else if (draggedTile.dataset.tempRow && draggedTile.dataset.tempCol) {
+                    const oldRow = parseInt(draggedTile.dataset.tempRow);
+                    const oldCol = parseInt(draggedTile.dataset.tempCol);
+                    board[oldRow][oldCol] = null;
+                    const cellElement = document.getElementById(`cell-${oldRow}-${oldCol}`);
+                    cellElement.innerHTML = '';
+                    const bonusType = currentBonusSquares[`${oldRow},${oldCol}`];
+                    if (bonusType) { cellElement.textContent = getBonusLabel(bonusType); }
+                    placedTiles = placedTiles.filter(p => p.tileElement !== draggedTile);
+                }
+
+                // Place tile on board's internal state
+                board[row][col] = {
+                    letter: draggedTileData.letter,
+                    points: draggedTileData.points,
+                    // Preserve assignedLetter if it was an already-assigned blank moving between board cells
+                    assignedLetter: draggedTileData.assignedLetter || draggedTileData.assignedLetterForTurn || null
+                };
+
+                draggedTile.dataset.tempRow = row;
+                draggedTile.dataset.col = col;
+                placedTiles.push({ r: row, c: col, tileObj: draggedTileData, tileElement: draggedTile });
+
+                // Update DOM
+                target.innerHTML = ''; // Clear any bonus label
+                target.appendChild(draggedTile);
+                playMP3Sound();
+                showMessageBox(`Tile ${draggedTileData.letter === '_' ? (draggedTileData.assignedLetterForTurn || 'blank') : draggedTileData.letter} placed at (${row},${col})`, 'info');
+
+                // Clear drag state after successful non-blank tile placement
+                draggedTile = null;
+                draggedTileData = null;
+                originalParent = null;
+
+            } else if (target === currentRack) { // Dropping on current player's rack
+                // If tile was previously on board (temporary placement)
+                if (draggedTile.dataset.tempRow && draggedTile.dataset.tempCol) {
+                    const oldRow = parseInt(draggedTile.dataset.tempRow);
+                    const oldCol = parseInt(draggedTile.dataset.tempCol);
+                    board[oldRow][oldCol] = null; // Remove from board's internal state
+                    const cellElement = document.getElementById(`cell-${oldRow}-${oldCol}`);
+                    cellElement.innerHTML = ''; // Clear the tile from the cell DOM
+                    const bonusType = currentBonusSquares[`${oldRow},${oldCol}`];
+                    if (bonusType) { cellElement.textContent = getBonusLabel(bonusType); } // Restore bonus label
+
+                    // Remove from placedTiles array
+                    placedTiles = placedTiles.filter(p => p.tileElement !== draggedTile);
+                }
+
+                // Revert the tile's assigned letter if it was a blank and add back to rack array
+                if (draggedTileData && draggedTileData.letter === '_') {
+                    draggedTileData.assignedLetterForTurn = null; // Clear temporary assignment
+                    draggedTile.querySelector('.tile-letter-display').textContent = '';
+                    delete draggedTile.dataset.assignedLetter; // Remove from DOM dataset
+                }
+                // Add the tile object back to the player's rack array (if it was removed)
+                if (!playerRacks[currentPlayer].includes(draggedTileData)) {
+                    playerRacks[currentPlayer].push(draggedTileData);
+                }
+
+                // Clean up DOM element datasets for temporary placement
+                delete draggedTile.dataset.tempRow;
+                delete draggedTile.dataset.tempCol;
+
+                renderRack(currentPlayer); // Re-render rack to update DOM based on `playerRacks` array
+                playMP3Sound();
+                showMessageBox('Tile moved back to rack.', 'info');
+
+                // Clear drag state after returning to rack
+                draggedTile = null;
+                draggedTileData = null;
+                originalParent = null;
+            } else {
+                // Revert to original parent if dropped on invalid target (not board, not own rack)
+                originalParent.appendChild(draggedTile);
+                // If it was a blank and assigned a letter, clear that assignment for this invalid drop
+                if (draggedTileData && draggedTileData.letter === '_') {
+                    draggedTileData.assignedLetterForTurn = null;
+                    draggedTile.querySelector('.tile-letter-display').textContent = '';
+                    delete draggedTile.dataset.assignedLetter;
+                }
+                showMessageBox('Invalid drop zone. Tile returned to its original place.', 'error');
+                // Clear drag state on invalid drop
+                draggedTile = null;
+                draggedTileData = null;
+                originalParent = null;
+            }
+        }
+
+        /**
+         * Handles a click event on a tile. If it's a temporary tile on the board,
+         * it moves the tile back to the current player's rack.
+         * @param {Event} e The click event.
+         */
+        function handleTileClick(e) {
+            const clickedTile = e.target.closest('.tile');
+            if (!clickedTile) return;
+
+            // Only allow returning tiles that are NOT permanent and are on the board
+            // This also ensures it's a tile that was placed this turn (not a permanent board tile)
+            if (clickedTile.dataset.permanent !== 'true' && clickedTile.dataset.tempRow && clickedTile.dataset.tempCol) {
+                // Ensure it's the human player's turn if in one-player mode
+                if (gameMode === 'one-player' && currentPlayer === 1) {
+                    showMessageBox("You can't move AI's tiles!", 'error');
+                    return;
+                }
+
+                const r = parseInt(clickedTile.dataset.tempRow);
+                const c = parseInt(clickedTile.dataset.tempCol);
+
+                // Retrieve the tile object directly from the board array at its recorded temporary position.
+                // This is more direct and less reliant on the `placedTiles` array for lookup during a click.
+                const tileObjToRevert = board[r][c];
+
+                if (!tileObjToRevert) {
+                    console.error(`Could not find tile object at board position (${r},${c}) for clicked DOM element.`);
+                    return;
+                }
+                
+                // Remove from board's internal state
+                board[r][c] = null;
+
+                // If it was a blank, clear its assigned letter
+                if (tileObjToRevert.letter === '_') {
+                    tileObjToRevert.assignedLetterForTurn = null; // Clear temporary assignment
+                    delete clickedTile.dataset.assignedLetter; // Remove from DOM dataset
+                    clickedTile.querySelector('.tile-letter-display').textContent = ''; // Revert visual to blank
+                }
+                playerRacks[currentPlayer].push(tileObjToRevert); // Add the tile object back to the rack
+
+                // Re-render the board cell to show bonus label if it had one
+                const cellElement = document.getElementById(`cell-${r}-${c}`);
+                cellElement.innerHTML = ''; // Clear the tile
+                const bonusType = currentBonusSquares[`${r},${c}`];
+                if (bonusType) { cellElement.textContent = getBonusLabel(bonusType); }
+
+                // Remove from placedTiles array after processing
+                placedTiles = placedTiles.filter(p => p.tileElement !== clickedTile);
+                delete clickedTile.dataset.tempRow;
+                delete clickedTile.dataset.tempCol;
+
+                renderRack(currentPlayer); // Re-render rack to show returned tile
+                playMP3Sound();
+                showMessageBox(`Tile ${tileObjToRevert.letter === '_' ? 'blank' : tileObjToRevert.letter} returned to rack.`, 'info');
+            }
+        }
+
+
+        // --- Game Logic ---
+
+        /**
+         * Validates the word(s) formed by the newly placed tiles.
+         * Checks if tiles are placed in a line, connected to existing words, and form valid words.
+         * @param {Array<Array<Object|null>>} currentBoard The board state to validate against.
+         * @param {Array<Object>} tilesToValidate An array of {letter (effective), points, r, c} for newly placed tiles.
+         * @returns {Object|null} An object containing the score and the words formed, or null if invalid.
+         */
+        function validateAndScoreWords(currentBoard, tilesToValidate) {
+            if (tilesToValidate.length === 0) {
+                return null; // No tiles placed
+            }
+
+            // Sort placed tiles for consistent processing (important for checking continuous lines)
+            tilesToValidate.sort((a, b) => {
+                const rowA = a.r;
+                const colA = a.c;
+                const rowB = b.r;
+                const colB = b.c;
+                if (rowA !== rowB) return rowA - rowB;
+                return colA - colB;
+            });
+
+            let firstTileRow = tilesToValidate[0].r;
+            let firstTileCol = tilesToValidate[0].c;
+
+            // Determine if placement is horizontal or vertical
+            let isHorizontal = true;
+            let isVertical = true;
+            if (tilesToValidate.length > 1) { // Only check direction if more than one tile is placed
+                for (let i = 1; i < tilesToValidate.length; i++) {
+                    const row1 = tilesToValidate[i-1].r;
+                    const col1 = tilesToValidate[i-1].c;
+                    const row2 = tilesToValidate[i].r;
+                    const col2 = tilesToValidate[i].c; 
+
+                    if (row1 !== row2) isHorizontal = false;
+                    if (col1 !== col2) isVertical = false;
+                }
+            } else { // Single tile placed, can be considered both horizontal and vertical
+                isHorizontal = true;
+                isVertical = true;
+            }
+
+            if (!isHorizontal && !isVertical) {
+                return null;
+            }
+            if (isHorizontal && isVertical && tilesToValidate.length > 1) { // Can't be both horizontal and vertical if more than one tile
+                return null;
+            }
+
+            // Check for continuity within the placed tiles if multiple are laid
+            if (tilesToValidate.length > 1) {
+                if (isHorizontal) {
+                    const row = tilesToValidate[0].r;
+                    const startCol = tilesToValidate[0].c;
+                    const endCol = tilesToValidate[tilesToValidate.length - 1].c;
+                    for (let c = startCol; c <= endCol; c++) {
+                        // Check if the cell is occupied by a new tile OR an existing board tile
+                        const isOccupied = tilesToValidate.some(t => t.r === row && t.c === c) || currentBoard[row][c] !== null;
+                        if (!isOccupied) {
+                            return null; // Gap found in the word
+                        }
+                    }
+                } else { // Vertical
+                    const col = tilesToValidate[0].c;
+                    const startRow = tilesToValidate[0].r;
+                    const endRow = tilesToValidate[tilesToValidate.length - 1].r;
+                    for (let r = startRow; r <= endRow; r++) {
+                             // Check if the cell is occupied by a new tile OR an existing board tile
+                        const isOccupied = tilesToValidate.some(t => t.r === r && t.c === col) || currentBoard[r][col] !== null;
+                        if (!isOccupied) {
+                            return null; // Gap found in the word
+                        }
+                    }
+                }
+            }
+
+            // Check if any new tile connects to an existing tile on the board,
+            // unless it's the very first move (needs to go through start-cell).
+            let connectedToExisting = false;
+            let isFirstMove = true;
+            for(let r=0; r<BOARD_SIZE; r++) {
+                for(let c=0; c<BOARD_SIZE; c++) {
+                    // Check for any tile on the board that is NOT one of the newly placed tiles
+                    if(currentBoard[r][c] !== null && !tilesToValidate.some(t => t.r === r && t.c === c)) {
+                        isFirstMove = false;
+                        break;
+                    }
+                }
+                if (!isFirstMove) break;
+            }
+
+            if (isFirstMove) {
+                const coversStartCell = tilesToValidate.some(tile => tile.r === 7 && tile.c === 7);
+                if (!coversStartCell) {
+                    return null; // First move must cover the start cell
+                }
+            } else {
+                for (const pTile of tilesToValidate) {
+                    const r = pTile.r;
+                    const c = pTile.c;
+                    const neighbors = [[r-1, c], [r+1, c], [r, c-1], [r, c+1]];
+                    for (const [nr, nc] of neighbors) {
+                        if (nr >= 0 && nr < BOARD_SIZE && nc >= 0 && nc < BOARD_SIZE) {
+                            const isNeighborNewlyPlaced = tilesToValidate.some(t => t.r === nr && t.c === nc);
+                            if (currentBoard[nr][nc] !== null && !isNeighborNewlyPlaced) {
+                                connectedToExisting = true;
+                                break;
+                            }
+                        }
+                    }
+                    if (connectedToExisting) break;
+                }
+                if (!connectedToExisting) {
+                    return null; // New word must connect to existing tiles (unless first move)
+                }
+            }
+
+            let totalScore = 0;
+            const formedWords = new Set(); // Store unique words formed
+
+            // Function to get the full word (horizontal or vertical)
+            const getFullWord = (r, c, direction, boardState) => {
+                let word = '';
+                let wordTiles = [];
+                let startR = r, startC = c;
+
+                // Find the start of the word
+                if (direction === 'horizontal') {
+                    while (startC > 0 && boardState[r][startC - 1]) {
+                        startC--;
+                    }
+                } else { // vertical
+                    while (startR > 0 && boardState[startR - 1][c]) {
+                        startR--;
+                    }
+                }
+
+                // Build the word
+                let currentR = startR, currentC = startC;
+                while (currentR < BOARD_SIZE && currentC < BOARD_SIZE && boardState[currentR][currentC]) {
+                    // Use the assigned letter if it exists, otherwise the original letter
+                    const effectiveLetter = boardState[currentR][currentC].assignedLetter || boardState[currentR][currentC].letter;
+                    word += effectiveLetter;
+                    wordTiles.push({ r: currentR, c: currentC });
+                    if (direction === 'horizontal') currentC++;
+                    else currentR++;
+                }
+                return { word, wordTiles };
+            };
+
+            let wordsToScore = [];
+
+            // Determine the primary word(s) formed by the new tiles
+            const isSingleTile = tilesToValidate.length === 1;
+            const primaryTile = tilesToValidate[0];
+
+            if (isHorizontal) {
+                const { word, wordTiles } = getFullWord(primaryTile.r, primaryTile.c, 'horizontal', currentBoard);
+                // A single tile forms a valid word horizontally only if it connects to form a word of length > 1
+                if (wordTiles.length > (isSingleTile ? 1 : 0)) {
+                    wordsToScore.push({ word, tiles: wordTiles, direction: 'horizontal' });
+                }
+            }
+            if (isVertical) {
+                const { word, wordTiles } = getFullWord(primaryTile.r, primaryTile.c, 'vertical', currentBoard);
+                // Add vertical word if it's not the same word as the horizontal one (for single tile case)
+                if (wordTiles.length > (isSingleTile ? 1 : 0) && !(isSingleTile && isHorizontal && wordsToScore[0] && wordsToScore[0].word.toUpperCase() === word.toUpperCase())) {
+                    wordsToScore.push({ word, tiles: wordTiles, direction: 'vertical' });
+                }
+            }
+
+            if (wordsToScore.length === 0) {
+                     return null; // No valid words formed from initial placement, even if single tile.
+            }
+
+            // Process all words formed (primary and perpendicular)
+            for (const { word: currentWord, tiles: currentWordTiles } of wordsToScore) {
+                if (!VALID_WORDS.has(currentWord.toUpperCase())) {
+                    return null; // Invalid word found
+                }
+                formedWords.add(currentWord);
+
+                let wordScore = 0;
+                let wordMultiplier = 1;
+
+                for (const { r, c } of currentWordTiles) {
+                    const bonusType = currentBonusSquares[`${r},${c}`];
+                    // tileInBoard is the actual object from currentBoard (simulated or real)
+                    const tileInBoard = currentBoard[r][c];
+                    let tilePoints = tileInBoard.points; // Always 0 for blank tiles, correct
+
+                    // Check if this specific tile on the board was *newly placed* in this turn
+                    // (i.e., it's one of the tiles in `tilesToValidate` that caused this word to form)
+                    const isNewlyPlacedInThisMove = tilesToValidate.some(t => t.r === r && t.c === c);
+
+                    let letterMultiplier = 1;
+                    if (isNewlyPlacedInThisMove) { // Apply letter/word bonuses only if it's a newly placed tile
+                        if (bonusType === 'double-letter') letterMultiplier = 2;
+                        if (bonusType === 'triple-letter') letterMultiplier = 3;
+                        if (bonusType === 'quadruple-letter') letterMultiplier = 4;
+                        if (bonusType === 'double-word' || bonusType === 'start-cell') wordMultiplier *= 2;
+                        if (bonusType === 'triple-word') wordMultiplier *= 3;
+                        if (bonusType === 'quadruple-word') wordMultiplier *= 4;
+                    }
+
+                    // Blank tiles (original letter is '_') always score 0 points, regardless of what letter they represent.
+                    if (tileInBoard.letter === '_') {
+                        tilePoints = 0;
+                    }
+
+                    wordScore += tilePoints * letterMultiplier;
+                }
+                wordScore *= wordMultiplier;
+                totalScore += wordScore;
+            }
+
+            // Check for any new perpendicular words formed by the newly placed tiles
+            // This is already done implicitly by checking all primary words and any words created perpendicular to them.
+            // The previous logic for perpendicular words was redundant as getFullWord already captures all.
+
+            // Scrabble bonus: 50 points if all 7 tiles are used
+            if (tilesToValidate.length === RACK_SIZE) { // Check if all 7 rack tiles were used in this move
+                totalScore += 50;
+            }
+
+            return { score: totalScore, words: Array.from(formedWords) };
+        }
+
+        /**
+         * Submits the placed word(s), calculates score, updates state, and ends turn.
+         */
+        function submitWord() {
+            // Ensure dictionary is loaded before allowing submission
+            if (!isDictionaryLoaded) {
+                showMessageBox('Dictionary is still loading. Please wait...', 'info');
+                return;
+            }
+            if (placedTiles.length === 0) {
+                showMessageBox('No tiles placed yet!', 'error');
+                return;
+            }
+
+            // Create a temporary board for validation that includes currently placed tiles
+            const tempBoard = JSON.parse(JSON.stringify(board)); // Deep copy of the actual board state
+            const tempPlacedTilesData = []; // Store simplified data for validation
+
+            placedTiles.forEach(pTile => {
+                const { r, c, tileObj } = pTile; // Get tile object from our placedTiles structure
+                // The letter used for word formation is the assigned letter if blank, else original letter
+                const effectiveLetter = tileObj.assignedLetterForTurn || tileObj.letter;
+
+                // Populate tempBoard with the tile data as it would be if placed permanently
+                tempBoard[r][c] = {
+                    letter: tileObj.letter, // Original letter ('_' for blanks)
+                    points: tileObj.points,
+                    assignedLetter: tileObj.assignedLetterForTurn || null // The chosen letter for a blank
+                };
+
+                // This array for validateAndScoreWords just needs effective letter and points
+                tempPlacedTilesData.push({ r, c, letter: effectiveLetter, points: tileObj.points });
+            });
+
+            const result = validateAndScoreWords(tempBoard, tempPlacedTilesData);
+
+            if (result) {
+                playerScores[currentPlayer] += result.score;
+                showMessageBox(`Player ${currentPlayer + 1} scored ${result.score} points! Words: ${result.words.join(', ')}`, 'success');
+                
+                // Play sounds based on score
+                if (result.score >= 100) {
+                    playHundredPointsSound();
+                } else if (result.score >= 50) {
+                    playFiftyPointsSound();
+                } else {
+                    playGotWordSound(); 
+                }
+
+                // Make placed tiles permanent on the actual board and DOM
+                placedTiles.forEach(pTile => {
+                    const { r, c, tileObj, tileElement } = pTile;
+
+                    // Update the actual board state permanently
+                    board[r][c] = {
+                        letter: tileObj.letter, // Original blank character or normal letter
+                        points: tileObj.points,
+                        assignedLetter: tileObj.assignedLetterForTurn || null // Permanent assigned letter
+                    };
+
+                    // Clear the temporary assignment from the tile object in the rack array for next turn/exchange
+                    if (tileObj.letter === '_') {
+                        tileObj.assignedLetterForTurn = null;
+                    }
+
+                    // Update the DOM element state
+                    tileElement.dataset.permanent = 'true';
+                    tileElement.draggable = false;
+                    tileElement.removeEventListener('click', handleTileClick);
+
+                    // Visually update the cell to show no bonus label underneath permanent tile
+                    const cellElement = document.getElementById(`cell-${r}-${c}`);
+                    if (cellElement) {
+                        cellElement.textContent = ''; // Clear label
+                        cellElement.appendChild(tileElement); // Re-append the tile to keep it in the DOM
+                    }
+                });
+                placedTiles = []; // Clear for next turn
+
+                // Draw new tiles for the current player
+                drawTilesToRack(currentPlayer, RACK_SIZE - playerRacks[currentPlayer].length);
+
+                // End turn
+                endTurn();
+            } else {
+                // If validation fails, revert tiles to rack
+                revertPlacedTiles();
+                showMessageBox("Invalid word placement or word. Check rules and try again!", 'error');
+                playNotWordSound(); // Play sound for invalid word
+            }
+        }
+
+        /**
+         * Reverts all temporarily placed tiles back to the current player's rack.
+         */
+        function revertPlacedTiles() {
+            placedTiles.forEach(pTile => {
+                const { r, c, tileObj, tileElement } = pTile;
+
+                // Revert the tile's assigned letter if it was a blank and add back to rack array
+                if (tileObj.letter === '_') {
+                    tileObj.assignedLetterForTurn = null; // Clear temporary assignment
+                    delete tileElement.dataset.assignedLetter; // Remove from DOM dataset
+                    tileElement.querySelector('.tile-letter-display').textContent = ''; // Revert visual to blank
+                }
+                playerRacks[currentPlayer].push(tileObj); // Add the tile object back to the rack
+
+                board[r][c] = null; // Remove from board's internal state
+
+                // Re-render the board cell to show bonus label if it had one
+                const cellElement = document.getElementById(`cell-${r}-${c}`);
+                cellElement.innerHTML = ''; // Clear the tile
+                const bonusType = currentBonusSquares[`${r},${c}`];
+                if (bonusType) { cellElement.textContent = getBonusLabel(bonusType); }
+
+                delete tileElement.dataset.tempRow;
+                delete tileElement.dataset.tempCol;
+
+                renderRack(currentPlayer); // Re-render rack to show returned tiles
+                showMessageBox('Tiles reverted to rack.', 'info');
+            });
+            placedTiles = []; // Clear placed tiles
+        }
+
+        /**
+         * Ends the current player's turn and switches to the next player.
+         */
+        function endTurn() {
+            currentPlayer = (currentPlayer + 1) % 2;
+            updateGameDisplay();
+
+            // Check for game end condition (e.g., tile bag empty and a player's rack is empty)
+            if (tileBag.length === 0 && playerRacks[currentPlayer].length === 0) {
+                let winnerMessage;
+                if (playerScores[0] > playerScores[1]) {
+                    winnerMessage = "Player 1 wins!";
+                } else if (playerScores[1] > playerScores[0]) {
+                    winnerMessage = `${gameMode === 'one-player' ? 'AI' : 'Player 2'} wins!`;
+                } else {
+                    winnerMessage = "It's a tie!";
+                }
+
+                showModal(`Game Over! Player 1: ${playerScores[0]} points, Player ${player2Label.textContent}: ${player2ScoreElement.textContent} points. ${winnerMessage}`, () => {
+                    // After game over, return to main menu
+                    gameWrapper.classList.add('hidden');
+                    mainMenu.classList.remove('hidden');
+                });
+            } else if (placedTiles.length > 0) {
+                // If turn ended with tiles on board (e.g., by pass button), revert tiles.
+                // This case is typically handled by the passTurnBtn's explicit revertPlacedTiles call
+                // but as a safeguard, if any tiles somehow remain, they should be cleared.
+                revertPlacedTiles();
+            }
+
+            // If it's AI's turn in one-player mode
+            if (gameMode === 'one-player' && currentPlayer === 1) {
+                setTimeout(makeAIMove, 1500); // AI takes its turn after a short delay
+            }
+        }
+
+        /**
+         * Shuffles the current player's rack.
+         */
+        function shuffleRack() {
+            if (gameMode === 'one-player' && currentPlayer === 1) {
+                showMessageBox("AI can't shuffle its rack. It plays automatically.", 'info');
+                return;
+            }
+            if (!isDictionaryLoaded) { showMessageBox('Dictionary still loading. Please wait.', 'info'); return; }
+            shuffleArray(playerRacks[currentPlayer]);
+            renderRack(currentPlayer);
+            showMessageBox('Rack shuffled!', 'info');
+        }
+
+        /**
+         * Shows the modal for selecting tiles to exchange.
+         */
+        function showExchangeModal() {
+            // First, revert any tiles currently on the board, as exchange happens from the rack
+            if (placedTiles.length > 0) {
+                revertPlacedTiles();
+            }
+
+            selectedTilesForExchange = []; // Reset selected tiles
+            confirmExchangeBtn.disabled = true; // Disable confirm until at least one tile is selected
+            exchangeTileSelectionContainer.innerHTML = ''; // Clear previous tiles
+
+            if (playerRacks[currentPlayer].length === 0) {
+                showMessageBox("Your rack is empty, no tiles to exchange!", 'error');
+                return;
+            }
+            if (tileBag.length === 0) {
+                showMessageBox('No tiles left in the bag to exchange!', 'error');
+                return;
+            }
+
+
+            // Render tiles from current player's rack into the modal
+            playerRacks[currentPlayer].forEach((tile, index) => {
+                const tileElement = createTileElement(tile); // Use the general createTileElement
+                tileElement.classList.add('rack-tile-for-exchange'); // Add a class for specific styling/selection
+                tileElement.dataset.originalIndex = index; // Store original index in rack for later retrieval
+
+                // Remove draggable and drag event listeners as they are not needed in the modal
+                tileElement.draggable = false;
+                tileElement.removeEventListener('dragstart', handleDragStart);
+                tileElement.removeEventListener('dragend', handleDragEnd);
+                tileElement.removeEventListener('click', handleTileClick); // Remove regular click handler
+
+                tileElement.addEventListener('click', (e) => {
+                    const clickedTileInModal = e.currentTarget;
+                    const originalIndex = parseInt(clickedTileInModal.dataset.originalIndex);
+                    // Find the actual tile object in the player's rack based on its original index
+                    const tileData = playerRacks[currentPlayer][originalIndex];
+
+                    // Check if the tile is already selected (by comparing object reference or contents)
+                    const isSelected = selectedTilesForExchange.includes(tileData);
+
+                    if (isSelected) {
+                        // Deselect: remove from selectedTilesForExchange
+                        selectedTilesForExchange = selectedTilesForExchange.filter(t => t !== tileData);
+                        clickedTileInModal.classList.remove('selected-for-exchange'); // Remove visual highlight
+                    } else {
+                        // Select: add to selectedTilesForExchange
+                        selectedTilesForExchange.push(tileData);
+                        clickedTileInModal.classList.add('selected-for-exchange'); // Add visual highlight
+                    }
+
+                    // Update button state and message based on selection and tile bag availability
+                    const canConfirm = selectedTilesForExchange.length > 0 && tileBag.length >= selectedTilesForExchange.length;
+                    confirmExchangeBtn.disabled = !canConfirm;
+
+                    if (selectedTilesForExchange.length > tileBag.length) {
+                        showMessageBox(`Not enough tiles in the bag (${tileBag.length}) to exchange ${selectedTilesForExchange.length} tiles. Select fewer.`, 'error');
+                    } else if (selectedTilesForExchange.length > 0) {
+                        messageBox.classList.remove('show'); // Clear message if valid selection made
+                    } else {
+                        showMessageBox('Please select at least one tile to exchange.', 'info');
+                    }
+                });
+                exchangeTileSelectionContainer.appendChild(tileElement);
+            });
+
+            exchangeModal.style.display = 'flex';
+        }
+
+        /**
+         * Confirms the tile exchange, processes the selected tiles, and ends the turn.
+         */
+        function confirmExchange() {
+            if (selectedTilesForExchange.length === 0) {
+                showMessageBox('Please select at least one tile to exchange.', 'error');
+                return;
+            }
+            if (tileBag.length < selectedTilesForExchange.length) {
+                showMessageBox(`Cannot exchange ${selectedTilesForExchange.length} tiles. Only ${tileBag.length} tiles left in the bag.`, 'error');
+                return;
+            }
+
+            // Remove selected tiles from player's rack and add to tile bag
+            const tilesToReturnToBag = [];
+            // Remove tiles from playerRacks that are in selectedTilesForExchange
+            playerRacks[currentPlayer] = playerRacks[currentPlayer].filter(tile => {
+                const isSelected = selectedTilesForExchange.includes(tile);
+                if (isSelected) {
+                    tilesToReturnToBag.push(tile);
+                    if (tile.letter === '_') { // If it was a blank, clear its temporary assignment
+                        tile.assignedLetterForTurn = null;
+                    }
+                }
+                return !isSelected;
+            });
+
+            tilesToReturnToBag.forEach(tile => tileBag.push(tile));
+            shuffleArray(tileBag); // Shuffle the bag after adding tiles back
+
+            // Draw new tiles to replace the exchanged ones
+            drawTilesToRack(currentPlayer, selectedTilesForExchange.length);
+
+            showMessageBox(`Exchanged ${selectedTilesForExchange.length} tiles. Turn passed.`, 'info');
+            exchangeModal.style.display = 'none';
+            endTurn(); // Exchange costs a turn
+        }
+
+        /**
+         * Cancels the tile exchange and hides the modal.
+         */
+        function cancelExchange() {
+            exchangeModal.style.display = 'none';
+            showMessageBox('Tile exchange cancelled.', 'info');
+            // Re-render the rack to ensure all visual highlights from the modal are removed
+            renderRack(currentPlayer);
+        }
+
+        /**
+         * Shows a modal for selecting a letter for a blank tile.
+         * @param {HTMLElement} blankTileDomElement The DOM element of the blank tile.
+         * @param {function} onLetterSelected Callback with the chosen letter.
+         * @param {function} onCancel Callback if user cancels.
+         */
+        function showLetterSelectionModal(blankTileDomElement, onLetterSelected, onCancel) {
+            currentBlankTileElement = blankTileDomElement;
+            blankTileLetterSelectionContainer.innerHTML = ''; // Clear previous buttons
+
+            ALPHABET.split('').forEach(char => {
+                const letterButton = document.createElement('button');
+                letterButton.classList.add('menu-button', 'w-12', 'h-12', 'flex', 'items-center', 'justify-center', 'text-xl', 'm-1'); // Adjusted for small buttons
+                letterButton.textContent = char;
+                letterButton.addEventListener('click', () => {
+                    onLetterSelected(char);
+                    blankTileModal.style.display = 'none';
+                    currentBlankTileElement = null; // Clear reference
+                });
+                blankTileLetterSelectionContainer.appendChild(letterButton);
+            });
+
+            blankTileModal.style.display = 'flex';
+
+            // IMPORTANT: Clear previous click handlers to prevent multiple firings
+            cancelBlankTileSelectionBtn.onclick = null; // Clear existing
+            cancelBlankTileSelectionBtn.addEventListener('click', () => {
+                onCancel();
+                blankTileModal.style.display = 'none';
+                currentBlankTileElement = null; // Clear reference
+            }, { once: true }); // Use { once: true } to auto-remove listener after first click
+
+            blankTileModal.onclick = null; // Clear existing
+            blankTileModal.addEventListener('click', (event) => {
+                if (event.target === blankTileModal) {
+                    onCancel();
+                    blankTileModal.style.display = 'none';
+                    currentBlankTileElement = null;
+                }
+            }, { once: true }); // Use { once: true } to auto-remove listener
+        }
+
+        /**
+         * Generates all possible valid words an AI can play from a given board state and rack.
+         * This function explores horizontal and vertical placements, including multi-tile words.
+         * @param {Array<Object>} rack The AI's current rack.
+         * @param {Array<Array<Object|null>>} currentBoard The current state of the game board.
+         * @returns {Array<Object>} An array of possible moves, each with score, word, tiles to place, and rack tiles used.
+         */
+        function findAllPossibleWords(rack, currentBoard) {
+            const possibleMoves = [];
+            const existingBoardTiles = currentBoard.flat().filter(tile => tile !== null).length > 0;
+
+            // Iterate over every cell on the board
+            for (let r = 0; r < BOARD_SIZE; r++) {
+                for (let c = 0; c < BOARD_SIZE; c++) {
+                    if (currentBoard[r][c] !== null) { // Skip occupied cells
+                        continue;
+                    }
+
+                    // Determine if this is an anchor point (empty cell adjacent to an existing tile, or center for first move)
+                    let isAnchor = false;
+                    const neighbors = [[r-1, c], [r+1, c], [r, c-1], [r, c+1]];
+                    if (!existingBoardTiles && r === 7 && c === 7) { // Center for first move
+                        isAnchor = true;
+                    } else if (existingBoardTiles) {
+                        for (const [nr, nc] of neighbors) {
+                            if (nr >= 0 && nr < BOARD_SIZE && nc >= 0 && nc < BOARD_SIZE && currentBoard[nr][nc] !== null) {
+                                isAnchor = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (!isAnchor) continue; // Only consider anchor points
+
+                    // Try placing words horizontally and vertically starting from this anchor
+                    ['horizontal', 'vertical'].forEach(direction => {
+                        // Iterate through all permutations of AI's rack tiles
+                        // For a real AI, this would involve more sophisticated algorithms (e.g., recursive backtracking)
+                        // For simplicity, let's consider subsets of rack tiles (1 to RACK_SIZE)
+                        for (let numTiles = 1; numTiles <= rack.length; numTiles++) {
+                            const combinations = getCombinations(rack, numTiles);
+
+                            combinations.forEach(combo => {
+                                // For each combination, try all permutations (ordering matters for placement)
+                                const permutations = getPermutations(combo);
+                                permutations.forEach(perm => {
+                                    const tilesToSimulate = [...perm]; // Copy for modification if blank tile
+
+                                    // Handle blank tiles for AI by trying all possible letters
+                                    let blankTileIndex = -1;
+                                    for(let i = 0; i < tilesToSimulate.length; i++) {
+                                        if (tilesToSimulate[i].letter === '_') {
+                                            blankTileIndex = i;
+                                            break;
+                                        }
+                                    }
+
+                                    if (blankTileIndex !== -1) {
+                                        ALPHABET.split('').forEach(char => {
+                                            const originalTile = tilesToSimulate[blankTileIndex];
+                                            // Temporarily assign letter to the blank tile for simulation
+                                            const simulatedTile = { ...originalTile, assignedLetterForTurn: char };
+                                            tilesToSimulate[blankTileIndex] = simulatedTile;
+
+                                            const move = tryPlacementAndValidate(r, c, direction, tilesToSimulate, currentBoard, existingBoardTiles);
+                                            if (move) {
+                                                possibleMoves.push(move);
+                                            }
+                                        });
+                                        // Revert the blank tile for subsequent permutations/combinations
+                                        tilesToSimulate[blankTileIndex] = { letter: '_', points: 0 };
+                                    } else {
+                                        const move = tryPlacementAndValidate(r, c, direction, tilesToSimulate, currentBoard, existingBoardTiles);
+                                        if (move) {
+                                            possibleMoves.push(move);
+                                        }
+                                    }
+                                });
+                            });
+                        }
+                    });
+                }
+            }
+            return possibleMoves;
+        }
+
+        /**
+         * Helper for findAllPossibleWords: Tries to place tiles and validates the resulting words.
+         * @param {number} r Row of the starting placement.
+         * @param {number} c Column of the starting placement.
+         * @param {string} direction 'horizontal' or 'vertical'.
+         * @param {Array<Object>} tilesToPlaceFromRack Tiles from rack to attempt to place. Each tile object might have `assignedLetterForTurn`.
+         * @param {Array<Array<Object|null>>} currentBoard Board state before this move.
+         * @param {boolean} existingBoardTiles Flag indicating if board has existing tiles.
+         * @returns {Object|null} A valid move object or null.
+         */
+        function tryPlacementAndValidate(r, c, direction, tilesToPlaceFromRack, currentBoard, existingBoardTiles) {
+            const simulatedBoard = JSON.parse(JSON.stringify(currentBoard));
+            const placedTempTilesData = []; // This will contain the simplified data required by validateAndScoreWords
+
+            let currentRow = r;
+            let currentCol = c;
+            let currentTileIndex = 0;
+
+            // Try placing tiles sequentially in the given direction
+            while (currentTileIndex < tilesToPlaceFromRack.length) {
+                if (currentRow >= BOARD_SIZE || currentCol >= BOARD_SIZE) {
+                    return null; // Out of bounds
+                }
+                if (simulatedBoard[currentRow][currentCol] !== null &&
+                    !tilesToPlaceFromRack.some(t => t === simulatedBoard[currentRow][currentCol])) { // If already occupied by a PERMANENT tile
+                    // If the cell is occupied by an existing tile not part of the current placement attempt, skip it but continue trying to place the next tile
+                    if (direction === 'horizontal') currentCol++;
+                    else currentRow++;
+                    continue; // Do not place a new tile here, but move to next slot
+                }
+                if (simulatedBoard[currentRow][currentCol] !== null) { // If occupied by a temporary tile from *this* placement
+                     // This means a new tile is attempting to overlap with another new tile, which should not happen
+                     return null;
+                }
+
+                const tile = tilesToPlaceFromRack[currentTileIndex];
+                simulatedBoard[currentRow][currentCol] = {
+                    letter: tile.letter, // Original letter (e.g., '_')
+                    points: tile.points,
+                    assignedLetter: tile.assignedLetterForTurn || null // Assigned letter for blanks
+                };
+                // For validation, we pass the *effective* letter and original points
+                placedTempTilesData.push({
+                    r: currentRow,
+                    c: currentCol,
+                    letter: tile.assignedLetterForTurn || tile.letter, // The letter that forms the word
+                    points: tile.points // Points are always from the original tile
+                });
+
+                if (direction === 'horizontal') currentCol++;
+                else currentRow++;
+                currentTileIndex++;
+            }
+
+            const result = validateAndScoreWords(simulatedBoard, placedTempTilesData);
+
+            // Re-check first move rule if applicable
+            if (!existingBoardTiles && result) {
+                const coversStartCell = placedTempTilesData.some(tile => tile.r === 7 && tile.c === 7);
+                if (!coversStartCell) {
+                    return null;
+                }
+            }
+
+            if (result && result.score > 0) { // Only return moves that score points
+                return {
+                    score: result.score,
+                    word: result.words.join(', '),
+                    tiles: placedTempTilesData, // The simplified placed tiles with their r,c, effective letter
+                    rackUsed: tilesToPlaceFromRack // The original rack tiles used (includes assignedLetterForTurn for blanks)
+                };
+            }
+            return null;
+        }
+
+        /**
+         * Helper function to get combinations of elements from an array.
+         * Used for AI to select a subset of its rack tiles.
+         * @param {Array} arr The array from which to get combinations.
+         * @param {number} k The size of each combination.
+         * @returns {Array<Array>} An array of combinations.
+         */
+        function getCombinations(arr, k) {
+            const result = [];
+            function backtrack(combination, start) {
+                if (combination.length === k) {
+                    result.push([...combination]);
+                    return;
+                }
+                for (let i = start; i < arr.length; i++) {
+                    combination.push(arr[i]);
+                    backtrack(combination, i + 1);
+                    combination.pop();
+                }
+            }
+            backtrack([], 0);
+            return result;
+        }
+
+        /**
+         * Helper function to get permutations of elements from an array.
+         * Used for AI to try different orderings of chosen tiles.
+         * @param {Array} arr The array from which to get permutations.
+         * @returns {Array<Array>} An array of permutations.
+         */
+        function getPermutations(arr) {
+            if (arr.length === 0) return [[]];
+            if (arr.length === 1) return [[arr[0]]];
+
+            const result = [];
+            arr.forEach((item, i) => {
+                const remaining = arr.filter((_, index) => index !== i);
+                const permutationsOfRemaining = getPermutations(remaining);
+                permutationsOfRemaining.forEach(p => {
+                    result.push([item, ...p]);
+                });
+            });
+            return result;
+        }
+
+
+        /**
+         * AI logic based on difficulty.
+         */
+        function makeAIMove() {
+            showMessageBox("AI is thinking...", 'info');
+
+            const aiRack = playerRacks[currentPlayer];
+            let chosenMove = null;
+            let possibleMoves = [];
+
+            // Reset assignedLetterForTurn for all AI's blank tiles before finding moves
+            aiRack.forEach(tile => {
+                if (tile.letter === '_') {
+                    tile.assignedLetterForTurn = null;
+                }
+            });
+
+            if (aiDifficulty === 'easy') {
+                // Easy AI: Finds any single-tile move, picks a random one, otherwise passes.
+                // It makes only one check for a simple word.
+                // Reusing `findAllPossibleWords` with a limited scope to keep logic centralized
+                possibleMoves = findAllPossibleWords(aiRack, board).filter(move => move.rackUsed.length === 1);
+
+                if (possibleMoves.length > 0) {
+                    chosenMove = possibleMoves[Math.floor(Math.random() * possibleMoves.length)]; // Pick a random valid move
+                }
+
+            } else if (aiDifficulty === 'medium') {
+                // Medium AI: Finds all single-tile moves, picks a random one that scores > 5, otherwise any random.
+                possibleMoves = findAllPossibleWords(aiRack, board).filter(move => move.rackUsed.length <= 2); // Consider 1-2 tile moves
+
+                const highScoringMoves = possibleMoves.filter(move => move.score >= 5);
+                if (highScoringMoves.length > 0) {
+                    chosenMove = highScoringMoves.reduce((best, current) => {
+                        return current.score > best.score ? current : best;
+                    }, { score: -1 }); // Pick the best from high scoring
+                } else if (possibleMoves.length > 0) {
+                    chosenMove = possibleMoves[Math.floor(Math.random() * possibleMoves.length)]; // Otherwise, any random
+                }
+
+            } else if (aiDifficulty === 'hard') {
+                // Hard AI: Uses findAllPossibleWords to find the best scoring move
+                possibleMoves = findAllPossibleWords(aiRack, board);
+                if (possibleMoves.length > 0) {
+                    chosenMove = possibleMoves.reduce((best, current) => {
+                        return current.score > best.score ? current : best;
+                    }, { score: -1 }); // Initialize with a negative score
+                }
+            }
+
+            // Execute the chosen move or pass/exchange
+            setTimeout(() => {
+                if (chosenMove && chosenMove.score > 0) {
+                    const playedTilesInfo = chosenMove.tiles; // These are the {r,c, letter (effective), points}
+                    const tilesToRemoveFromRack = chosenMove.rackUsed; // These are the actual tile objects from AI's rack
+
+                    // Remove played tiles from AI's actual rack (use the original objects)
+                    tilesToRemoveFromRack.forEach(playedTileObj => {
+                        const index = playerRacks[currentPlayer].indexOf(playedTileObj);
+                        if (index > -1) {
+                            playerRacks[currentPlayer].splice(index, 1);
+                        }
+                    });
+
+                    // Place tiles on board permanently
+                    playedTilesInfo.forEach(tileData => {
+                        // Find the original tile object that was used for this tileData entry
+                        // This assumes `chosenMove.rackUsed` contains the *exact* objects from `playerRacks[currentPlayer]`
+                        const originalTileObj = tilesToRemoveFromRack.find(t =>
+                            (t.letter === '_' && t.assignedLetterForTurn === tileData.letter) || // Blank matched by assigned letter
+                            (t.letter === tileData.letter && t.points === tileData.points) // Regular tile
+                        );
+
+                        board[tileData.r][tileData.c] = {
+                            letter: originalTileObj ? originalTileObj.letter : tileData.letter, // Original _ or letter
+                            points: originalTileObj ? originalTileObj.points : tileData.points, // Original 0 for _
+                            assignedLetter: originalTileObj ? originalTileObj.assignedLetterForTurn : null // Assigned letter if blank
+                        };
+                        // Clear the temporary assignedLetterForTurn from the original object
+                        if (originalTileObj && originalTileObj.letter === '_') {
+                            originalTileObj.assignedLetterForTurn = null;
+                        }
+
+                        const cellElement = document.getElementById(`cell-${tileData.r}-${tileData.c}`);
+                        cellElement.innerHTML = ''; // Clear existing bonus label
+                        // Create a new DOM tile element for the permanent board tile
+                        const permanentTileElement = createTileElement(board[tileData.r][tileData.c]);
+                        permanentTileElement.dataset.permanent = 'true';
+                        permanentTileElement.draggable = false;
+                        permanentTileElement.removeEventListener('click', handleTileClick);
+                        cellElement.appendChild(permanentTileElement);
+                    });
+
+                    playerScores[currentPlayer] += chosenMove.score;
+                    showMessageBox(`AI played: ${chosenMove.word} for ${chosenMove.score} points!`, 'success');
+                    
+                    if (chosenMove.score >= 100) {
+                        playHundredPointsSound();
+                    } else if (chosenMove.score >= 50) {
+                        playFiftyPointsSound();
+                    } else {
+                        playGotWordSound();
+                    }
+
+                    // Draw new tiles for AI
+                    drawTilesToRack(currentPlayer, RACK_SIZE - playerRacks[currentPlayer].length);
+                    endTurn();
+                } else {
+                    // If no scoring move is found, then exchange tiles if possible (for Hard), otherwise pass
+                    if (aiDifficulty === 'hard' && tileBag.length >= 1) { // AI can exchange any number of tiles, even 1, if no good move
+                        const tilesToExchangeCount = Math.min(aiRack.length, tileBag.length);
+                        if (tilesToExchangeCount > 0) {
+                            showMessageBox(`AI exchanges ${tilesToExchangeCount} tiles (Hard mode - no scoring word found).`, 'info');
+                            // Select a random set of tiles to exchange for hard AI
+                            shuffleArray(aiRack); // Shuffle to pick random tiles
+                            const exchangedTiles = aiRack.splice(0, tilesToExchangeCount);
+                            exchangedTiles.forEach(tile => {
+                                tileBag.push(tile);
+                                if (tile.letter === '_') tile.assignedLetterForTurn = null; // Clear assignment
+                            });
+                            shuffleArray(tileBag);
+                            drawTilesToRack(currentPlayer, tilesToExchangeCount);
+                            endTurn(); // End turn after exchange
+                            return;
+                        }
+                    }
+                    showMessageBox(`AI passes its turn (${aiDifficulty} mode - no scoring word found).`, 'info');
+                    endTurn();
+                }
+            }, 1500); // Simulate AI thinking time
+        }
+
+
+        // --- Event Listeners ---
+        submitWordBtn.addEventListener('click', submitWord);
+        passTurnBtn.addEventListener('click', () => {
+            if (gameMode === 'one-player' && currentPlayer === 1) {
+                showMessageBox("You can't pass for it.", 'error');
+                return;
+            }
+            if (placedTiles.length > 0) {
+                showModal('You have tiles on the board. Do you want to pass your turn and return them to your rack?', () => {
+                    revertPlacedTiles();
+                    endTurn();
+                });
+            } else {
+                showModal('Are you sure you want to pass your turn?', () => {
+                    endTurn();
+                });
+            }
+        });
+        shuffleTilesBtn.addEventListener('click', shuffleRack);
+        exchangeTilesBtn.addEventListener('click', showExchangeModal); // Call showExchangeModal directly
+        newGameBtn.addEventListener('click', () => {
+            showModal('Are you sure you want to start a new game? Current progress will be lost.', () => {
+                gameWrapper.classList.add('hidden');
+                mainMenu.classList.remove('hidden');
+            });
+        });
+
+        // Main Menu Button Listeners
+        onePlayerBtn.addEventListener('click', () => {
+            if (!isDictionaryLoaded) { showMessageBox('Dictionary still loading. Please wait.', 'info'); return; }
+            mainMenu.classList.add('hidden');
+            difficultyMenu.classList.remove('hidden');
+        });
+
+        twoPlayerBtn.addEventListener('click', () => {
+            if (!isDictionaryLoaded) { showMessageBox('Dictionary still loading. Please wait.', 'info'); return; }
+            gameMode = 'two-player';
+            mainMenu.classList.add('hidden');
+            gameWrapper.classList.remove('hidden');
+            initializeGame();
+        });
+
+        // Difficulty Menu Button Listeners
+        difficultyEasyBtn.addEventListener('click', () => {
+            aiDifficulty = 'easy';
+            gameMode = 'one-player';
+            difficultyMenu.classList.add('hidden');
+            gameWrapper.classList.remove('hidden');
+            initializeGame();
+        });
+
+        difficultyMediumBtn.addEventListener('click', () => {
+            aiDifficulty = 'medium';
+            gameMode = 'one-player';
+            difficultyMenu.classList.add('hidden');
+            gameWrapper.classList.remove('hidden');
+            initializeGame();
+        });
+
+        difficultyHardBtn.addEventListener('click', () => {
+            aiDifficulty = 'hard';
+            gameMode = 'one-player';
+            difficultyMenu.classList.add('hidden');
+            gameWrapper.classList.remove('hidden');
+            initializeGame();
+        });
+
+        difficultyBackBtn.addEventListener('click', () => {
+            difficultyMenu.classList.add('hidden');
+            mainMenu.classList.remove('hidden');
+        });
+
+        // Event listeners for the new exchange modal
+        confirmExchangeBtn.addEventListener('click', confirmExchange);
+        cancelExchangeBtn.addEventListener('click', cancelExchange);
+        closeExchangeModalBtn.addEventListener('click', cancelExchange);
+        exchangeModal.addEventListener('click', (event) => {
+            if (event.target === exchangeModal) {
+                cancelExchange();
+            }
+        });
+
+
+        // --- Initial Setup ---
+        // Load the dictionary as soon as the DOM is ready
+        document.addEventListener('DOMContentLoaded', () => {
+            showMessageBox('Loading dictionary, please wait...', 'info');
+            onePlayerBtn.disabled = true; // Disable buttons until dictionary is loaded
+            twoPlayerBtn.disabled = true;
+            loadDictionary();
+        });
+    </script>
+</body>
+</html>
+
+
