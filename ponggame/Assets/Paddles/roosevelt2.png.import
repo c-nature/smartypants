@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dpqko87musa5q"
-path="res://.godot/imported/roosevelt2 (2).png-24b7bb2e24cea1cc37ff3dba336baa77.ctex"
+uid="uid://t4rmjs7bpe2r"
+path="res://.godot/imported/roosevelt2.png-475f7a5c738f72eeb540d41ea42c225e.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Assets/Paddles/roosevelt2 (2).png"
-dest_files=["res://.godot/imported/roosevelt2 (2).png-24b7bb2e24cea1cc37ff3dba336baa77.ctex"]
+source_file="res://Assets/Paddles/roosevelt2.png"
+dest_files=["res://.godot/imported/roosevelt2.png-475f7a5c738f72eeb540d41ea42c225e.ctex"]
 
 [params]
 
