@@ -68,8 +68,10 @@
         const messageBox = document.getElementById('message-box');
 
         // --- API Configuration ---
-        const apiKey = 'NBLzVtc9zEUgykvHHYEelQ==Nk1wfVKY9E9NGnQs'; 
-        const apiUrl = 'https://api.api-ninjas.com/v1/animals?name=';
+        const ninjasApiKey = 'NBLzVtc9zEUgykvHHYEelQ==Nk1wfVKY9E9NGnQs'; 
+        const pexelsApiKey = 'rNeFMYzKsFyZy2B9fv0M9dXHQariKslYt7kSJhD8KezlzTEPYdc1u9dQ';
+        const animalsApiUrl = 'https://api.api-ninjas.com/v1/animals?name=';
+        const pexelsApiUrl = 'https://api.pexels.com/v1/search?query=';
 
         // --- Event Listeners ---
         searchBtn.addEventListener('click', searchForAnimal);
@@ -88,7 +90,59 @@
                 displayMessage('Please enter an animal name to start exploring!');
                 return;
             }
+            if (pexelsApiKey === 'YOUR_PEXELS_API_KEY' || !pexelsApiKey) {
+                displayMessage('Please add your Pexels API key to the script to fetch images.');
+                return;
+            }
             fetchAnimalData(animalName);
+        }
+
+        /**
+         * Fetches an image for a given animal name from the Pexels API.
+         * It first tries a specific query, then falls back to a broader one.
+         * @param {string} animalName - The name of the animal.
+         * @returns {Promise<string|null>} - A promise that resolves to the image URL or null if not found.
+         */
+        async function fetchAnimalImage(animalName) {
+            // Helper function to perform the actual fetch and check for photos
+            const searchPexels = async (query) => {
+                try {
+                    const response = await fetch(`${pexelsApiUrl}${encodeURIComponent(query)}&per_page=1`, {
+                        headers: {
+                            Authorization: pexelsApiKey
+                        }
+                    });
+                    if (!response.ok) {
+                        console.warn(`Pexels API request for "${query}" failed with status: ${response.status}`);
+                        return null; // Return null to allow fallback
+                    }
+                    const data = await response.json();
+                    if (data.photos && data.photos.length > 0) {
+                        return data.photos[0].src.large;
+                    }
+                    return null; // No photos found for this query
+                } catch (error) {
+                    console.error(`Error fetching image for query "${query}" from Pexels:`, error);
+                    return null; // Network or other error
+                }
+            };
+
+            // 1. First, try the more specific query (e.g., "Tiger Salamander animal")
+            let imageUrl = await searchPexels(`${animalName} animal`);
+
+            // 2. If that fails, try the original, broader query (e.g., "Tiger Salamander")
+            if (!imageUrl) {
+                console.log(`Specific search for "${animalName} animal" failed, trying broader search.`);
+                imageUrl = await searchPexels(animalName);
+            }
+
+            // 3. If both searches fail, return null.
+            if (imageUrl) {
+                return imageUrl;
+            } else {
+                console.log(`All image searches for "${animalName}" failed. No image will be displayed.`);
+                return null; // Return null instead of a placeholder URL
+            }
         }
 
         /**
@@ -101,9 +155,9 @@
             hideMessage();
 
             try {
-                const response = await fetch(apiUrl + animalName, {
+                const response = await fetch(animalsApiUrl + animalName, {
                     method: 'GET',
-                    headers: { 'X-Api-Key': apiKey }
+                    headers: { 'X-Api-Key': ninjasApiKey }
                 });
 
                 if (!response.ok) {
@@ -111,7 +165,7 @@
                 }
 
                 const data = await response.json();
-                displayResults(data);
+                await displayResults(data);
 
             } catch (error) {
                 console.error('Error fetching animal data:', error);
@@ -122,16 +176,17 @@
         }
 
         /**
-         * Displays the fetched animal data on the page, including an image.
+         * Displays the fetched animal data on the page, including an image from Pexels.
          * @param {Array} animals - An array of animal objects from the API.
          */
-        function displayResults(animals) {
+        async function displayResults(animals) {
             if (animals.length === 0) {
                 displayMessage('No animals found with that name. Try another one!');
                 return;
             }
 
-            animals.forEach(animal => {
+            // Use a for...of loop to handle async image fetching correctly for each card.
+            for (const animal of animals) {
                 const card = document.createElement('div');
                 card.className = 'bg-gradient-to-br from-white/90 to-gray-100/90 dark:from-gray-800/90 dark:to-gray-900/90 rounded-xl shadow-lg overflow-hidden transform hover:scale-105 hover:shadow-2xl transition-all duration-300';
                 
@@ -142,13 +197,16 @@
                 const lifespan = animal.characteristics?.lifespan || 'N/A';
                 const skinType = animal.characteristics?.skin_type || 'N/A';
 
-                // Image URL from Unsplash Source, which provides random images based on a keyword.
-                const imageUrl = `https://source.unsplash.com/400x300/?${name}`;
-                // A fallback placeholder image in case the Unsplash image fails to load.
-                const placeholderUrl = `https://placehold.co/400x300/e2e8f0/64748b?text=${name}`;
+                // Fetch a specific, more accurate image from Pexels for each animal.
+                const imageUrl = await fetchAnimalImage(name);
+
+                // **** MODIFICATION HERE: Only create an image tag if an imageUrl was found ****
+                const imageTag = imageUrl 
+                    ? `<img src="${imageUrl}" alt="Photo of a ${name}" class="w-full h-48 object-cover">`
+                    : '';
 
                 card.innerHTML = `
-                    <img src="${imageUrl}" alt="Photo of a ${name}" class="w-full h-48 object-cover" onerror="this.onerror=null;this.src='${placeholderUrl}';">
+                    ${imageTag}
                     <div class="p-6">
                         <h2 class="text-2xl font-bold text-teal-700 dark:text-teal-300 mb-2">${name}</h2>
                         <p class="text-sm text-gray-500 dark:text-gray-400 font-medium mb-5 italic">${scientificName}</p>
@@ -162,7 +220,7 @@
                     </div>
                 `;
                 resultsContainer.appendChild(card);
-            });
+            }
         }
 
         /**
@@ -184,3 +242,4 @@
 
 </body>
 </html>
+
