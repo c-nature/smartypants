@@ -1,0 +1,269 @@
+[gd_scene load_steps=15 format=3 uid="uid://dhice3aetposj"]
+
+[ext_resource type="Script" uid="uid://pm0pil6mixl3" path="res://Scripts/PaddleSelectScreen.gd" id="1_25w6v"]
+[ext_resource type="Texture2D" uid="uid://bihsajdg8g0gn" path="res://Assets/paddleselectscreen.jpg" id="1_i71mr"]
+[ext_resource type="FontFile" uid="uid://cwpc0d2b36u0l" path="res://Fonts/Komigo3D-Regular.ttf" id="2_1vq67"]
+[ext_resource type="Texture2D" uid="uid://rv21u66omgcx" path="res://Assets/playerbutton_removed.png" id="3_m5i1k"]
+[ext_resource type="FontFile" uid="uid://bewpidr0danru" path="res://Fonts/BebasNeue-Regular.ttf" id="3_umobd"]
+[ext_resource type="Texture2D" uid="uid://b2ie82mgh3hkk" path="res://Assets/playerbuttonpressed.png" id="4_25w6v"]
+[ext_resource type="Texture2D" uid="uid://blq0vk1j1gfet" path="res://Assets/playerbuttonhover.png" id="5_yr8m1"]
+[ext_resource type="Texture2D" uid="uid://dtuh8fmln6lqg" path="res://Assets/arrow (1).png" id="7_mtj0q"]
+[ext_resource type="Texture2D" uid="uid://c18awu5pmc3ir" path="res://Assets/leftarrowpressed.png" id="8_d1n8g"]
+[ext_resource type="Texture2D" uid="uid://b0uvud6jmxb26" path="res://Assets/leftarrowhover.png" id="9_6tw2d"]
+[ext_resource type="Texture2D" uid="uid://bwo1bpgwjg62u" path="res://Assets/rightarrow2.png" id="10_h8n3y"]
+[ext_resource type="Texture2D" uid="uid://by5x6cxgd1gp" path="res://Assets/rightarrowpressed.png" id="11_vwn32"]
+[ext_resource type="Texture2D" uid="uid://cnyc4ugrb1xy1" path="res://Assets/rightarrowhover.png" id="12_5kxu8"]
+[ext_resource type="FontFile" uid="uid://cp8rti82oh7h3" path="res://Assets/Paddles/BebasNeue-Regular.ttf" id="13_l6m3t"]
+
+[node name="PaddleSelectScreen" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+script = ExtResource("1_25w6v")
+
+[node name="TextureRect" type="TextureRect" parent="."]
+layout_mode = 0
+offset_left = -653.0
+offset_top = -352.0
+offset_right = 655.0
+offset_bottom = 358.0
+texture = ExtResource("1_i71mr")
+metadata/_edit_lock_ = true
+
+[node name="Camera2D" type="Camera2D" parent="."]
+
+[node name="TopUIContainer" type="VBoxContainer" parent="."]
+top_level = true
+layout_mode = 0
+offset_left = -427.0
+offset_top = -400.0
+offset_right = 8193.0
+offset_bottom = 3330.0
+scale = Vector2(0.1, 0.1)
+alignment = 1
+
+[node name="InstructionLabel" type="Label" parent="TopUIContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.542021, 0.693628, 0.987575, 1)
+theme_override_colors/font_shadow_color = Color(0.0581072, 0, 0.620817, 1)
+theme_override_colors/font_outline_color = Color(0.0352941, 0.192157, 1, 1)
+theme_override_constants/shadow_offset_x = 50
+theme_override_constants/shadow_offset_y = 55
+theme_override_constants/outline_size = 60
+theme_override_constants/shadow_outline_size = 50
+theme_override_fonts/font = ExtResource("3_umobd")
+theme_override_font_sizes/font_size = 700
+text = "Elect Your President!"
+horizontal_alignment = 1
+
+[node name="TextureButton" type="TextureButton" parent="TopUIContainer/InstructionLabel"]
+custom_minimum_size = Vector2(100, 10)
+layout_direction = 4
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -130.0
+offset_top = -1736.0
+offset_bottom = 3444.0
+grow_horizontal = 2
+grow_vertical = 0
+texture_normal = ExtResource("3_m5i1k")
+texture_pressed = ExtResource("4_25w6v")
+texture_hover = ExtResource("5_yr8m1")
+ignore_texture_size = true
+stretch_mode = 3
+
+[node name="Confirm" type="Label" parent="TopUIContainer/InstructionLabel/TextureButton"]
+layout_mode = 0
+offset_left = -200.0
+offset_right = 8870.0
+offset_bottom = 5141.0
+theme_override_fonts/font = ExtResource("2_1vq67")
+theme_override_font_sizes/font_size = 400
+text = "Confirm"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="SelectionBlocksContainer" type="HBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -455.0
+offset_top = -310.0
+offset_right = 8435.0
+offset_bottom = 5030.0
+grow_horizontal = 2
+grow_vertical = 2
+scale = Vector2(0.1, 0.1)
+theme_override_constants/separation = 2310
+
+[node name="Player1SelectionBlock" type="VBoxContainer" parent="SelectionBlocksContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 8
+theme_override_constants/separation = -500
+
+[node name="Player1PresidentControls" type="HBoxContainer" parent="SelectionBlocksContainer/Player1SelectionBlock"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme_override_constants/separation = 800
+
+[node name="Player1LeftArrow" type="TextureButton" parent="SelectionBlocksContainer/Player1SelectionBlock/Player1PresidentControls"]
+layout_mode = 2
+texture_normal = ExtResource("7_mtj0q")
+texture_pressed = ExtResource("8_d1n8g")
+texture_hover = ExtResource("9_6tw2d")
+
+[node name="Player1PresidentDisplay" type="TextureRect" parent="SelectionBlocksContainer/Player1SelectionBlock/Player1PresidentControls"]
+layout_mode = 2
+
+[node name="Player1RightArrow" type="TextureButton" parent="SelectionBlocksContainer/Player1SelectionBlock/Player1PresidentControls"]
+layout_mode = 2
+texture_normal = ExtResource("10_h8n3y")
+texture_pressed = ExtResource("11_vwn32")
+texture_hover = ExtResource("12_5kxu8")
+
+[node name="Player1SelectButton" type="TextureButton" parent="SelectionBlocksContainer/Player1SelectionBlock"]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+texture_normal = ExtResource("3_m5i1k")
+texture_pressed = ExtResource("4_25w6v")
+texture_hover = ExtResource("5_yr8m1")
+
+[node name="Player1\'sPresident" type="Label" parent="SelectionBlocksContainer/Player1SelectionBlock"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.542021, 0.693628, 0.987575, 1)
+theme_override_colors/font_shadow_color = Color(0.0581072, 0, 0.620817, 1)
+theme_override_colors/font_outline_color = Color(0.0352941, 0.192157, 1, 1)
+theme_override_constants/shadow_offset_x = 6
+theme_override_constants/shadow_offset_y = 5
+theme_override_constants/outline_size = 10
+theme_override_constants/shadow_outline_size = 5
+theme_override_fonts/font = ExtResource("13_l6m3t")
+theme_override_font_sizes/font_size = 500
+text = "Player 1's President"
+horizontal_alignment = 1
+vertical_alignment = 2
+
+[node name="RightSideSelectionWrapper" type="Control" parent="SelectionBlocksContainer"]
+layout_mode = 2
+
+[node name="Player2SelectionBlock" type="VBoxContainer" parent="SelectionBlocksContainer/RightSideSelectionWrapper"]
+visible = false
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -850.0
+offset_top = -2148.0
+offset_right = 4240.0
+grow_horizontal = 2
+grow_vertical = 0
+size_flags_vertical = 4
+theme_override_constants/separation = -500
+
+[node name="Player2PresidentControls" type="HBoxContainer" parent="SelectionBlocksContainer/RightSideSelectionWrapper/Player2SelectionBlock"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme_override_constants/separation = 800
+
+[node name="Player2LeftArrow" type="TextureButton" parent="SelectionBlocksContainer/RightSideSelectionWrapper/Player2SelectionBlock/Player2PresidentControls"]
+layout_mode = 2
+texture_normal = ExtResource("7_mtj0q")
+
+[node name="Player2PresidentDisplay" type="TextureRect" parent="SelectionBlocksContainer/RightSideSelectionWrapper/Player2SelectionBlock/Player2PresidentControls"]
+layout_mode = 2
+
+[node name="Player2RightArrow" type="TextureButton" parent="SelectionBlocksContainer/RightSideSelectionWrapper/Player2SelectionBlock/Player2PresidentControls"]
+layout_mode = 2
+size_flags_horizontal = 8
+size_flags_vertical = 8
+texture_normal = ExtResource("10_h8n3y")
+
+[node name="Player2SelectButton" type="TextureButton" parent="SelectionBlocksContainer/RightSideSelectionWrapper/Player2SelectionBlock"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+texture_normal = ExtResource("3_m5i1k")
+texture_pressed = ExtResource("4_25w6v")
+texture_hover = ExtResource("5_yr8m1")
+
+[node name="Player2\'sPresident" type="Label" parent="SelectionBlocksContainer/RightSideSelectionWrapper/Player2SelectionBlock"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.542021, 0.693628, 0.987575, 1)
+theme_override_colors/font_shadow_color = Color(0.0581072, 0, 0.620817, 1)
+theme_override_colors/font_outline_color = Color(0.0352941, 0.192157, 1, 1)
+theme_override_constants/shadow_offset_x = 6
+theme_override_constants/shadow_offset_y = 5
+theme_override_constants/outline_size = 10
+theme_override_constants/shadow_outline_size = 5
+theme_override_fonts/font = ExtResource("13_l6m3t")
+theme_override_font_sizes/font_size = 500
+text = "Player 2's President"
+horizontal_alignment = 1
+vertical_alignment = 2
+
+[node name="AISelectionBlock" type="VBoxContainer" parent="SelectionBlocksContainer/RightSideSelectionWrapper"]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -850.0
+offset_top = -2148.0
+offset_right = 4240.0
+grow_horizontal = 2
+grow_vertical = 0
+size_flags_vertical = 4
+theme_override_constants/separation = -500
+
+[node name="AIPresidentControls" type="HBoxContainer" parent="SelectionBlocksContainer/RightSideSelectionWrapper/AISelectionBlock"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme_override_constants/separation = 800
+
+[node name="AILeftArrow" type="TextureButton" parent="SelectionBlocksContainer/RightSideSelectionWrapper/AISelectionBlock/AIPresidentControls"]
+layout_mode = 2
+texture_normal = ExtResource("7_mtj0q")
+
+[node name="AIPresidentDisplay" type="TextureRect" parent="SelectionBlocksContainer/RightSideSelectionWrapper/AISelectionBlock/AIPresidentControls"]
+layout_mode = 2
+
+[node name="AIRightArrow" type="TextureButton" parent="SelectionBlocksContainer/RightSideSelectionWrapper/AISelectionBlock/AIPresidentControls"]
+layout_mode = 2
+size_flags_horizontal = 8
+size_flags_vertical = 8
+texture_normal = ExtResource("10_h8n3y")
+
+[node name="AISelectButton" type="TextureButton" parent="SelectionBlocksContainer/RightSideSelectionWrapper/AISelectionBlock"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+texture_normal = ExtResource("3_m5i1k")
+texture_pressed = ExtResource("4_25w6v")
+texture_hover = ExtResource("5_yr8m1")
+
+[node name="AIPresident" type="Label" parent="SelectionBlocksContainer/RightSideSelectionWrapper/AISelectionBlock"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.542021, 0.693628, 0.987575, 1)
+theme_override_colors/font_shadow_color = Color(0.0581072, 0, 0.620817, 1)
+theme_override_colors/font_outline_color = Color(0.0352941, 0.192157, 1, 1)
+theme_override_constants/shadow_offset_x = 6
+theme_override_constants/shadow_offset_y = 5
+theme_override_constants/outline_size = 10
+theme_override_constants/shadow_outline_size = 5
+theme_override_fonts/font = ExtResource("13_l6m3t")
+theme_override_font_sizes/font_size = 500
+text = "Computer's President"
+horizontal_alignment = 1
+vertical_alignment = 2

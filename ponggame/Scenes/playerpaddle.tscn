@@ -1,0 +1,22 @@
+[gd_scene load_steps=3 format=3 uid="uid://bo8vjvq2q7lq"]
+
+[ext_resource type="Script" uid="uid://bge3ey5xy5tio" path="res://Scripts/PlayerPaddle.gd" id="1_bfp7d"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ig7tw"]
+size = Vector2(2.8984, 12.025)
+
+[node name="PlayerPaddle" type="CharacterBody2D"]
+position = Vector2(0, 1)
+scale = Vector2(0.8, 0.8)
+collision_layer = 3
+motion_mode = 1
+script = ExtResource("1_bfp7d")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+position = Vector2(-710.258, -12.1875)
+scale = Vector2(0.0620041, 0.0723267)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(-707.5, -7.375)
+scale = Vector2(5, 10)
+shape = SubResource("RectangleShape2D_ig7tw")

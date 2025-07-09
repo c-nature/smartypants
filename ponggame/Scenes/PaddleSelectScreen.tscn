@@ -1,0 +1,162 @@
+[gd_scene load_steps=7 format=3 uid="uid://dhice3aetposj"]
+
+[ext_resource type="PackedScene" uid="uid://bp3w8htx06kl3" path="res://TopUI.tscn" id="1_1vq67"]
+[ext_resource type="Script" uid="uid://pm0pil6mixl3" path="res://Scripts/PaddleSelectScreen.gd" id="1_25w6v"]
+[ext_resource type="Texture2D" uid="uid://bihsajdg8g0gn" path="res://Assets/paddleselectscreen.jpg" id="1_i71mr"]
+[ext_resource type="PackedScene" uid="uid://b2vlq3feilbhk" path="res://SelectionBlocksContainer.tscn" id="3_umobd"]
+[ext_resource type="FontFile" uid="uid://bewpidr0danru" path="res://Fonts/BebasNeue-Regular.ttf" id="5_b8dm6"]
+[ext_resource type="AudioStream" uid="uid://c7e81q1bcxojh" path="res://Sounds/ui-click-43196.mp3" id="5_psjxm"]
+
+[node name="PaddleSelectionScreen" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_25w6v")
+
+[node name="TopUIContainer" parent="." instance=ExtResource("1_1vq67")]
+layout_mode = 0
+anchors_preset = 0
+anchor_left = 0.0
+anchor_right = 0.0
+offset_left = 390.0
+offset_top = 10.0
+offset_right = 5435.0
+offset_bottom = 2000.0
+grow_horizontal = 1
+
+[node name="InstructionLabel" parent="TopUIContainer" index="0"]
+theme_override_colors/font_outline_color = Color(0.976471, 0.192157, 0.117647, 1)
+
+[node name="Label" parent="TopUIContainer/ConfirmButton" index="0"]
+theme_override_font_sizes/font_size = 250
+text = "Start Game"
+
+[node name="TextureRect" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("1_i71mr")
+
+[node name="SelectionBlocksContainer" parent="." instance=ExtResource("3_umobd")]
+layout_mode = 1
+anchors_preset = 0
+anchor_right = 0.0
+anchor_bottom = 0.0
+offset_left = 189.0
+offset_top = 217.0
+offset_right = 9549.0
+offset_bottom = 3887.0
+grow_horizontal = 1
+grow_vertical = 1
+theme_override_constants/separation = 1830
+
+[node name="Player1PresidentInfoLabel" type="Label" parent="SelectionBlocksContainer/Player1SelectionBlock/Player1PresidentControls/Player1PresidentDisplay" index="0"]
+layout_mode = 0
+offset_left = -582.0
+offset_top = 1758.0
+offset_right = 2678.0
+offset_bottom = 2208.0
+theme_override_colors/font_color = Color(0.542021, 0.693628, 0.987575, 1)
+theme_override_colors/font_shadow_color = Color(0.0581072, 0, 0.620817, 1)
+theme_override_colors/font_outline_color = Color(0.976471, 0.192157, 0.117647, 1)
+theme_override_constants/shadow_offset_x = 50
+theme_override_constants/shadow_offset_y = 55
+theme_override_constants/outline_size = 60
+theme_override_constants/shadow_outline_size = 50
+theme_override_fonts/font = ExtResource("5_b8dm6")
+theme_override_font_sizes/font_size = 320
+text = "President's Name 2021-2022"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Player1\'sPresident" parent="SelectionBlocksContainer/Player1SelectionBlock" index="2"]
+theme_override_colors/font_outline_color = Color(0.976471, 0.192157, 0.117647, 1)
+theme_override_constants/shadow_offset_x = 50
+theme_override_constants/shadow_offset_y = 55
+theme_override_constants/outline_size = 60
+theme_override_constants/shadow_outline_size = 50
+
+[node name="Player2PresidentInfoLabel" type="Label" parent="SelectionBlocksContainer/RightSideSelectionWrapper/Player2SelectionBlock/Player2PresidentControls/Player2PresidentDisplay" index="0"]
+layout_mode = 0
+offset_left = -582.0
+offset_top = 1758.0
+offset_right = 2678.0
+offset_bottom = 2208.0
+theme_override_colors/font_color = Color(0.542021, 0.693628, 0.987575, 1)
+theme_override_colors/font_shadow_color = Color(0.0581072, 0, 0.620817, 1)
+theme_override_colors/font_outline_color = Color(0.976471, 0.192157, 0.117647, 1)
+theme_override_constants/shadow_offset_x = 50
+theme_override_constants/shadow_offset_y = 55
+theme_override_constants/outline_size = 60
+theme_override_constants/shadow_outline_size = 50
+theme_override_fonts/font = ExtResource("5_b8dm6")
+theme_override_font_sizes/font_size = 320
+text = "President's Name 2021-2022"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="AIPresidentInfoLabel" type="Label" parent="SelectionBlocksContainer/RightSideSelectionWrapper/Player2SelectionBlock/Player2PresidentControls/Player2PresidentDisplay/Player2PresidentInfoLabel"]
+layout_mode = 0
+offset_left = -582.0
+offset_top = 1758.0
+offset_right = 2678.0
+offset_bottom = 2208.0
+theme_override_colors/font_color = Color(0.542021, 0.693628, 0.987575, 1)
+theme_override_colors/font_shadow_color = Color(0.0581072, 0, 0.620817, 1)
+theme_override_colors/font_outline_color = Color(0.976471, 0.192157, 0.117647, 1)
+theme_override_constants/shadow_offset_x = 50
+theme_override_constants/shadow_offset_y = 55
+theme_override_constants/outline_size = 60
+theme_override_constants/shadow_outline_size = 50
+theme_override_fonts/font = ExtResource("5_b8dm6")
+theme_override_font_sizes/font_size = 320
+text = "President's Name 2021-2022"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Player2\'sPresident" parent="SelectionBlocksContainer/RightSideSelectionWrapper/Player2SelectionBlock" index="2"]
+theme_override_colors/font_outline_color = Color(0.976471, 0.192157, 0.117647, 1)
+theme_override_constants/shadow_offset_x = 50
+theme_override_constants/shadow_offset_y = 55
+theme_override_constants/outline_size = 60
+theme_override_constants/shadow_outline_size = 50
+
+[node name="AIPresidentInfoLabel" type="Label" parent="SelectionBlocksContainer/RightSideSelectionWrapper/AISelectionBlock/AIPresidentControls/AIPresidentDisplay" index="0"]
+layout_mode = 0
+offset_left = -582.0
+offset_top = 1758.0
+offset_right = 2678.0
+offset_bottom = 2208.0
+theme_override_colors/font_color = Color(0.542021, 0.693628, 0.987575, 1)
+theme_override_colors/font_shadow_color = Color(0.0581072, 0, 0.620817, 1)
+theme_override_colors/font_outline_color = Color(0.976471, 0.192157, 0.117647, 1)
+theme_override_constants/shadow_offset_x = 50
+theme_override_constants/shadow_offset_y = 55
+theme_override_constants/outline_size = 60
+theme_override_constants/shadow_outline_size = 50
+theme_override_fonts/font = ExtResource("5_b8dm6")
+theme_override_font_sizes/font_size = 320
+text = "President's Name 2021-2022"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="AI\'sPresident" parent="SelectionBlocksContainer/RightSideSelectionWrapper/AISelectionBlock" index="2"]
+theme_override_colors/font_outline_color = Color(0.976471, 0.192157, 0.117647, 1)
+theme_override_constants/shadow_offset_x = 50
+theme_override_constants/shadow_offset_y = 55
+theme_override_constants/outline_size = 60
+theme_override_constants/shadow_outline_size = 50
+
+[node name="UIClickSound" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource("5_psjxm")
+
+[connection signal="pressed" from="TopUIContainer/ConfirmButton" to="." method="_on_ConfirmButton_pressed"]
+
+[editable path="TopUIContainer"]
+[editable path="SelectionBlocksContainer"]

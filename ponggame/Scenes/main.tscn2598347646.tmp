@@ -1,0 +1,240 @@
+[gd_scene load_steps=19 format=3 uid="uid://c1orecnybynmk"]
+
+[ext_resource type="Script" uid="uid://vb2h6lojc1kk" path="res://Scripts/Main.gd" id="1_ynf5e"]
+[ext_resource type="PackedScene" uid="uid://bo8vjvq2q7lq" path="res://Scenes/playerpaddle.tscn" id="2_hptm8"]
+[ext_resource type="Script" uid="uid://ccanbt2fiq65i" path="res://Scripts/AIPaddle.gd" id="3_d1ilt"]
+[ext_resource type="Texture2D" uid="uid://btmd5omlja0h0" path="res://Assets/grunge-wall-texture.jpg" id="5_fdnlq"]
+[ext_resource type="Texture2D" uid="uid://b630mw4vl1iuv" path="res://Assets/pongtable.jpeg" id="6_jkdf5"]
+[ext_resource type="FontFile" uid="uid://buq63d01vt7wj" path="res://Fonts/Lato-Bold.ttf" id="7_wsu2k"]
+[ext_resource type="PackedScene" uid="uid://yioard2p4plg" path="res://Scenes/ball.tscn" id="8_k12tt"]
+[ext_resource type="Texture2D" uid="uid://c3dymc3odn5dg" path="res://Assets/pongball.png" id="9_h1bgf"]
+[ext_resource type="FontFile" uid="uid://cwpc0d2b36u0l" path="res://Fonts/Komigo3D-Regular.ttf" id="9_ynf5e"]
+[ext_resource type="Texture2D" uid="uid://dnc4d1yqr8euy" path="res://Assets/american-flag.jpg" id="10_d1ilt"]
+[ext_resource type="FontFile" uid="uid://cp8rti82oh7h3" path="res://Assets/BebasNeue-Regular.ttf" id="11_6iyac"]
+[ext_resource type="AudioStream" uid="uid://b3r3ftv780cx8" path="res://Sounds/pongballsound1.mp3" id="12_jkdf5"]
+[ext_resource type="AudioStream" uid="uid://dnq866rb444g1" path="res://Sounds/pongballsound2.mp3" id="13_wsu2k"]
+[ext_resource type="AudioStream" uid="uid://bggjl14x1e3fg" path="res://Sounds/pongballsound3.mp3" id="14_k12tt"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_kek77"]
+size = Vector2(2.8984, 12.025)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_272bh"]
+size = Vector2(1377, 449)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_5vw27"]
+size = Vector2(71, 608)
+
+[sub_resource type="Gradient" id="Gradient_4c57u"]
+colors = PackedColorArray(0.873298, 0.873298, 0.873298, 1, 1, 1, 1, 0)
+
+[node name="Main" type="Node2D"]
+script = ExtResource("1_ynf5e")
+
+[node name="PlayerPaddle" parent="." instance=ExtResource("2_hptm8")]
+position = Vector2(-2, 0)
+
+[node name="Camera2D" type="Camera2D" parent="."]
+visibility_layer = 3
+
+[node name="AIPaddle" type="CharacterBody2D" parent="."]
+position = Vector2(40, 0)
+scale = Vector2(0.8, 0.8)
+collision_layer = 3
+script = ExtResource("3_d1ilt")
+
+[node name="Sprite2D" type="Sprite2D" parent="AIPaddle"]
+visibility_layer = 3
+position = Vector2(669.738, -11.272)
+scale = Vector2(0.062, 0.072)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="AIPaddle"]
+position = Vector2(661.25, -8.75)
+scale = Vector2(5, 10)
+shape = SubResource("RectangleShape2D_kek77")
+
+[node name="Player2Paddle" type="CharacterBody2D" parent="."]
+visible = false
+position = Vector2(40, 0)
+scale = Vector2(0.8, 0.8)
+collision_layer = 3
+script = ExtResource("3_d1ilt")
+
+[node name="Sprite2D" type="Sprite2D" parent="Player2Paddle"]
+position = Vector2(669.738, -11.272)
+scale = Vector2(0.062, 0.072)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Player2Paddle"]
+position = Vector2(661.25, -8.75)
+scale = Vector2(5, 10)
+shape = SubResource("RectangleShape2D_kek77")
+
+[node name="TopWall" type="StaticBody2D" parent="."]
+collision_layer = 3
+
+[node name="Sprite2D" type="Sprite2D" parent="TopWall"]
+position = Vector2(8, -375)
+scale = Vector2(0.306222, 0.0663333)
+texture = ExtResource("5_fdnlq")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="TopWall"]
+position = Vector2(8, -500)
+shape = SubResource("RectangleShape2D_272bh")
+
+[node name="BallSpawnPosition" type="Marker2D" parent="."]
+position = Vector2(50, 40)
+
+[node name="BottomWall" type="StaticBody2D" parent="."]
+collision_layer = 3
+
+[node name="Sprite2D" type="Sprite2D" parent="BottomWall"]
+position = Vector2(-38, 433)
+scale = Vector2(0.306222, 0.0663333)
+texture = ExtResource("5_fdnlq")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="BottomWall"]
+position = Vector2(-25, 556)
+shape = SubResource("RectangleShape2D_272bh")
+
+[node name="LeftGoal" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="LeftGoal"]
+position = Vector2(-637, 28)
+shape = SubResource("RectangleShape2D_5vw27")
+
+[node name="RIghtGoal" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="RIghtGoal"]
+position = Vector2(641.5, 29)
+shape = SubResource("RectangleShape2D_5vw27")
+
+[node name="Background" type="Sprite2D" parent="."]
+z_index = -10
+position = Vector2(0, 10)
+texture = ExtResource("6_jkdf5")
+metadata/_edit_lock_ = true
+
+[node name="Player1Score" type="Label" parent="."]
+offset_left = -430.0
+offset_top = -308.0
+offset_right = -390.0
+offset_bottom = -285.0
+theme_override_fonts/font = ExtResource("7_wsu2k")
+theme_override_font_sizes/font_size = 20
+text = "0"
+horizontal_alignment = 1
+
+[node name="ComputerScore" type="Label" parent="."]
+offset_left = 430.0
+offset_top = -308.0
+offset_right = 470.0
+offset_bottom = -285.0
+theme_override_fonts/font = ExtResource("7_wsu2k")
+theme_override_font_sizes/font_size = 20
+text = "0"
+horizontal_alignment = 1
+
+[node name="Ball" parent="." instance=ExtResource("8_k12tt")]
+position = Vector2(50, 32)
+scale = Vector2(1.2, 1.2)
+collision_mask = 3
+
+[node name="Area2D" parent="Ball" index="2"]
+collision_layer = 7
+collision_mask = 3
+priority = 3
+
+[node name="CPUParticles2D" type="CPUParticles2D" parent="Ball"]
+position = Vector2(-41.6667, -26.6667)
+scale = Vector2(0.833333, 0.833333)
+amount = 20
+texture = ExtResource("9_h1bgf")
+lifetime = 0.27
+local_coords = true
+emission_shape = 1
+emission_sphere_radius = 1.0
+particle_flag_align_y = true
+direction = Vector2(0, 0)
+spread = 180.0
+gravity = Vector2(0, 0)
+angular_velocity_min = 100.0
+angular_velocity_max = 100.0
+scale_amount_min = 0.03
+scale_amount_max = 0.03
+color_ramp = SubResource("Gradient_4c57u")
+
+[node name="Player1ScoreLabel" type="Label" parent="."]
+offset_left = -480.0
+offset_top = -339.0
+offset_right = -344.0
+offset_bottom = -311.0
+rotation = -0.00176161
+theme_override_font_sizes/font_size = 20
+text = "Player 1 Score"
+
+[node name="Player2ScoreLabel" type="Label" parent="."]
+offset_left = 360.0
+offset_top = -339.0
+offset_right = 533.0
+offset_bottom = -311.0
+rotation = -0.00176161
+theme_override_font_sizes/font_size = 20
+text = "Computer 1 Score"
+
+[node name="TimerLabel" type="Label" parent="."]
+offset_left = -212.0
+offset_top = -356.0
+offset_right = 64.0
+offset_bottom = -287.0
+theme_override_fonts/font = ExtResource("9_ynf5e")
+theme_override_font_sizes/font_size = 50
+text = "00:00"
+horizontal_alignment = 1
+
+[node name="TextureRect" type="TextureRect" parent="."]
+visible = false
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -450.0
+offset_top = -256.0
+offset_right = 4550.0
+offset_bottom = 2825.0
+grow_horizontal = 2
+grow_vertical = 2
+scale = Vector2(0.18, 0.18)
+size_flags_horizontal = 4
+size_flags_vertical = 4
+texture = ExtResource("10_d1ilt")
+
+[node name="WinnerLabel" type="Label" parent="TextureRect"]
+layout_mode = 0
+offset_right = 4994.0
+offset_bottom = 3083.0
+theme_override_colors/font_color = Color(0.30991, 0.519469, 0.999988, 1)
+theme_override_colors/font_outline_color = Color(0.756863, 0, 0, 1)
+theme_override_constants/shadow_offset_x = 0
+theme_override_constants/shadow_offset_y = 100
+theme_override_constants/outline_size = 100
+theme_override_constants/shadow_outline_size = 100
+theme_override_fonts/font = ExtResource("11_6iyac")
+theme_override_font_sizes/font_size = 600
+text = "President 1 Wins!!!"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="BallHitSound1" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource("12_jkdf5")
+
+[node name="BallHitSound2" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource("13_wsu2k")
+
+[node name="BallHitSound3" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource("14_k12tt")
+
+[connection signal="body_entered" from="LeftGoal" to="." method="_on_LeftGoal_body_entered"]
+[connection signal="body_entered" from="RIghtGoal" to="." method="_on_RightGoal_body_entered"]
+[connection signal="body_entered" from="Ball/Area2D" to="Ball" method="_on_ball_body_entered"]
+
+[editable path="Ball"]

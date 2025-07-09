@@ -24,7 +24,7 @@
             padding: 0;
             width: 100%;
             text-align: center;
-            max-width: 900px;
+            max-width: 1200px; /* Increased max-width for 4 cards */
             margin-left: auto;
             margin-right: auto;
         }
@@ -59,9 +59,17 @@
             padding: 1rem;
         }
 
+        /* On medium screens (tablets), show 2 columns */
         @media (min-width: 768px) {
             .grid-layout {
-                grid-template-columns: repeat(3, 1fr);
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        /* On large screens (desktops), show 4 columns */
+        @media (min-width: 1024px) {
+            .grid-layout {
+                grid-template-columns: repeat(4, 1fr);
             }
         }
 
@@ -105,6 +113,15 @@
         }
         .category-card.ela .title { color: #880e4f; }
         .category-card.ela .description { color: #d32f2f; }
+        
+        /* New styles for Social Studies card */
+        .category-card.social-studies {
+            background-color: rgba(255, 165, 0, 0.9); /* Orange background */
+            border-color: rgb(204, 132, 0); /* Darker orange border */
+        }
+        .category-card.social-studies .title { color: #a0522d; } /* Sienna title color */
+        .category-card.social-studies .description { color: #8b4513; } /* SaddleBrown description color */
+
 
         .category-icon {
             width: 5rem;
@@ -495,11 +512,13 @@
                     Explore <span style="margin-left: 0.5rem;">&#x276F;</span> </button>
             </div>
 
+            <!-- **** MODIFICATION HERE **** -->
             <div class="category-card science">
                 <img src="science.png" alt="Science Icon" class="category-icon" onerror="this.onerror=null; this.src='https://placehold.co/80x80/81C784/000000?text=Science';" />
                 <h2 class="category-title">Science Games</h2>
                 <p class="category-description">Discover the world around you!</p>
-                <button class="explore-button" onclick="playClickSound();">
+                <!-- I updated the onclick to call the new showScienceGame() function -->
+                <button class="explore-button" onclick="playClickSound(); showScienceGame();">
                     Explore <span style="margin-left: 0.5rem;">&#x276F;</span> </button>
             </div>
 
@@ -508,6 +527,15 @@
                 <h2 class="category-title">ELA Games</h2>
                 <p class="category-description">Read, write, and communicate!</p>
                 <button class="explore-button" onclick="playClickSound(); showElaGame();"> Explore <span style="margin-left: 0.5rem;">&#x276F;</span> </button>
+            </div>
+
+            <!-- NEW Social Studies Card -->
+            <div class="category-card social-studies">
+                <img src="socialstudies.png" alt="Social Studies Icon" class="category-icon" onerror="this.onerror=null; this.src='https://placehold.co/80x80/FFA500/000000?text=History';" />
+                <h2 class="category-title">Social Studies</h2>
+                <p class="category-description">Explore history and cultures!</p>
+                <!-- UPDATED BUTTON ONCLICK -->
+                <button class="explore-button" onclick="playClickSound(); showPongGame();"> Explore <span style="margin-left: 0.5rem;">&#x276F;</span> </button>
             </div>
 
         </div>
@@ -521,14 +549,30 @@
         <button onclick="playClickSound(); showMainMenu();" class="back-button">
             &larr; Back to Main Menu
         </button>
-        <iframe src="mathgame.html" title="Math Challenge Game" class="game-iframe"></iframe>
+        <iframe id="math-game-iframe" src="" title="Math Challenge Game" class="game-iframe"></iframe>
+    </div>
+
+    <!-- **** NEW CONTAINER FOR THE ANIMAL APP **** -->
+    <div id="science-game-view" class="game-iframe-container">
+        <button onclick="playClickSound(); showMainMenu();" class="back-button">
+            &larr; Back to Main Menu
+        </button>
+        <iframe id="science-game-iframe" src="" title="Animal Kingdom Explorer" class="game-iframe"></iframe>
     </div>
 
     <div id="ela-game-view" class="game-iframe-container">
         <button onclick="playClickSound(); showMainMenu();" class="back-button">
             &larr; Back to Main Menu
         </button>
-        <iframe src="WordWarrior.html" title="Word Weaver Game" class="game-iframe"></iframe>
+        <iframe id="ela-game-iframe" src="" title="Word Weaver Game" class="game-iframe"></iframe>
+    </div>
+
+    <!-- NEW PONG GAME CONTAINER -->
+    <div id="pong-game-view" class="game-iframe-container">
+        <button onclick="playClickSound(); showMainMenu();" class="back-button">
+            &larr; Back to Main Menu
+        </button>
+        <iframe id="pong-game-iframe" src="" title="Presidential Pong Game" class="game-iframe"></iframe>
     </div>
 
     <audio id="mainClickSoundElement" preload="auto">
@@ -651,9 +695,19 @@
 
 
     <script>
+        // **** MODIFICATION HERE ****
         const mainMenuContainer = document.getElementById('main-menu-container');
         const mathGameView = document.getElementById('math-game-view');
+        // I added a reference to the new science game view
+        const scienceGameView = document.getElementById('science-game-view');
         const elaGameView = document.getElementById('ela-game-view');
+        const pongGameView = document.getElementById('pong-game-view');
+
+        const mathGameIframe = document.getElementById('math-game-iframe');
+        // I added a reference to the new science game iframe
+        const scienceGameIframe = document.getElementById('science-game-iframe');
+        const elaGameIframe = document.getElementById('ela-game-iframe');
+        const pongGameIframe = document.getElementById('pong-game-iframe');
 
         const mainClickSoundElement = document.getElementById('mainClickSoundElement');
 
@@ -668,24 +722,78 @@
             }
         }
 
+        // **** MODIFICATION HERE ****
         function showMainMenu() {
             mainMenuContainer.style.display = 'block';
             mathGameView.style.display = 'none';
+            // I added logic to hide the science game view
+            scienceGameView.style.display = 'none';
             elaGameView.style.display = 'none';
+            pongGameView.style.display = 'none';
+
+            // I added logic to stop the science game by clearing its iframe source
+            mathGameIframe.src = '';
+            scienceGameIframe.src = '';
+            elaGameIframe.src = '';
+            pongGameIframe.src = '';
+
             document.body.style.overflow = 'auto'; // Re-enable scrolling when main menu is shown
         }
 
+        // **** MODIFICATION HERE ****
         function showMathGame() {
             mainMenuContainer.style.display = 'none';
             mathGameView.style.display = 'flex';
+            // I added logic to hide the science game view
+            scienceGameView.style.display = 'none';
             elaGameView.style.display = 'none';
+            pongGameView.style.display = 'none';
+            
+            mathGameIframe.src = 'mathgame.html';
+
             document.body.style.overflow = 'hidden'; // Hide scrolling when game view is active
         }
 
+        // **** NEW FUNCTION TO SHOW THE ANIMAL APP ****
+        function showScienceGame() {
+            mainMenuContainer.style.display = 'none';
+            mathGameView.style.display = 'none';
+            scienceGameView.style.display = 'flex'; // Show the science view
+            elaGameView.style.display = 'none';
+            pongGameView.style.display = 'none';
+
+            // Load the animal app by setting the iframe source.
+            // Make sure your animal app file is named "animalapp.html"
+            scienceGameIframe.src = 'animalapp.html';
+
+            document.body.style.overflow = 'hidden'; // Hide scrolling when game view is active
+        }
+
+        // **** MODIFICATION HERE ****
         function showElaGame() {
             mainMenuContainer.style.display = 'none';
             mathGameView.style.display = 'none';
+            // I added logic to hide the science game view
+            scienceGameView.style.display = 'none';
             elaGameView.style.display = 'flex';
+            pongGameView.style.display = 'none';
+
+            elaGameIframe.src = 'WordWarrior.html';
+
+            document.body.style.overflow = 'hidden'; // Hide scrolling when game view is active
+        }
+
+        // **** MODIFICATION HERE ****
+        function showPongGame() {
+            mainMenuContainer.style.display = 'none';
+            mathGameView.style.display = 'none';
+            // I added logic to hide the science game view
+            scienceGameView.style.display = 'none';
+            elaGameView.style.display = 'none';
+            pongGameView.style.display = 'flex';
+
+            pongGameIframe.src = 'ponggame/presidentialpong.html';
+
             document.body.style.overflow = 'hidden'; // Hide scrolling when game view is active
         }
 
@@ -940,7 +1048,7 @@
         function updateAvatarPreview(config) {
             const queryParams = new URLSearchParams(config).toString();
             avatarPreview.src = `https://avataaars.io/?${queryParams}`;
-              // Set wrapper background color based on avatarStyle and circleColor
+                 // Set wrapper background color based on avatarStyle and circleColor
             // Removed logic for setting background color based on circleColor
             avatarPreview.parentElement.style.backgroundColor = 'transparent'; // Always transparent
         }

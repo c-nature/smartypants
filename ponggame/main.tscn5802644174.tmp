@@ -1,0 +1,145 @@
+[gd_scene load_steps=15 format=3 uid="uid://c1orecnybynmk"]
+
+[ext_resource type="Script" uid="uid://vb2h6lojc1kk" path="res://Main.gd" id="1_4c57u"]
+[ext_resource type="Script" uid="uid://bge3ey5xy5tio" path="res://PlayerPaddle.gd" id="1_h2yge"]
+[ext_resource type="Texture2D" uid="uid://b0jfjrfx7qo4w" path="res://trump.png" id="1_ig7tw"]
+[ext_resource type="Texture2D" uid="uid://1rfe34ut5eu6" path="res://biden.png" id="2_0xm2m"]
+[ext_resource type="Script" uid="uid://ccanbt2fiq65i" path="res://AIPaddle.gd" id="3_1bvp3"]
+[ext_resource type="Texture2D" uid="uid://c3dymc3odn5dg" path="res://pongball.png" id="5_lquwl"]
+[ext_resource type="Texture2D" uid="uid://btmd5omlja0h0" path="res://grunge-wall-texture.jpg" id="7_272bh"]
+[ext_resource type="Texture2D" uid="uid://b630mw4vl1iuv" path="res://pongtable.jpeg" id="8_5vw27"]
+[ext_resource type="PackedScene" uid="uid://yioard2p4plg" path="res://ball.tscn" id="9_4c57u"]
+[ext_resource type="FontFile" uid="uid://buq63d01vt7wj" path="res://Lato-Bold.ttf" id="9_kek77"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ig7tw"]
+size = Vector2(4.3, 11.8)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_272bh"]
+size = Vector2(1377, 449)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_5vw27"]
+size = Vector2(71, 608)
+
+[sub_resource type="Gradient" id="Gradient_4c57u"]
+colors = PackedColorArray(0.873298, 0.873298, 0.873298, 1, 1, 1, 1, 0)
+
+[node name="Main" type="Node2D"]
+script = ExtResource("1_4c57u")
+
+[node name="PlayerPaddle" type="CharacterBody2D" parent="."]
+position = Vector2(-2, 0)
+scale = Vector2(0.8, 0.8)
+script = ExtResource("1_h2yge")
+
+[node name="Sprite2D" type="Sprite2D" parent="PlayerPaddle"]
+position = Vector2(-710.258, -12.1875)
+scale = Vector2(0.0620041, 0.0723267)
+texture = ExtResource("1_ig7tw")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="PlayerPaddle"]
+position = Vector2(-706.266, -8.18746)
+scale = Vector2(10, 10)
+shape = SubResource("RectangleShape2D_ig7tw")
+
+[node name="Camera2D" type="Camera2D" parent="."]
+
+[node name="AIPaddle" type="CharacterBody2D" parent="."]
+position = Vector2(40, 0)
+scale = Vector2(0.8, 0.8)
+script = ExtResource("3_1bvp3")
+
+[node name="Sprite2D" type="Sprite2D" parent="AIPaddle"]
+position = Vector2(669.738, -11.272)
+scale = Vector2(0.062, 0.072)
+texture = ExtResource("2_0xm2m")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="AIPaddle"]
+position = Vector2(664.738, -10.272)
+scale = Vector2(10, 10)
+shape = SubResource("RectangleShape2D_ig7tw")
+
+[node name="TopWall" type="StaticBody2D" parent="."]
+
+[node name="Sprite2D" type="Sprite2D" parent="TopWall"]
+position = Vector2(8, -375)
+scale = Vector2(0.306222, 0.0663333)
+texture = ExtResource("7_272bh")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="TopWall"]
+position = Vector2(11, -500)
+shape = SubResource("RectangleShape2D_272bh")
+
+[node name="BallSpawnPosition" type="Marker2D" parent="."]
+
+[node name="BottomWall" type="StaticBody2D" parent="."]
+
+[node name="Sprite2D" type="Sprite2D" parent="BottomWall"]
+position = Vector2(-38, 433)
+scale = Vector2(0.306222, 0.0663333)
+texture = ExtResource("7_272bh")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="BottomWall"]
+position = Vector2(-25, 556)
+shape = SubResource("RectangleShape2D_272bh")
+
+[node name="LeftGoal" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="LeftGoal"]
+position = Vector2(-637, 28)
+shape = SubResource("RectangleShape2D_5vw27")
+
+[node name="RIghtGoal" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="RIghtGoal"]
+position = Vector2(641.5, 29)
+shape = SubResource("RectangleShape2D_5vw27")
+
+[node name="Background" type="Sprite2D" parent="."]
+z_index = -10
+position = Vector2(0, 10)
+texture = ExtResource("8_5vw27")
+metadata/_edit_lock_ = true
+
+[node name="Player1Score" type="Label" parent="."]
+offset_left = -430.0
+offset_top = -308.0
+offset_right = -390.0
+offset_bottom = -285.0
+theme_override_fonts/font = ExtResource("9_kek77")
+text = "0"
+horizontal_alignment = 1
+
+[node name="ComputerScore" type="Label" parent="."]
+offset_left = 430.0
+offset_top = -308.0
+offset_right = 470.0
+offset_bottom = -285.0
+theme_override_fonts/font = ExtResource("9_kek77")
+text = "0"
+horizontal_alignment = 1
+
+[node name="Ball" parent="." instance=ExtResource("9_4c57u")]
+position = Vector2(50, 32)
+scale = Vector2(1.2, 1.2)
+
+[node name="CPUParticles2D" type="CPUParticles2D" parent="Ball"]
+position = Vector2(-41.6667, -26.6667)
+scale = Vector2(0.833333, 0.833333)
+amount = 20
+texture = ExtResource("5_lquwl")
+lifetime = 0.27
+local_coords = true
+emission_shape = 1
+emission_sphere_radius = 1.0
+particle_flag_align_y = true
+direction = Vector2(0, 0)
+spread = 180.0
+gravity = Vector2(0, 0)
+angular_velocity_min = 100.0
+angular_velocity_max = 100.0
+scale_amount_min = 0.03
+scale_amount_max = 0.03
+color_ramp = SubResource("Gradient_4c57u")
+
+[connection signal="body_entered" from="LeftGoal" to="PlayerPaddle" method="_on_left_goal_body_entered"]
+[connection signal="body_entered" from="RIghtGoal" to="PlayerPaddle" method="_on_r_ight_goal_body_entered"]

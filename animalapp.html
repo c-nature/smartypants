@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Animal Kingdom Explorer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-image: url('https://images.pexels.com/photos/1661179/pexels-photo-1661179.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+        .backdrop-blur-sm {
+             backdrop-filter: blur(4px);
+        }
+    </style>
+</head>
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
+
+    <div class="container mx-auto p-4 sm:p-6 lg:p-8">
+        <div class="max-w-3xl mx-auto bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm rounded-2xl p-6 md:p-8 shadow-2xl">
+            
+            <!-- Header -->
+            <header class="text-center mb-8">
+                <h1 class="text-4xl sm:text-5xl font-bold text-teal-600 dark:text-teal-400" style="text-shadow: 1px 1px 2px rgba(0,0,0,0.1);">Animal Kingdom Explorer</h1>
+                <p class="mt-2 text-lg text-gray-700 dark:text-gray-300">Let's discover the wonders of the animal world!</p>
+            </header>
+
+            <!-- Search Bar -->
+            <div class="mb-8">
+                <div class="flex flex-col sm:flex-row gap-4">
+                    <input type="text" id="animal-name" class="flex-grow w-full px-4 py-3 bg-white/70 dark:bg-gray-800/70 border-2 border-teal-300 dark:border-teal-600 rounded-lg focus:outline-none focus:ring-4 focus:ring-teal-500/50 transition" placeholder="Enter an animal name (e.g., Tiger)">
+                    <button id="search-btn" class="w-full sm:w-auto px-6 py-3 bg-teal-500 text-white font-semibold rounded-lg shadow-lg hover:bg-teal-600 focus:outline-none focus:ring-4 focus:ring-teal-500/50 transform hover:-translate-y-1 transition-all duration-200">
+                        <i class="fas fa-search mr-2"></i> Search
+                    </button>
+                </div>
+            </div>
+
+            <!-- Loading Spinner -->
+            <div id="loader" class="text-center hidden my-8">
+                <div class="inline-block animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-teal-500"></div>
+                <p class="mt-4 text-gray-600 dark:text-gray-400">Exploring the wild...</p>
+            </div>
+
+            <!-- Message Display -->
+            <div id="message-box" class="text-center hidden my-8 p-4 bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300 rounded-lg shadow"></div>
+
+
+            <!-- Results Section -->
+            <div id="results" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Animal cards will be inserted here -->
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // --- Element References ---
+        const searchBtn = document.getElementById('search-btn');
+        const animalNameInput = document.getElementById('animal-name');
+        const resultsContainer = document.getElementById('results');
+        const loader = document.getElementById('loader');
+        const messageBox = document.getElementById('message-box');
+
+        // --- API Configuration ---
+        const apiKey = 'NBLzVtc9zEUgykvHHYEelQ==Nk1wfVKY9E9NGnQs'; 
+        const apiUrl = 'https://api.api-ninjas.com/v1/animals?name=';
+
+        // --- Event Listeners ---
+        searchBtn.addEventListener('click', searchForAnimal);
+        animalNameInput.addEventListener('keyup', (event) => {
+            if (event.key === 'Enter') {
+                searchForAnimal();
+            }
+        });
+
+        /**
+         * Main function to trigger the animal search.
+         */
+        function searchForAnimal() {
+            const animalName = animalNameInput.value.trim();
+            if (!animalName) {
+                displayMessage('Please enter an animal name to start exploring!');
+                return;
+            }
+            fetchAnimalData(animalName);
+        }
+
+        /**
+         * Fetches animal data from the API Ninjas endpoint.
+         * @param {string} animalName - The name of the animal to search for.
+         */
+        async function fetchAnimalData(animalName) {
+            loader.classList.remove('hidden');
+            resultsContainer.innerHTML = '';
+            hideMessage();
+
+            try {
+                const response = await fetch(apiUrl + animalName, {
+                    method: 'GET',
+                    headers: { 'X-Api-Key': apiKey }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                displayResults(data);
+
+            } catch (error) {
+                console.error('Error fetching animal data:', error);
+                displayMessage('Oops! Couldn\'t fetch data. Please check your connection or try again.');
+            } finally {
+                loader.classList.add('hidden');
+            }
+        }
+
+        /**
+         * Displays the fetched animal data on the page, including an image.
+         * @param {Array} animals - An array of animal objects from the API.
+         */
+        function displayResults(animals) {
+            if (animals.length === 0) {
+                displayMessage('No animals found with that name. Try another one!');
+                return;
+            }
+
+            animals.forEach(animal => {
+                const card = document.createElement('div');
+                card.className = 'bg-gradient-to-br from-white/90 to-gray-100/90 dark:from-gray-800/90 dark:to-gray-900/90 rounded-xl shadow-lg overflow-hidden transform hover:scale-105 hover:shadow-2xl transition-all duration-300';
+                
+                const name = animal.name || 'N/A';
+                const scientificName = animal.taxonomy?.scientific_name || 'N/A';
+                const locations = (animal.locations && animal.locations.length > 0) ? animal.locations.join(', ') : 'Not specified';
+                const diet = animal.characteristics?.diet || 'N/A';
+                const lifespan = animal.characteristics?.lifespan || 'N/A';
+                const skinType = animal.characteristics?.skin_type || 'N/A';
+
+                // Image URL from Unsplash Source, which provides random images based on a keyword.
+                const imageUrl = `https://source.unsplash.com/400x300/?${name}`;
+                // A fallback placeholder image in case the Unsplash image fails to load.
+                const placeholderUrl = `https://placehold.co/400x300/e2e8f0/64748b?text=${name}`;
+
+                card.innerHTML = `
+                    <img src="${imageUrl}" alt="Photo of a ${name}" class="w-full h-48 object-cover" onerror="this.onerror=null;this.src='${placeholderUrl}';">
+                    <div class="p-6">
+                        <h2 class="text-2xl font-bold text-teal-700 dark:text-teal-300 mb-2">${name}</h2>
+                        <p class="text-sm text-gray-500 dark:text-gray-400 font-medium mb-5 italic">${scientificName}</p>
+                        
+                        <div class="space-y-4 text-gray-800 dark:text-gray-200">
+                            <p><i class="fas fa-map-marker-alt w-6 text-red-500"></i> <strong class="font-semibold">Locations:</strong> ${locations}</p>
+                            <p><i class="fas fa-utensils w-6 text-yellow-500"></i> <strong class="font-semibold">Diet:</strong> ${diet}</p>
+                            <p><i class="fas fa-heartbeat w-6 text-green-500"></i> <strong class="font-semibold">Lifespan:</strong> ${lifespan}</p>
+                            <p><i class="fas fa-tshirt w-6 text-blue-500"></i> <strong class="font-semibold">Skin Type:</strong> ${skinType}</p>
+                        </div>
+                    </div>
+                `;
+                resultsContainer.appendChild(card);
+            });
+        }
+
+        /**
+         * Displays a message to the user.
+         * @param {string} message - The message to display.
+         */
+        function displayMessage(message) {
+            messageBox.textContent = message;
+            messageBox.classList.remove('hidden');
+        }
+
+        /**
+         * Hides the message box.
+         */
+        function hideMessage() {
+            messageBox.classList.add('hidden');
+        }
+    </script>
+
+</body>
+</html>
