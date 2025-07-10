@@ -20,7 +20,7 @@
             overflow-x: hidden; /* Keep horizontal overflow hidden unless specified */
         }
 
-        .main-container {
+        .main-container, .category-view {
             padding: 0;
             width: 100%;
             text-align: center;
@@ -30,10 +30,9 @@
         }
 
         /* Adjust content padding to prevent it from being hidden by the fixed header */
-        .main-container-with-header-offset {
+        .main-container-with-header-offset, .category-view {
             padding-top: 6rem; /* Adjust based on header height */
         }
-
 
         .header-title {
             font-size: 3.5rem;
@@ -204,9 +203,7 @@
             padding: 1rem;
             box-sizing: border-box;
             position: fixed;
-            /* Changed top from 0 to 6rem to start below the fixed header */
             top: 6rem; 
-            /* Adjusted height to account for the header */
             height: calc(100vh - 6rem); 
             left: 0;
             z-index: 50;
@@ -219,6 +216,84 @@
             border-radius: 1rem;
             box-shadow: 0 4px 15px rgba(0,0,0,0.2);
             background-color: #fff;
+        }
+        
+        .game-list-layout {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            padding: 1rem;
+            margin-top: 2rem;
+        }
+
+        .game-list-card {
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 1.5rem;
+            padding: 2rem;
+            box-shadow: 0 8px 12px -3px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .game-list-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 20px -5px rgba(0, 0, 0, 0.15);
+        }
+
+        .game-list-card h3 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+        
+        .game-list-card p {
+            font-size: 1.1rem;
+            color: #555;
+            margin-bottom: 1.5rem;
+            font-weight: 400;
+        }
+
+        .game-card-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            width: 100%;
+            align-items: center;
+        }
+
+        .play-game-button, .play-game-button-new-window {
+            padding: 0.7rem 1.5rem;
+            border-radius: 9999px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            transition: background-color 0.2s, transform 0.1s;
+            border: none;
+            width: 90%;
+            cursor: pointer;
+        }
+
+        .play-game-button {
+            background-color: #ff4081;
+            color: white;
+        }
+
+        .play-game-button:hover {
+            background-color: #f50057;
+            transform: scale(1.05);
+        }
+        
+        .play-game-button-new-window {
+            background-color: #0288d1;
+            color: white;
+        }
+
+        .play-game-button-new-window:hover {
+            background-color: #01579b;
+            transform: scale(1.05);
         }
 
         .back-button {
@@ -234,6 +309,7 @@
             margin-bottom: 1rem;
             transition: background-color 0.2s, transform 0.1s;
             z-index: 51;
+            align-self: flex-start;
         }
 
         .back-button:hover {
@@ -274,7 +350,6 @@
             }
             .game-iframe-container {
                 padding: 0.5rem;
-                /* Adjusted top and height for smaller screens */
                 top: 5rem; 
                 height: calc(100vh - 5rem);
             }
@@ -282,8 +357,8 @@
                 padding: 0.6rem 1.2rem;
                 font-size: 0.9rem;
             }
-            .main-container-with-header-offset {
-                padding-top: 5rem; /* Smaller offset for mobile */
+            .main-container-with-header-offset, .category-view {
+                padding-top: 5rem;
             }
         }
 
@@ -297,21 +372,22 @@
             z-index: 1000;
             transition: opacity 0.3s ease-in-out;
         }
-        .auth-modal.hidden, .avatar-modal.hidden { 
+        .auth-modal.hidden, .avatar-modal.hidden, .category-view.hidden { 
             opacity: 0;
             pointer-events: none;
+            display: none;
         }
-        .auth-modal-content { /* Existing styles for auth modal content */
+        .auth-modal-content {
             background-color: white;
             padding: 2rem;
             border-radius: 0.75rem;
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-            max-width: 40rem; /* Increased size for profile modal */
+            max-width: 40rem;
             width: 100%;
             font-family: 'Fredoka One', cursive;
-            position: relative; /* Added for positioning avatar */
+            position: relative;
         }
-        .avatar-modal-content { /* Existing styles for avatar modal content */
+        .avatar-modal-content {
             background-color: white;
             padding: 2rem;
             border-radius: 0.75rem;
@@ -380,7 +456,7 @@
             text-align: center;
             font-size: 0.875rem;
             margin-top: 1rem;
-            white-space: pre-wrap; /* Preserve newlines for profile message */
+            white-space: pre-wrap;
         }
 
         .avatar-preview {
@@ -389,18 +465,18 @@
             border-radius: 50%;
             background-color: #f0f0f0;
             margin: 0 auto 1rem;
-            display: block; /* Ensure it takes up space and margin works */
+            display: block;
             box-shadow: 0 2px 5px rgba(0,0,0,0.2);
             border: 2px solid #ddd;
         }
         .avatar-options {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); /* Responsive grid */
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
             gap: 1rem;
             margin-top: 1.5rem;
-            max-height: 300px; /* Limit height and add scroll */
+            max-height: 300px;
             overflow-y: auto;
-            padding-right: 0.5rem; /* For scrollbar if present */
+            padding-right: 0.5rem;
         }
         .avatar-option-group {
             display: flex;
@@ -436,61 +512,76 @@
             flex: 1;
         }
         .avatar-btn-primary {
-            background-color: #4CAF50; /* Green */
+            background-color: #4CAF50;
             color: white;
         }
         .avatar-btn-primary:hover {
             background-color: #45a049;
         }
         .avatar-btn-secondary {
-            background-color: #f44336; /* Red */
+            background-color: #f44336;
             color: white;
         }
         .avatar-btn-secondary:hover {
             background-color: #da190b;
         }
 
-        /* NEW: Styles for profile avatar display */
         .profile-avatar-display {
             position: absolute;
-            top: 1rem; /* Adjust as needed */
-            right: 1rem; /* Adjust as needed */
-            z-index: 10; /* Ensure it's above other elements */
+            top: 1rem;
+            right: 1rem;
+            z-index: 10;
         }
 
         .profile-avatar-img {
-            width: 80px; /* Larger size for profile modal */
-            height: 80px; /* Larger size for profile modal */
+            width: 80px;
+            height: 80px;
             border-radius: 50%;
             object-fit: cover;
-            border: 3px solid #8a2be2; /* Purple border for emphasis */
+            border: 3px solid #8a2be2;
             box-shadow: 0 2px 8px rgba(0,0,0,0.3);
         }
 
-        /* Responsive adjustments for auth modal content */
         @media (max-width: 768px) {
             .auth-modal-content {
-                max-width: 95%; /* Adjust for smaller screens */
+                max-width: 95%;
                 padding: 1.5rem;
             }
             .profile-avatar-img {
-                width: 60px; /* Smaller avatar on mobile */
+                width: 60px;
                 height: 60px;
             }
+        }
+
+        #ela-category-view .game-card-buttons button {
+            background-image: url('wordweaver.png');
+            background-size: cover;
+            background-position: center;
+            background-color: #6a0dad; 
+            background-blend-mode: multiply;
+            
+            color: white;
+            font-weight: 700;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+            border: 2px solid rgba(255, 255, 255, 0.6);
+            transition: filter 0.2s, transform 0.2s, border-color 0.2s;
+        }
+
+        #ela-category-view .game-card-buttons button:hover {
+            filter: brightness(1.2);
+            transform: scale(1.05);
+            border-color: white;
         }
     </style>
 </head>
 <body>
 
-    <!-- Moved Header outside of main-container -->
-    <!-- Changed z-[999] to z-60 to ensure it's always on top -->
     <header class="fixed top-0 left-0 right-0 p-4 flex justify-end items-center z-60"> 
         <nav class="flex space-x-2">
             <button id="loginBtn" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-full font-semibold shadow-md">Login</button>
             <button id="signupBtn" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-full font-semibold shadow-md">Sign Up</button>
             <button id="profileBtn" class="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded-full font-semibold shadow-md">
                 Profile </button>
-            <!-- logoutBtn removed from here - now inside authModal -->
         </nav>
     </header>
 
@@ -503,22 +594,19 @@
         </p>
 
         <div class="grid-layout">
-
             <div class="category-card math">
                 <img src="math.png" alt="Math Icon" class="category-icon" onerror="this.onerror=null; this.src='https://placehold.co/80x80/FFD700/000000?text=Math';" />
                 <h2 class="category-title">Math Games</h2>
                 <p class="category-description">Fun with numbers & logic!</p>
-                <button class="explore-button" onclick="playClickSound(); showMathGame();">
+                <button class="explore-button" onclick="playClickSound(); showMathCategoryView();">
                     Explore <span style="margin-left: 0.5rem;">&#x276F;</span> </button>
             </div>
 
-            <!-- **** MODIFICATION HERE **** -->
             <div class="category-card science">
                 <img src="science.png" alt="Science Icon" class="category-icon" onerror="this.onerror=null; this.src='https://placehold.co/80x80/81C784/000000?text=Science';" />
                 <h2 class="category-title">Science Games</h2>
                 <p class="category-description">Discover the world around you!</p>
-                <!-- I updated the onclick to call the new showScienceGame() function -->
-                <button class="explore-button" onclick="playClickSound(); showScienceGame();">
+                <button class="explore-button" onclick="playClickSound(); showScienceCategoryView();">
                     Explore <span style="margin-left: 0.5rem;">&#x276F;</span> </button>
             </div>
 
@@ -526,24 +614,82 @@
                 <img src="abc.png" alt="ELA Icon" class="category-icon" onerror="this.onerror=null; this.src='https://placehold.co/80x80/EF9A9A/000000?text=ABC';" />
                 <h2 class="category-title">ELA Games</h2>
                 <p class="category-description">Read, write, and communicate!</p>
-                <button class="explore-button" onclick="playClickSound(); showElaGame();"> Explore <span style="margin-left: 0.5rem;">&#x276F;</span> </button>
+                <button class="explore-button" onclick="playClickSound(); showElaCategoryView();"> Explore <span style="margin-left: 0.5rem;">&#x276F;</span> </button>
             </div>
 
-            <!-- NEW Social Studies Card -->
             <div class="category-card social-studies">
                 <img src="socialstudies.png" alt="Social Studies Icon" class="category-icon" onerror="this.onerror=null; this.src='https://placehold.co/80x80/FFA500/000000?text=History';" />
                 <h2 class="category-title">Social Studies</h2>
                 <p class="category-description">Explore history and cultures!</p>
-                <!-- UPDATED BUTTON ONCLICK -->
-                <button class="explore-button" onclick="playClickSound(); showPongGame();"> Explore <span style="margin-left: 0.5rem;">&#x276F;</span> </button>
+                <button class="explore-button" onclick="playClickSound(); showSocialStudiesCategoryView();"> Explore <span style="margin-left: 0.5rem;">&#x276F;</span> </button>
             </div>
-
         </div>
 
         <p class="footer-text">
             (Account features and AI assistance coming soon!)
         </p>
     </div>
+
+    <div id="math-category-view" class="category-view hidden">
+        <button onclick="playClickSound(); showMainMenu();" class="back-button"> &larr; Back to Main Menu </button>
+        <h1 class="header-title">MATH</h1>
+        <div class="game-list-layout">
+            <div class="game-list-card">
+                <h3>Math Challenge</h3>
+                <p>Test your arithmetic skills!</p>
+                <div class="game-card-buttons">
+                    <button class="play-game-button" onclick="playClickSound(); showMathGame();">Play Here</button>
+                    <button class="play-game-button-new-window" onclick="playClickSound(); openGameInNewWindow('mathgame.html');">Open in New Window</button>
+                </div>
+            </div>
+            </div>
+    </div>
+
+    <div id="science-category-view" class="category-view hidden">
+        <button onclick="playClickSound(); showMainMenu();" class="back-button"> &larr; Back to Main Menu </button>
+        <h1 class="header-title">SCIENCE</h1>
+        <div class="game-list-layout">
+            <div class="game-list-card">
+                <h3>Animal Kingdom Explorer</h3>
+                <p>Learn about amazing animals!</p>
+                <div class="game-card-buttons">
+                    <button class="play-game-button" onclick="playClickSound(); showScienceGame();">Play Here</button>
+                    <button class="play-game-button-new-window" onclick="playClickSound(); openGameInNewWindow('animalapp.html');">Open in New Window</button>
+                </div>
+            </div>
+            </div>
+    </div>
+    
+    <div id="ela-category-view" class="category-view hidden">
+        <button onclick="playClickSound(); showMainMenu();" class="back-button"> &larr; Back to Main Menu </button>
+        <h1 class="header-title">ELA</h1>
+        <div class="game-list-layout">
+            <div class="game-list-card" style="background-image: url('wordweaver.png'); background-size: cover; background-position: center;">
+                <h3 style="color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);">Word Weaver</h3>
+                <p style="color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);">A fun adventure in vocabulary!</p>
+                <div class="game-card-buttons">
+                    <button class="play-game-button" onclick="playClickSound(); showElaGame();">Play Here</button>
+                    <button class="play-game-button-new-window" onclick="playClickSound(); openGameInNewWindow('WordWarrior.html');">Open in New Window</button>
+                </div>
+            </div>
+            </div>
+    </div>
+
+    <div id="social-studies-category-view" class="category-view hidden">
+        <button onclick="playClickSound(); showMainMenu();" class="back-button"> &larr; Back to Main Menu </button>
+        <h1 class="header-title">SOCIAL STUDIES</h1>
+        <div class="game-list-layout">
+            <div class="game-list-card">
+                <h3>Presidential Pong</h3>
+                <p>A historic twist on a classic!</p>
+                <div class="game-card-buttons">
+                    <button class="play-game-button" onclick="playClickSound(); showPongGame();">Play Here</button>
+                    <button class="play-game-button-new-window" onclick="playClickSound(); openGameInNewWindow('ponggame/presidentialpong.html');">Open in New Window</button>
+                </div>
+            </div>
+            </div>
+    </div>
+
 
     <div id="math-game-view" class="game-iframe-container">
         <button onclick="playClickSound(); showMainMenu();" class="back-button">
@@ -552,7 +698,6 @@
         <iframe id="math-game-iframe" src="" title="Math Challenge Game" class="game-iframe"></iframe>
     </div>
 
-    <!-- **** NEW CONTAINER FOR THE ANIMAL APP **** -->
     <div id="science-game-view" class="game-iframe-container">
         <button onclick="playClickSound(); showMainMenu();" class="back-button">
             &larr; Back to Main Menu
@@ -567,7 +712,6 @@
         <iframe id="ela-game-iframe" src="" title="Word Weaver Game" class="game-iframe"></iframe>
     </div>
 
-    <!-- NEW PONG GAME CONTAINER -->
     <div id="pong-game-view" class="game-iframe-container">
         <button onclick="playClickSound(); showMainMenu();" class="back-button">
             &larr; Back to Main Menu
@@ -584,7 +728,6 @@
     <div id="authModal" class="auth-modal hidden">
         <div class="auth-modal-content">
             <h2 id="authTitle" class="auth-modal-title"></h2>
-            <!-- NEW: Avatar display within profile modal -->
             <div id="profileAvatarDisplay" class="profile-avatar-display hidden">
                 <img id="profileAvatarImg" class="profile-avatar-img" alt="User Avatar">
             </div>
@@ -616,7 +759,6 @@
             <p id="authMessage" class="auth-message"></p>
             <a href="#" id="forgotPasswordLink" class="text-blue-500 hover:text-blue-700 text-sm mt-2 block text-center">Forgot password?</a>
             <button id="changeAvatarProfileBtn" class="auth-submit-btn mt-4 bg-purple-500 hover:bg-purple-600 hidden">Change Avatar</button>
-            <!-- MOVED logoutBtn HERE -->
             <button id="logoutBtn" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-full font-semibold shadow-md mt-4 hidden">Logout</button>
             <button id="closeModalBtn" class="auth-close-btn">Close</button>
         </div>
@@ -634,7 +776,6 @@
                     <label for="avatarStyleSelect" class="avatar-option-label">Avatar Style:</label>
                     <select id="avatarStyleSelect" class="avatar-option-select"></select>
                 </div>
-                <!-- Removed circleFillColorGroup div -->
                 <div class="avatar-option-group">
                     <label for="topTypeSelect" class="avatar-option-label">Hair/Top:</label>
                     <select id="topTypeSelect" class="avatar-option-select"></select>
@@ -695,16 +836,23 @@
 
 
     <script>
-        // **** MODIFICATION HERE ****
+        // --- Get references to all view containers ---
         const mainMenuContainer = document.getElementById('main-menu-container');
+        
+        // Category Views
+        const mathCategoryView = document.getElementById('math-category-view');
+        const scienceCategoryView = document.getElementById('science-category-view');
+        const elaCategoryView = document.getElementById('ela-category-view');
+        const socialStudiesCategoryView = document.getElementById('social-studies-category-view');
+
+        // Game Iframe Views
         const mathGameView = document.getElementById('math-game-view');
-        // I added a reference to the new science game view
         const scienceGameView = document.getElementById('science-game-view');
         const elaGameView = document.getElementById('ela-game-view');
         const pongGameView = document.getElementById('pong-game-view');
 
+        // Game Iframes
         const mathGameIframe = document.getElementById('math-game-iframe');
-        // I added a reference to the new science game iframe
         const scienceGameIframe = document.getElementById('science-game-iframe');
         const elaGameIframe = document.getElementById('ela-game-iframe');
         const pongGameIframe = document.getElementById('pong-game-iframe');
@@ -722,104 +870,110 @@
             }
         }
 
-        // **** MODIFICATION HERE ****
-        function showMainMenu() {
-            mainMenuContainer.style.display = 'block';
+        // --- View Management Functions ---
+
+        function hideAllViews() {
+            mainMenuContainer.style.display = 'none';
+            mathCategoryView.classList.add('hidden');
+            scienceCategoryView.classList.add('hidden');
+            elaCategoryView.classList.add('hidden');
+            socialStudiesCategoryView.classList.add('hidden');
             mathGameView.style.display = 'none';
-            // I added logic to hide the science game view
             scienceGameView.style.display = 'none';
             elaGameView.style.display = 'none';
             pongGameView.style.display = 'none';
+        }
 
-            // I added logic to stop the science game by clearing its iframe source
+        function showMainMenu() {
+            hideAllViews();
+            mainMenuContainer.style.display = 'block';
             mathGameIframe.src = '';
             scienceGameIframe.src = '';
             elaGameIframe.src = '';
             pongGameIframe.src = '';
-
-            document.body.style.overflow = 'auto'; // Re-enable scrolling when main menu is shown
+            document.body.style.overflow = 'auto';
         }
 
-        // **** MODIFICATION HERE ****
+        // --- Show Category View Functions ---
+        function showMathCategoryView() {
+            hideAllViews();
+            mathCategoryView.classList.remove('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        function showScienceCategoryView() {
+            hideAllViews();
+            scienceCategoryView.classList.remove('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        function showElaCategoryView() {
+            hideAllViews();
+            elaCategoryView.classList.remove('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        function showSocialStudiesCategoryView() {
+            hideAllViews();
+            socialStudiesCategoryView.classList.remove('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        // --- Show Game View Functions ---
         function showMathGame() {
-            mainMenuContainer.style.display = 'none';
+            hideAllViews();
             mathGameView.style.display = 'flex';
-            // I added logic to hide the science game view
-            scienceGameView.style.display = 'none';
-            elaGameView.style.display = 'none';
-            pongGameView.style.display = 'none';
-            
             mathGameIframe.src = 'mathgame.html';
-
-            document.body.style.overflow = 'hidden'; // Hide scrolling when game view is active
+            document.body.style.overflow = 'hidden';
         }
 
-        // **** NEW FUNCTION TO SHOW THE ANIMAL APP ****
         function showScienceGame() {
-            mainMenuContainer.style.display = 'none';
-            mathGameView.style.display = 'none';
-            scienceGameView.style.display = 'flex'; // Show the science view
-            elaGameView.style.display = 'none';
-            pongGameView.style.display = 'none';
-
-            // Load the animal app by setting the iframe source.
-            // Make sure your animal app file is named "animalapp.html"
+            hideAllViews();
+            scienceGameView.style.display = 'flex';
             scienceGameIframe.src = 'animalapp.html';
-
-            document.body.style.overflow = 'hidden'; // Hide scrolling when game view is active
+            document.body.style.overflow = 'hidden';
         }
 
-        // **** MODIFICATION HERE ****
         function showElaGame() {
-            mainMenuContainer.style.display = 'none';
-            mathGameView.style.display = 'none';
-            // I added logic to hide the science game view
-            scienceGameView.style.display = 'none';
+            hideAllViews();
             elaGameView.style.display = 'flex';
-            pongGameView.style.display = 'none';
-
             elaGameIframe.src = 'WordWarrior.html';
-
-            document.body.style.overflow = 'hidden'; // Hide scrolling when game view is active
+            document.body.style.overflow = 'hidden';
         }
 
-        // **** MODIFICATION HERE ****
         function showPongGame() {
-            mainMenuContainer.style.display = 'none';
-            mathGameView.style.display = 'none';
-            // I added logic to hide the science game view
-            scienceGameView.style.display = 'none';
-            elaGameView.style.display = 'none';
+            hideAllViews();
             pongGameView.style.display = 'flex';
-
             pongGameIframe.src = 'ponggame/presidentialpong.html';
-
-            document.body.style.overflow = 'hidden'; // Hide scrolling when game view is active
+            document.body.style.overflow = 'hidden';
+        }
+        
+        // NEW: Function to open a game in a new window
+        function openGameInNewWindow(gameUrl) {
+            window.open(gameUrl, '_blank');
         }
 
+        // --- DOMContentLoaded and Auth Logic ---
         document.addEventListener('DOMContentLoaded', () => {
             showMainMenu();
-            updateAuthButtons(); // Call this on load to set button visibility
+            updateAuthButtons();
 
-            // Attach event listener for changeAvatarProfileBtn only once on DOMContentLoaded
             const changeAvatarProfileBtn = document.getElementById('changeAvatarProfileBtn');
             if (changeAvatarProfileBtn) {
                 changeAvatarProfileBtn.addEventListener('click', () => {
                     playClickSound();
-                    authModal.classList.add('hidden'); // Hide profile modal
+                    authModal.classList.add('hidden');
                     const user = JSON.parse(localStorage.getItem('user'));
-                    showAvatarCreatorModal(user.avatar_config || {}); // Show avatar creator with current config
+                    showAvatarCreatorModal(user.avatar_config || {});
                 });
             }
-            // Initialize avatar creator options once the DOM is loaded
             initializeAvatarCreatorOptions();
         });
 
-        // Get references to authentication-related elements
         const loginBtn = document.getElementById('loginBtn');
         const signupBtn = document.getElementById('signupBtn');
         const profileBtn = document.getElementById('profileBtn');
-        const logoutBtn = document.getElementById('logoutBtn'); // Now in authModal
+        const logoutBtn = document.getElementById('logoutBtn');
         const authModal = document.getElementById('authModal');
         const authTitle = document.getElementById('authTitle');
         const authForm = document.getElementById('authForm');
@@ -834,19 +988,16 @@
         const forgotPasswordFields = document.getElementById('forgotPasswordFields');
         const forgotPasswordEmailInput = document.getElementById('forgotPasswordEmail');
         const forgotPasswordLink = document.getElementById('forgotPasswordLink');
-        const changeAvatarProfileBtn = document.getElementById('changeAvatarProfileBtn'); // Get reference here too
+        const changeAvatarProfileBtn = document.getElementById('changeAvatarProfileBtn');
 
-        // NEW: Get references to avatar creator elements
         const avatarModal = document.getElementById('avatarModal');
         const avatarPreview = document.getElementById('avatarPreview');
         const generateRandomAvatarBtn = document.getElementById('generateRandomAvatarBtn');
         const saveAvatarBtn = document.getElementById('saveAvatarBtn');
         const closeAvatarModalBtn = document.getElementById('closeAvatarModalBtn');
         const avatarMessage = document.getElementById('avatarMessage');
-        const avatarOptionsContainer = document.getElementById('avatarOptionsContainer'); // NEW: Reference to options container
-        // NEW: References to all avatar feature selects
+        const avatarOptionsContainer = document.getElementById('avatarOptionsContainer');
         const avatarStyleSelect = document.getElementById('avatarStyleSelect');
-        // Removed reference to circleFillColorSelect
         const topTypeSelect = document.getElementById('topTypeSelect');
         const topColorSelect = document.getElementById('topColorSelect');
         const hairColorSelect = document.getElementById('hairColorSelect');
@@ -861,143 +1012,114 @@
         const clotheGraphicTypeSelect = document.getElementById('clotheGraphicTypeSelect');
         const accessoriesTypeSelect = document.getElementById('accessoriesTypeSelect');
 
-        // NEW: References to conditional display groups
-        const circleFillColorGroup = document.getElementById('circleFillColorGroup');
         const topColorGroup = document.getElementById('topColorGroup');
         const facialHairColorGroup = document.getElementById('facialHairColorGroup');
         const clotheGraphicTypeGroup = document.getElementById('clotheGraphicTypeGroup');
-        // NEW: References for profile modal avatar display
         const profileAvatarDisplay = document.getElementById('profileAvatarDisplay');
         const profileAvatarImg = document.getElementById('profileAvatarImg');
 
-
-        // Define the backend URL (ensure this matches your server.js configuration)
         const BACKEND_URL = 'http://localhost:3000/user'; 
 
-        // Function to update the visibility of login/signup/profile/logout buttons
         function updateAuthButtons() {
-            const token = localStorage.getItem('token'); // Check if a token exists in local storage
+            const token = localStorage.getItem('token');
             const user = JSON.parse(localStorage.getItem('user'));
-            
-            // Profile button is always visible, but its content changes
-            profileBtn.classList.remove('hidden'); // Ensure profile button is always visible
+            profileBtn.classList.remove('hidden');
 
             if (token && user) {
-                // User is logged in
                 loginBtn.classList.add('hidden');
                 signupBtn.classList.add('hidden');
-                // logoutBtn visibility is now handled by profile modal logic
-                // logoutBtn.classList.remove('hidden'); // REMOVED THIS LINE
-
-                // Update Profile button to show avatar if available
                 if (user.has_created_avatar && user.avatar_config && Object.keys(user.avatar_config).length > 0) {
                     const avatarUrl = `https://avataaars.io/?${new URLSearchParams(user.avatar_config).toString()}`;
                     profileBtn.innerHTML = `<img src="${avatarUrl}" alt="Avatar" class="h-8 w-8 rounded-full object-cover">`;
-                    profileBtn.classList.remove('px-4', 'py-2'); // Adjust padding if needed
-                    profileBtn.classList.add('w-12', 'h-12', 'flex', 'items-center', 'justify-center'); // Make it square for avatar
+                    profileBtn.classList.remove('px-4', 'py-2');
+                    profileBtn.classList.add('w-12', 'h-12', 'flex', 'items-center', 'justify-center');
                 } else {
                     profileBtn.innerHTML = `Profile`;
                     profileBtn.classList.add('px-4', 'py-2');
-                    profileBtn.classList.remove('w-12', 'h-12', 'flex', 'items-center', 'justify-center'); // Remove avatar styling
+                    profileBtn.classList.remove('w-12', 'h-12', 'flex', 'items-center', 'justify-center');
                 }
-
             } else {
-                // User is logged out
-                loginBtn.classList.remove('hidden');  // Show login button
-                signupBtn.classList.remove('hidden'); // Show signup button
-                // profileBtn is always visible, so no need to add 'hidden' here
-                // logoutBtn visibility is now handled by profile modal logic
-                // logoutBtn.classList.add('hidden'); // REMOVED THIS LINE
-
-                profileBtn.innerHTML = `Profile`; // Ensure text for logged out
+                loginBtn.classList.remove('hidden');
+                signupBtn.classList.remove('hidden');
+                profileBtn.innerHTML = `Profile`;
                 profileBtn.classList.add('px-4', 'py-2');
-                profileBtn.classList.remove('w-12', 'h-12', 'flex', 'items-center', 'justify-center'); // Remove avatar styling
+                profileBtn.classList.remove('w-12', 'h-12', 'flex', 'items-center', 'justify-center');
             }
         }
 
-        // Functions to display the login, signup, or forgot password forms
         function showLoginForm() {
             authTitle.textContent = 'Login';
             submitAuthBtn.textContent = 'Login';
-            authForm.dataset.currentAction = 'login'; // Use dataset to store the action
+            authForm.dataset.currentAction = 'login';
             loginSignupFields.classList.remove('hidden');
-            emailGroup.classList.add('hidden'); // Hide email field for login
-            forgotPasswordFields.classList.add('hidden'); // Hide forgot password fields
-            forgotPasswordLink.classList.remove('hidden'); // Show forgot password link
-            authMessage.textContent = ''; // Clear any previous messages
-            usernameInput.value = ''; // Clear form fields
-            emailInput.value = ''; // Clear email field (important for state consistency)
+            emailGroup.classList.add('hidden');
+            forgotPasswordFields.classList.add('hidden');
+            forgotPasswordLink.classList.remove('hidden');
+            authMessage.textContent = '';
+            usernameInput.value = '';
+            emailInput.value = '';
             passwordInput.value = '';
-            submitAuthBtn.classList.remove('hidden'); // Ensure submit button is visible
-            // Ensure change avatar button is hidden for login/signup forms
+            submitAuthBtn.classList.remove('hidden');
             if (changeAvatarProfileBtn) changeAvatarProfileBtn.classList.add('hidden'); 
-            profileAvatarDisplay.classList.add('hidden'); // Hide profile avatar display
-            logoutBtn.classList.add('hidden'); // Hide logout button for this form type
+            profileAvatarDisplay.classList.add('hidden');
+            logoutBtn.classList.add('hidden');
         }
 
         function showSignupForm() {
             authTitle.textContent = 'Sign Up';
             submitAuthBtn.textContent = 'Sign Up';
-            authForm.dataset.currentAction = 'signup'; // Use dataset to store the action
+            authForm.dataset.currentAction = 'signup';
             loginSignupFields.classList.remove('hidden');
-            emailGroup.classList.remove('hidden'); // Show email field for signup
-            forgotPasswordFields.classList.add('hidden'); // Hide forgot password fields
-            forgotPasswordLink.classList.add('hidden'); // Hide forgot password link for signup
+            emailGroup.classList.remove('hidden');
+            forgotPasswordFields.classList.add('hidden');
+            forgotPasswordLink.classList.add('hidden');
             authMessage.textContent = '';
             usernameInput.value = '';
             emailInput.value = '';
             passwordInput.value = '';
-            submitAuthBtn.classList.remove('hidden'); // Ensure submit button is visible
-            // Ensure change avatar button is hidden for login/signup forms
+            submitAuthBtn.classList.remove('hidden');
             if (changeAvatarProfileBtn) changeAvatarProfileBtn.classList.add('hidden');
-            profileAvatarDisplay.classList.add('hidden'); // Hide profile avatar display
-            logoutBtn.classList.add('hidden'); // Hide logout button for this form type
+            profileAvatarDisplay.classList.add('hidden');
+            logoutBtn.classList.add('hidden');
         }
 
         function showForgotPasswordForm() {
             authTitle.textContent = 'Forgot Password';
             submitAuthBtn.textContent = 'Send Reset Link';
-            authForm.dataset.currentAction = 'forgot-password'; // Use dataset to store the action
-            loginSignupFields.classList.add('hidden'); // Hide login/signup fields
-            emailGroup.classList.add('hidden'); // Ensure email group is hidden
-            forgotPasswordFields.classList.remove('hidden'); // Show forgot password fields
+            authForm.dataset.currentAction = 'forgot-password';
+            loginSignupFields.classList.add('hidden');
+            emailGroup.classList.add('hidden');
+            forgotPasswordFields.classList.remove('hidden');
             forgotPasswordEmailInput.setAttribute('required', 'true');
-            forgotPasswordLink.classList.add('hidden'); // Hide forgot password link within the modal
+            forgotPasswordLink.classList.add('hidden');
             authMessage.textContent = '';
-            submitAuthBtn.classList.remove('hidden'); // Ensure submit button is visible
-            // Ensure change avatar button is hidden for forgot password form
+            submitAuthBtn.classList.remove('hidden');
             if (changeAvatarProfileBtn) changeAvatarProfileBtn.classList.add('hidden');
-            profileAvatarDisplay.classList.add('hidden'); // Hide profile avatar display
-            logoutBtn.classList.add('hidden'); // Hide logout button for this form type
+            profileAvatarDisplay.classList.add('hidden');
+            logoutBtn.classList.add('hidden');
         }
 
-        // Function to show Avatar Creator modal
-        let currentAvatarConfig = {}; // To store the current avatar config being built
+        let currentAvatarConfig = {};
 
         function showAvatarCreatorModal(userAvatarConfig = {}) {
-            authModal.classList.add('hidden'); // Hide auth modal if open
-            avatarModal.classList.remove('hidden'); // Show avatar modal
-            avatarMessage.textContent = ''; // Clear messages
+            authModal.classList.add('hidden');
+            avatarModal.classList.remove('hidden');
+            avatarMessage.textContent = '';
 
-            // If a config is passed AND it's not empty, use it. Otherwise, generate random.
             if (userAvatarConfig && Object.keys(userAvatarConfig).length > 0) {
-                currentAvatarConfig = { ...userAvatarConfig }; // Deep copy to avoid modifying original
+                currentAvatarConfig = { ...userAvatarConfig };
             } else {
                 currentAvatarConfig = generateRandomAvatarConfig();
             }
             updateAvatarPreview(currentAvatarConfig);
-            // Set dropdown values to match current config
             setAvatarCreatorOptions(currentAvatarConfig);
-            // Manually trigger change to handle initial state of conditional fields
             handleConditionalAvatarFields(); 
         }
 
-        // Function to hide Avatar Creator modal
         function hideAvatarCreatorModal() { 
             avatarModal.classList.add('hidden');
         }
 
-        // Helper function to generate a random avatar configuration
         const avatarFeatures = {
             avatarStyle: ['Circle', 'Transparent'],
             topType: ['NoHair', 'Eyepatch', 'Hat', 'Hijab', 'Turban', 'WinterHat1', 'WinterHat2', 'WinterHat3', 'WinterHat4', 'LongHairBigHair', 'LongHairBob', 'LongHairBun', 'LongHairCurly', 'LongHairCurvy', 'LongHairDreads', 'LongHairFrida', 'LongHairFro', 'LongHairMiaWallace', 'LongHairStraight', 'LongHairStraight2', 'LongHairStraightStrand', 'ShortHairDreads01', 'ShortHairDreads02', 'ShortHairFrizzle', 'ShortHairShaggy', 'ShortHairShaggyMullet', 'ShortHairShortCurly', 'ShortHairShortFlat', 'ShortHairShortRound', 'ShortHairShortWaved', 'ShortHairSides', 'ShortHairTheCaesar', 'ShortHairTheCaesarSidePart'],
@@ -1007,39 +1129,33 @@
             noseType: ['Default'],
             eyeType: ['Default', 'Close', 'Cry', 'Dizzy', 'EyeRoll', 'Happy', 'Hearts', 'Side', 'Squint', 'Surprised', 'Wink', 'WinkWacky'],
             eyebrowType: ['Default', 'Angry', 'AngryNatural', 'FlatNatural', 'FrownNatural', 'RaisedExcited', 'RaisedExcitedNatural', 'SadConcerned', 'SadConcernedNatural', 'UnibrowNatural', 'Updown', 'UpDownNatural'],
-            mouthType: ['Default', 'Smile', 'Concerned', 'Disbelief', 'Eating', 'Grimace', 'Sad', 'Twinkle'], /* Removed Tongue, Vomit */
-            skinColor: ['Tanned', 'Yellow', 'Pale', 'Light', 'Brown', 'DarkBrown', 'Black'], /* Reordered to match avataaars.io, custom names handled in populateSelect */
+            mouthType: ['Default', 'Smile', 'Concerned', 'Disbelief', 'Eating', 'Grimace', 'Sad', 'Twinkle'],
+            skinColor: ['Tanned', 'Yellow', 'Pale', 'Light', 'Brown', 'DarkBrown', 'Black'],
             clotheType: ['BlazerShirt', 'BlazerSweater', 'CollarSweater', 'GraphicShirt', 'Hoodie', 'Overall', 'ShirtCrewNeck', 'ShirtScoopNeck', 'ShirtVNeck'],
             clotheColor: ['Black', 'Blue01', 'Blue02', 'Blue03', 'Gray01', 'Gray02', 'Heather', 'PastelBlue', 'PastelGreen', 'PastelOrange', 'PastelRed', 'PastelYellow', 'Pink', 'Red', 'White'],
             clotheGraphicType: ['Bat', 'Cumbia', 'Deer', 'Diamond', 'Hola', 'Pizza', 'Resist', 'Selena', 'Bear', 'Skull', 'SkullOutline'],
             accessoriesType: ['Blank', 'Prescription01', 'Prescription02', 'Round', 'Sunglasses', 'Wayfarers'],
-            topColor: ['Black', 'Blue01', 'Blue02', 'Blue03', 'Gray01', 'Gray02', 'Heather', 'PastelBlue', 'PastelGreen', 'PastelOrange', 'PastelRed', 'PastelYellow', 'Pink', 'Red', 'White'], // Hat colors
-            // Removed circleColor from avatarFeatures
+            topColor: ['Black', 'Blue01', 'Blue02', 'Blue03', 'Gray01', 'Gray02', 'Heather', 'PastelBlue', 'PastelGreen', 'PastelOrange', 'PastelRed', 'PastelYellow', 'Pink', 'Red', 'White'],
         };
 
         function generateRandomAvatarConfig() {
             const randomConfig = {};
             for (const feature in avatarFeatures) {
-                // Ensure a random value is picked for the 'avatarStyle' as well.
                 const possibleValues = avatarFeatures[feature];
                 randomConfig[feature] = possibleValues[Math.floor(Math.random() * possibleValues.length)];
             }
-
-            // Handle conditional features for random generation
-            // Removed logic for circleColor
             if (!['Hat', 'WinterHat1', 'WinterHat2', 'WinterHat3', 'WinterHat4', 'Turban', 'Hijab'].includes(randomConfig.topType)) {
                 delete randomConfig.topColor;
             }
             if (randomConfig.facialHairType === 'Blank') {
                 delete randomConfig.facialHairColor;
             }
-            if (randomConfig.clotheType === 'GraphicShirt') { // Corrected: Only apply if clotheType is GraphicShirt
-                // Check if clotheGraphicType is already in randomConfig, if not, assign one.
+            if (randomConfig.clotheType === 'GraphicShirt') {
                 if (!randomConfig.clotheGraphicType) {
                     randomConfig.clotheGraphicType = avatarFeatures.clotheGraphicType[Math.floor(Math.random() * avatarFeatures.clotheGraphicType.length)];
                 }
             } else {
-                delete randomConfig.clotheGraphicType; // Remove if not GraphicShirt
+                delete randomConfig.clotheGraphicType;
             }
             return randomConfig;
         }
@@ -1048,9 +1164,7 @@
         function updateAvatarPreview(config) {
             const queryParams = new URLSearchParams(config).toString();
             avatarPreview.src = `https://avataaars.io/?${queryParams}`;
-                 // Set wrapper background color based on avatarStyle and circleColor
-            // Removed logic for setting background color based on circleColor
-            avatarPreview.parentElement.style.backgroundColor = 'transparent'; // Always transparent
+            avatarPreview.parentElement.style.backgroundColor = 'transparent';
         }
 
         function createOption(value, text) {
@@ -1061,29 +1175,19 @@
         }
 
         function populateSelect(selectElement, featureArray) {
-            selectElement.innerHTML = ''; // Clear existing options
+            selectElement.innerHTML = '';
             featureArray.forEach(value => {
-                let text = value.replace(/([A-Z])/g, ' $1').replace(/([0-9])/, ' $1').trim(); // Default readable format
-
-                // Custom display names for skinColorSelect
+                let text = value.replace(/([A-Z])/g, ' $1').replace(/([0-9])/, ' $1').trim();
                 if (selectElement.id === 'skinColorSelect') {
-                    if (value === 'Pale') {
-                        text = 'Pale'; 
-                    } else if (value === 'Yellow') { // 'Yellow' is the avataaars.io value for light tan
-                        text = 'Light Tan';
-                    } else if (value === 'Light') { // 'Light' is for pale beige
-                        text = 'Pale Beige';
-                    }
+                    if (value === 'Pale') { text = 'Pale'; } 
+                    else if (value === 'Yellow') { text = 'Light Tan'; } 
+                    else if (value === 'Light') { text = 'Pale Beige'; }
                 }
                 selectElement.appendChild(createOption(value, text));
             });
         }
 
-        // Function to handle showing/hiding conditional avatar fields
         function handleConditionalAvatarFields() {
-            // Removed Circle Fill Color logic
-            
-            // Top Color (if topType is Hat, WinterHat1-4, Turban, Hijab)
             const topType = currentAvatarConfig.topType;
             if (['Hat', 'WinterHat1', 'WinterHat2', 'WinterHat3', 'WinterHat4', 'Turban', 'Hijab'].includes(topType)) {
                 topColorGroup.classList.remove('hidden');
@@ -1095,7 +1199,6 @@
                 delete currentAvatarConfig.topColor;
             }
 
-            // Facial Hair Color (if facialHairType is not Blank)
             if (currentAvatarConfig.facialHairType !== 'Blank') {
                 facialHairColorGroup.classList.remove('hidden');
                 if (!currentAvatarConfig.facialHairColor) {
@@ -1106,7 +1209,6 @@
                 delete currentAvatarConfig.facialHairColor;
             }
 
-            // Clothe Graphic Type (if clotheType is GraphicShirt)
             if (currentAvatarConfig.clotheType === 'GraphicShirt') {
                 clotheGraphicTypeGroup.classList.remove('hidden');
                 if (!currentAvatarConfig.clotheGraphicType) {
@@ -1116,13 +1218,12 @@
                 clotheGraphicTypeGroup.classList.add('hidden');
                 delete currentAvatarConfig.clotheGraphicType;
             }
-            updateAvatarPreview(currentAvatarConfig); // Update preview after conditional changes
+            updateAvatarPreview(currentAvatarConfig);
         }
 
 
         function initializeAvatarCreatorOptions() {
             populateSelect(avatarStyleSelect, avatarFeatures.avatarStyle);
-            // Removed populateSelect for circleFillColorSelect
             populateSelect(topTypeSelect, avatarFeatures.topType);
             populateSelect(topColorSelect, avatarFeatures.topColor);
             populateSelect(hairColorSelect, avatarFeatures.hairColor);
@@ -1137,9 +1238,7 @@
             populateSelect(clotheGraphicTypeSelect, avatarFeatures.clotheGraphicType);
             populateSelect(accessoriesTypeSelect, avatarFeatures.accessoriesType);
             
-            // Add event listeners for all selects
             avatarStyleSelect.addEventListener('change', (event) => { currentAvatarConfig.avatarStyle = event.target.value; handleConditionalAvatarFields(); updateAvatarPreview(currentAvatarConfig); });
-            // Removed event listener for circleFillColorSelect
             topTypeSelect.addEventListener('change', (event) => { currentAvatarConfig.topType = event.target.value; handleConditionalAvatarFields(); updateAvatarPreview(currentAvatarConfig); });
             topColorSelect.addEventListener('change', (event) => { currentAvatarConfig.topColor = event.target.value; updateAvatarPreview(currentAvatarConfig); });
             hairColorSelect.addEventListener('change', (event) => { currentAvatarConfig.hairColor = event.target.value; updateAvatarPreview(currentAvatarConfig); });
@@ -1155,12 +1254,8 @@
             accessoriesTypeSelect.addEventListener('change', (event) => { currentAvatarConfig.accessoriesType = event.target.value; updateAvatarPreview(currentAvatarConfig); });
         }
 
-        // Function to set the dropdowns/controls to match the current avatar config
         function setAvatarCreatorOptions(config) {
-            // Safely set each select's value, falling back to first option if not found in config
-            // Use logical OR for fallback default if config property is missing or undefined
             avatarStyleSelect.value = config.avatarStyle || avatarFeatures.avatarStyle[0];
-            // Removed setting for circleFillColorSelect
             topTypeSelect.value = config.topType || avatarFeatures.topType[0];
             topColorSelect.value = config.topColor || avatarFeatures.topColor[0];
             hairColorSelect.value = config.hairColor || avatarFeatures.hairColor[0];
@@ -1175,11 +1270,10 @@
             clotheGraphicTypeSelect.value = config.clotheGraphicType || avatarFeatures.clotheGraphicType[0];
             accessoriesTypeSelect.value = config.accessoriesType || avatarFeatures.accessoriesType[0];
             
-            handleConditionalAvatarFields(); // Apply visibility based on loaded config
+            handleConditionalAvatarFields();
         }
 
 
-        // Event listeners for the header buttons
         loginBtn.addEventListener('click', () => {
             playClickSound();
             showLoginForm();
@@ -1192,46 +1286,39 @@
             authModal.classList.remove('hidden');
         });
 
-        // Modified profileBtn event listener
         profileBtn.addEventListener('click', () => {
             playClickSound();
             const user = JSON.parse(localStorage.getItem('user')); 
-            console.log("User object from localStorage on profile click:", user); // Debug log
+            console.log("User object from localStorage on profile click:", user);
 
-            // Always ensure all fields within authModalContent are reset/hidden first
             authMessage.textContent = '';
-            authMessage.style.color = 'black'; // Reset message color
+            authMessage.style.color = 'black';
             submitAuthBtn.classList.add('hidden');
             loginSignupFields.classList.add('hidden');
             forgotPasswordFields.classList.add('hidden');
             forgotPasswordLink.classList.add('hidden');
-            if (changeAvatarProfileBtn) changeAvatarProfileBtn.classList.add('hidden'); // Hide it by default
-            profileAvatarDisplay.classList.add('hidden'); // Hide profile avatar display by default
-            logoutBtn.classList.add('hidden'); // Hide logout button by default for any profile modal open
+            if (changeAvatarProfileBtn) changeAvatarProfileBtn.classList.add('hidden');
+            profileAvatarDisplay.classList.add('hidden');
+            logoutBtn.classList.add('hidden');
 
-            if (!user) { // No user logged in
-                authMessage.textContent = 'Please log in to view your profile.'; // More user-friendly message
+            if (!user) {
+                authMessage.textContent = 'Please log in to view your profile.';
                 authMessage.style.color = 'red';
                 authModal.classList.remove('hidden');
-                showLoginForm(); // Default to login form if not logged in
+                showLoginForm();
                 return;
             }
 
-            // Check if user has created avatar (handle undefined, null, or false explicitly)
             if (user.has_created_avatar === false || user.has_created_avatar === undefined || user.has_created_avatar === null) { 
-                showAvatarCreatorModal(user.avatar_config || {}); // Pass existing (possibly empty) config
+                showAvatarCreatorModal(user.avatar_config || {});
             } else {
-                // User has an avatar, show regular profile view
-                authTitle.textContent = 'User Profile'; // Set title for profile view
+                authTitle.textContent = 'User Profile';
                 authMessage.textContent = `Welcome, ${user.username}!\nCoins: ${user.coins || 'N/A'}\nBadges: ${user.badges && user.badges.length > 0 ? user.badges.join(', ') : 'None'}\nAvatar saved: ${user.avatar_url ? 'Yes' : 'No'}`;
                 authModal.classList.remove('hidden');
                 
-                // Show change avatar button only if user has an avatar
                 if (changeAvatarProfileBtn) changeAvatarProfileBtn.classList.remove('hidden');
-                // Show logout button when profile modal is open and user is logged in
                 logoutBtn.classList.remove('hidden');
 
-                // Display user's avatar in the top right of the profile modal
                 if (user.avatar_config && Object.keys(user.avatar_config).length > 0) {
                     const avatarUrl = `https://avataaars.io/?${new URLSearchParams(user.avatar_config).toString()}`;
                     profileAvatarImg.src = avatarUrl;
@@ -1249,13 +1336,12 @@
 
         closeModalBtn.addEventListener('click', () => {
             playClickSound();
-            // Ensure change avatar button is hidden when closing modal
             if (changeAvatarProfileBtn) changeAvatarProfileBtn.classList.add('hidden'); 
-            profileAvatarDisplay.classList.add('hidden'); // Hide profile avatar display on close
-            logoutBtn.classList.add('hidden'); // Ensure logout button is hidden when closing modal
+            profileAvatarDisplay.classList.add('hidden');
+            logoutBtn.classList.add('hidden');
             authModal.classList.add('hidden');
             authMessage.textContent = '';
-            showLoginForm(); // Reset to login form state (important for next open)
+            showLoginForm();
         });
 
         closeAvatarModalBtn.addEventListener('click', () => {
@@ -1269,7 +1355,6 @@
             updateAvatarPreview(currentAvatarConfig);
             avatarMessage.textContent = 'New random avatar generated!';
             avatarMessage.style.color = 'gray';
-            // NEW: Update dropdowns to reflect the newly generated random avatar
             setAvatarCreatorOptions(currentAvatarConfig);
         });
 
@@ -1280,7 +1365,7 @@
             saveAvatarBtn.disabled = true;
 
             const user = JSON.parse(localStorage.getItem('user'));
-            console.log('Save Avatar: User from localStorage before saving:', user); // Debug log
+            console.log('Save Avatar: User from localStorage before saving:', user);
 
             if (!user || !user._id) {
                 avatarMessage.textContent = 'Error: User not logged in.';
@@ -1291,7 +1376,7 @@
                 return;
             }
 
-            console.log('Save Avatar: Current avatar config being sent:', currentAvatarConfig); // Debug: config
+            console.log('Save Avatar: Current avatar config being sent:', currentAvatarConfig);
             try {
                 const response = await fetch(`${BACKEND_URL}/avatar/${user._id}`, {
                     method: 'POST',
@@ -1301,31 +1386,27 @@
                     body: JSON.stringify(currentAvatarConfig)
                 });
 
-                console.log('Save Avatar: Fetch response received. Status:', response.status, response.statusText); // Debug: response status
+                console.log('Save Avatar: Fetch response received. Status:', response.status, response.statusText);
 
                 if (!response.ok) {
-                    // Handle non-2xx responses (e.g., 400, 401, 500)
                     const errorData = await response.json().catch(() => ({ message: 'Could not parse error response.' }));
                     avatarMessage.textContent = errorData.message || `Error saving avatar: ${response.status} ${response.statusText}`;
                     avatarMessage.style.color = 'red';
                     console.error('Save Avatar: Server responded with error:', response.status, errorData);
-                    return; // Exit here if response is not OK
+                    return;
                 }
 
                 const data = await response.json();
-                console.log('Save Avatar: Parsed response data:', data); // Debug: parsed data
+                console.log('Save Avatar: Parsed response data:', data);
 
                 if (data.status === "Success") {
                     avatarMessage.textContent = data.message;
                     avatarMessage.style.color = 'green';
                     
-                    // IMPORTANT: Update user data in local storage with the LATEST data from backend
-                    localStorage.setItem('user', JSON.stringify(data.data)); // data.data is the user object from backend
+                    localStorage.setItem('user', JSON.stringify(data.data));
                     console.log('Save Avatar: User data updated in localStorage:', data.data);
 
-                    // --- START OF FIX ---
-                    // Update the profile button's avatar immediately
-                    const updatedUser = data.data; // Get the most recent user data
+                    const updatedUser = data.data;
                     if (updatedUser.has_created_avatar && updatedUser.avatar_config && Object.keys(updatedUser.avatar_config).length > 0) {
                         const avatarUrl = `https://avataaars.io/?${new URLSearchParams(updatedUser.avatar_config).toString()}`;
                         profileBtn.innerHTML = `<img src="${avatarUrl}" alt="Avatar" class="h-8 w-8 rounded-full object-cover">`;
@@ -1337,13 +1418,10 @@
                         profileBtn.classList.remove('w-12', 'h-12', 'flex', 'items-center', 'justify-center');
                     }
 
-                    // Update the avatar display within the profile modal if it's open or will be opened next
                     profileAvatarImg.src = `https://avataaars.io/?${new URLSearchParams(currentAvatarConfig).toString()}`;
-                    // --- END OF FIX ---
 
                     setTimeout(() => {
                         hideAvatarCreatorModal(); 
-                        // updateAuthButtons(); // No longer strictly needed here since we update directly above
                         console.log('Save Avatar: Avatar modal hidden and auth buttons updated (directly).');
                     }, 1000);
 
@@ -1366,7 +1444,7 @@
             playClickSound();
             localStorage.removeItem('token');
             localStorage.removeItem('user');
-            updateAuthButtons(); // Will now ensure login/signup are visible
+            updateAuthButtons();
             authMessage.textContent = 'You have been logged out.';
             authMessage.style.color = 'blue';
             authModal.classList.remove('hidden');
@@ -1375,15 +1453,14 @@
             loginSignupFields.classList.add('hidden');
             forgotPasswordFields.classList.add('hidden');
             forgotPasswordLink.classList.add('hidden');
-            profileAvatarDisplay.classList.add('hidden'); // Hide profile avatar display on logout
-            logoutBtn.classList.add('hidden'); // Explicitly hide on logout
+            profileAvatarDisplay.classList.add('hidden');
+            logoutBtn.classList.add('hidden');
             setTimeout(() => {
                 authModal.classList.add('hidden');
                 authMessage.textContent = '';
             }, 2000);
         });
 
-        // Main form submission handler for login, signup, and forgot password
         async function handleAuthSubmission(e) {
             if (e && e.preventDefault) {
                 e.preventDefault(); 
@@ -1444,28 +1521,23 @@
                 });
 
                 const data = await response.json(); 
-                console.log('Auth Backend Response Status:', response.status); // Specific log for Auth
-                console.log('Auth Backend Response Data:', data); // Specific log for Auth
+                console.log('Auth Backend Response Status:', response.status);
+                console.log('Auth Backend Response Data:', data);
 
 
                 if (response.ok) {
                     if (action === 'login' || action === 'signup') {
                         if (data.status === "Success") {
-                            // Ensure the entire user object (including avatar flags/config) is saved
                             localStorage.setItem('token', data.token); 
-                            localStorage.setItem('user', JSON.stringify(data.data)); // data.data is the user object from backend
+                            localStorage.setItem('user', JSON.stringify(data.data));
                             
                             authMessage.textContent = data.message;
                             authMessage.style.color = 'green';
                             setTimeout(() => {
                                 authModal.classList.add('hidden');
-                                updateAuthButtons(); // Update buttons, now checking avatar status
-                                // Conditional redirect/modal display based on has_created_avatar
+                                updateAuthButtons();
                                 if (!data.data.has_created_avatar) {
-                                    showAvatarCreatorModal(data.data.avatar_config || {}); // Show creator if avatar not created
-                                } else {
-                                    // User has avatar, just close modal or redirect to main game (if desired)
-                                    // For now, it will just update the profile button via updateAuthButtons()
+                                    showAvatarCreatorModal(data.data.avatar_config || {});
                                 }
                             }, 1000);
                         } else {
@@ -1496,9 +1568,7 @@
 
         authForm.addEventListener('submit', handleAuthSubmission);
         submitAuthBtn.addEventListener('click', handleAuthSubmission);
-
-        // Profile button logic
-        // This event listener is now more robust, and the old duplicate one has been removed.
     </script>
 </body>
 </html>
+
