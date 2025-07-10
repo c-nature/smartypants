@@ -16,7 +16,7 @@
             background-attachment: fixed;
         }
         .backdrop-blur-sm {
-             backdrop-filter: blur(4px);
+            backdrop-filter: blur(4px);
         }
     </style>
 </head>
@@ -98,50 +98,47 @@
         }
 
         /**
-         * Fetches an image for a given animal name from the Pexels API.
-         * It first tries a specific query, then falls back to a broader one.
+         * Fetches an image for a given animal by searching Pexels and verifying the
+         * image's alt text for a more accurate match.
          * @param {string} animalName - The name of the animal.
-         * @returns {Promise<string|null>} - A promise that resolves to the image URL or null if not found.
+         * @returns {Promise<string|null>} - A promise that resolves to the image URL or null if no accurate match is found.
          */
         async function fetchAnimalImage(animalName) {
-            // Helper function to perform the actual fetch and check for photos
-            const searchPexels = async (query) => {
-                try {
-                    const response = await fetch(`${pexelsApiUrl}${encodeURIComponent(query)}&per_page=1`, {
-                        headers: {
-                            Authorization: pexelsApiKey
-                        }
-                    });
-                    if (!response.ok) {
-                        console.warn(`Pexels API request for "${query}" failed with status: ${response.status}`);
-                        return null; // Return null to allow fallback
-                    }
-                    const data = await response.json();
-                    if (data.photos && data.photos.length > 0) {
-                        return data.photos[0].src.large;
-                    }
-                    return null; // No photos found for this query
-                } catch (error) {
-                    console.error(`Error fetching image for query "${query}" from Pexels:`, error);
-                    return null; // Network or other error
+            // Construct a more specific query to prioritize actual animals.
+            const query = encodeURIComponent(`${animalName} animal`);
+            const url = `${pexelsApiUrl}${query}&per_page=5`;
+
+            try {
+                const response = await fetch(url, {
+                    headers: { Authorization: pexelsApiKey }
+                });
+
+                if (!response.ok) {
+                    console.warn(`Pexels API request for "${animalName}" failed with status: ${response.status}`);
+                    return null;
                 }
-            };
 
-            // 1. First, try the more specific query (e.g., "Tiger Salamander animal")
-            let imageUrl = await searchPexels(`${animalName} animal`);
+                const data = await response.json();
 
-            // 2. If that fails, try the original, broader query (e.g., "Tiger Salamander")
-            if (!imageUrl) {
-                console.log(`Specific search for "${animalName} animal" failed, trying broader search.`);
-                imageUrl = await searchPexels(animalName);
-            }
+                if (data.photos && data.photos.length > 0) {
+                    // Look for the first photo where the alt text contains the full animal name.
+                    const lowerCaseAnimalName = animalName.toLowerCase();
+                    for (const photo of data.photos) {
+                        const altText = (photo.alt || '').toLowerCase();
+                        if (altText.includes(lowerCaseAnimalName)) {
+                            console.log(`Found a matching image for "${animalName}" with alt text: "${photo.alt}"`);
+                            return photo.src.large; // Found a good match!
+                        }
+                    }
+                }
+                
+                // If no photo with a matching alt text was found in the top results.
+                console.log(`No image with an accurate alt text match was found for "${animalName}".`);
+                return null;
 
-            // 3. If both searches fail, return null.
-            if (imageUrl) {
-                return imageUrl;
-            } else {
-                console.log(`All image searches for "${animalName}" failed. No image will be displayed.`);
-                return null; // Return null instead of a placeholder URL
+            } catch (error) {
+                console.error(`Error fetching image for query "${animalName}" from Pexels:`, error);
+                return null;
             }
         }
 
@@ -200,9 +197,9 @@
                 // Fetch a specific, more accurate image from Pexels for each animal.
                 const imageUrl = await fetchAnimalImage(name);
 
-                // **** MODIFICATION HERE: Only create an image tag if an imageUrl was found ****
+                // Only create an image tag if a valid imageUrl was found.
                 const imageTag = imageUrl 
-                    ? `<img src="${imageUrl}" alt="Photo of a ${name}" class="w-full h-48 object-cover">`
+                    ? `<img src="${imageUrl}" alt="Photo of a ${name}" class="w-full h-48 object-cover" onerror="this.style.display='none'">`
                     : '';
 
                 card.innerHTML = `
@@ -242,5 +239,4 @@
 
 </body>
 </html>
-
 
