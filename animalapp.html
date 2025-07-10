@@ -6,10 +6,14 @@
     <title>Animal Kingdom Explorer</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- Import both the title font (Lilita One) and the body font (Nunito) -->
+    <link href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Nunito:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        /* Set the default body font */
         body {
-            font-family: 'Poppins', sans-serif;
+            font-family: 'Nunito', sans-serif;
             background-image: url('https://images.pexels.com/photos/1661179/pexels-photo-1661179.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2');
             background-size: cover;
             background-position: center;
@@ -17,6 +21,24 @@
         }
         .backdrop-blur-sm {
             backdrop-filter: blur(4px);
+        }
+        /* Create a custom class for the title font with a complementary color outline/shadow */
+        .font-title {
+            font-family: 'Lilita One', cursive;
+            /* A crisp white outline with an orange glow for light mode */
+            text-shadow: -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 1px 1px 0 #fff, 0 0 10px #f97316, 0 0 20px #f97316;
+        }
+        /* A different shadow for dark mode to ensure visibility */
+        .dark .font-title {
+             /* A crisp dark outline with a brighter orange glow for dark mode */
+            text-shadow: -1px -1px 0 #0f766e, 1px -1px 0 #0f766e, -1px 1px 0 #0f766e, 1px 1px 0 #0f766e, 0 0 12px #fb923c, 0 0 22px #fb923c;
+        }
+        .card-hover-effect {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .card-hover-effect:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
         }
     </style>
 </head>
@@ -27,8 +49,9 @@
             
             <!-- Header -->
             <header class="text-center mb-8">
-                <h1 class="text-4xl sm:text-5xl font-bold text-teal-600 dark:text-teal-400" style="text-shadow: 1px 1px 2px rgba(0,0,0,0.1);">Animal Kingdom Explorer</h1>
-                <p class="mt-2 text-lg text-gray-700 dark:text-gray-300">Let's discover the wonders of the animal world!</p>
+                <!-- Applied the new title font class -->
+                <h1 class="text-5xl sm:text-6xl font-bold text-teal-600 dark:text-teal-400 font-title tracking-wider">Animal Kingdom Explorer</h1>
+                <p class="mt-2 text-lg text-gray-700 dark:text-gray-300">Discover the wonders of the animal world!</p>
             </header>
 
             <!-- Search Bar -->
@@ -59,21 +82,28 @@
         </div>
     </div>
 
-    <!-- Gallery View -->
-    <div id="gallery-view" class="hidden container mx-auto p-4 sm:p-6 lg:p-8">
+    <!-- Detail View -->
+    <div id="detail-view" class="hidden container mx-auto p-4 sm:p-6 lg:p-8">
          <div class="max-w-5xl mx-auto bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm rounded-2xl p-6 md:p-8 shadow-2xl">
             <header class="flex justify-between items-center mb-8">
-                <h2 id="gallery-title" class="text-3xl font-bold text-teal-600 dark:text-teal-400"></h2>
+                <!-- Applied the new title font class -->
+                <h2 id="detail-title" class="text-4xl font-bold text-teal-600 dark:text-teal-400 font-title tracking-wider"></h2>
                 <button id="back-btn" class="px-6 py-3 bg-teal-500 text-white font-semibold rounded-lg shadow-lg hover:bg-teal-600 focus:outline-none focus:ring-4 focus:ring-teal-500/50">
                     <i class="fas fa-arrow-left mr-2"></i> Back to Results
                 </button>
             </header>
-            <div id="gallery-loader" class="text-center hidden my-8">
-                <div class="inline-block animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-teal-500"></div>
-                <p class="mt-4 text-gray-600 dark:text-gray-400">Fetching more photos...</p>
+            <div id="detail-content" class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Animal details will be inserted here -->
             </div>
-            <div id="gallery-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                <!-- Gallery images will be inserted here -->
+            <div class="mt-8">
+                <h3 class="text-2xl font-bold text-teal-700 dark:text-teal-300 mb-4">Photo Gallery</h3>
+                <div id="gallery-loader" class="text-center hidden my-8">
+                    <div class="inline-block animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-teal-500"></div>
+                    <p class="mt-4 text-gray-600 dark:text-gray-400">Fetching more photos...</p>
+                </div>
+                <div id="gallery-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                    <!-- Gallery images will be inserted here -->
+                </div>
             </div>
         </div>
     </div>
@@ -88,21 +118,22 @@
         const messageBox = document.getElementById('message-box');
         
         const mainView = document.getElementById('main-view');
-        const galleryView = document.getElementById('gallery-view');
+        const detailView = document.getElementById('detail-view');
         const backBtn = document.getElementById('back-btn');
-        const galleryTitle = document.getElementById('gallery-title');
+        const detailTitle = document.getElementById('detail-title');
+        const detailContent = document.getElementById('detail-content');
         const galleryGrid = document.getElementById('gallery-grid');
         const galleryLoader = document.getElementById('gallery-loader');
 
+        // --- State ---
+        let lastSearchResults = [];
 
         // --- API Configuration ---
         const ninjasApiKey = 'NBLzVtc9zEUgykvHHYEelQ==Nk1wfVKY9E9NGnQs'; 
         const pexelsApiKey = 'rNeFMYzKsFyZy2B9fv0M9dXHQariKslYt7kSJhD8KezlzTEPYdc1u9dQ';
-        const pixabayApiKey = '51881389-4d98b5fa44d0fd317a1d9b7fd';
         
         const animalsApiUrl = 'https://api.api-ninjas.com/v1/animals?name=';
         const pexelsApiUrl = 'https://api.pexels.com/v1/search?query=';
-        const pixabayApiUrl = 'https://pixabay.com/api/';
 
         // --- Event Listeners ---
         searchBtn.addEventListener('click', searchForAnimal);
@@ -110,7 +141,7 @@
             if (event.key === 'Enter') searchForAnimal();
         });
         backBtn.addEventListener('click', () => {
-            galleryView.classList.add('hidden');
+            detailView.classList.add('hidden');
             mainView.classList.remove('hidden');
         });
 
@@ -121,8 +152,8 @@
                 displayMessage('Please enter an animal name to start exploring!');
                 return;
             }
-            if (!isApiKeyAvailable(pexelsApiKey) && !isApiKeyAvailable(pixabayApiKey)) {
-                displayMessage('Please add an API key for Pexels or Pixabay to fetch images.');
+            if (!isApiKeyAvailable(pexelsApiKey)) {
+                displayMessage('Please add your Pexels API key to fetch images.');
                 return;
             }
             fetchAnimalData(animalName);
@@ -135,23 +166,12 @@
         
         /** Main image fetching function for a single card image. */
         async function fetchAnimalImage(animalName) {
-            let imageUrl = await fetchPexelsImages(animalName, 5, true);
-            if (!imageUrl) {
-                console.log('Pexels search failed, trying Pixabay...');
-                imageUrl = await fetchPixabayImages(animalName, 5, true);
-            }
-            return imageUrl;
+            return await fetchPexelsImages(animalName, 5, true);
         }
         
         /** Fetches multiple images for the gallery view. */
         async function fetchAllGalleryImages(animalName) {
-            const pexelsPromise = fetchPexelsImages(animalName, 12, false);
-            const pixabayPromise = fetchPixabayImages(animalName, 12, false);
-
-            const [pexelsImages, pixabayImages] = await Promise.all([pexelsPromise, pixabayPromise]);
-            
-            // Combine and return results, filtering out any null/undefined entries
-            return [...(pexelsImages || []), ...(pixabayImages || [])];
+            return await fetchPexelsImages(animalName, 16, false);
         }
 
         /** Fetches images from Pexels. Can return one or many. */
@@ -171,27 +191,6 @@
                     .filter(photo => (photo.alt || '').toLowerCase().includes(lowerCaseAnimalName))
                     .map(photo => photo.src.large);
             } catch (error) { console.error('Error fetching from Pexels:', error); return null; }
-        }
-
-        /** Fetches images from Pixabay. Can return one or many. */
-        async function fetchPixabayImages(animalName, count, findOne) {
-            if (!isApiKeyAvailable(pixabayApiKey)) return null;
-            // FIX: Pixabay's API requires spaces to be replaced with '+'
-            const query = encodeURIComponent(animalName).replace(/%20/g, '+');
-            const url = `${pixabayApiUrl}?key=${pixabayApiKey}&q=${query}&per_page=${count}`;
-            console.log('Requesting URL from Pixabay:', url);
-            try {
-                const response = await fetch(url);
-                if (!response.ok) { console.warn(`Pixabay API failed: ${response.status}`); return null; }
-                const data = await response.json();
-                 if (findOne) {
-                    return findBestMatch(data.hits, animalName, photo => photo.tags, photo => photo.largeImageURL, "Pixabay");
-                }
-                const lowerCaseAnimalName = animalName.toLowerCase();
-                return data.hits
-                    .filter(photo => (photo.tags || '').toLowerCase().includes(lowerCaseAnimalName))
-                    .map(photo => photo.largeImageURL);
-            } catch (error) { console.error('Error fetching from Pixabay:', error); return null; }
         }
         
         /** Generic helper function to find the best single image match from a list of results. */
@@ -217,6 +216,7 @@
                 const response = await fetch(animalsApiUrl + animalName, { headers: { 'X-Api-Key': ninjasApiKey } });
                 if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
                 const data = await response.json();
+                lastSearchResults = data; // Cache the results
                 await displayResults(data);
             } catch (error) {
                 console.error('Error fetching animal data:', error);
@@ -233,6 +233,68 @@
                 return;
             }
 
+            for (const animal of animals) {
+                const card = document.createElement('div');
+                card.className = 'bg-gradient-to-br from-white/90 to-gray-100/90 dark:from-gray-800/90 dark:to-gray-900/90 rounded-xl shadow-lg overflow-hidden flex flex-col card-hover-effect';
+                
+                const name = animal.name || 'N/A';
+                const scientificName = animal.taxonomy?.scientific_name || 'N/A';
+                const diet = animal.characteristics?.diet || 'N/A';
+                const locations = (animal.locations && animal.locations.length > 0) ? animal.locations.join(', ') : 'Not specified';
+
+                const imageUrl = await fetchAnimalImage(name);
+                let imageContainer;
+                if (imageUrl) {
+                    imageContainer = document.createElement('a');
+                    imageContainer.href = '#';
+                    imageContainer.className = 'cursor-pointer block';
+                    imageContainer.setAttribute('data-animal-name', name);
+                    imageContainer.innerHTML = `<img src="${imageUrl}" alt="Photo of a ${name}" class="w-full h-48 object-cover" onerror="this.style.display='none'">`;
+                } else {
+                    imageContainer = document.createElement('div'); // Placeholder
+                    imageContainer.className = 'w-full h-48 bg-gray-200 dark:bg-gray-700 flex items-center justify-center';
+                    imageContainer.innerHTML = `<i class="fas fa-image fa-3x text-gray-400"></i>`;
+                }
+
+                const contentDiv = document.createElement('div');
+                contentDiv.className = 'p-6 flex-grow';
+                contentDiv.innerHTML = `
+                    <a href="#" class="cursor-pointer" data-animal-name="${name}">
+                        <h2 class="text-2xl font-bold text-teal-700 dark:text-teal-300 mb-2 hover:underline">${name}</h2>
+                    </a>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 font-medium mb-5 italic">${scientificName}</p>
+                    <div class="space-y-4 text-gray-800 dark:text-gray-200">
+                        <p><i class="fas fa-utensils w-6 text-yellow-500"></i> <strong class="font-semibold">Diet:</strong> ${diet}</p>
+                        <p><i class="fas fa-map-marker-alt w-6 text-red-500"></i> <strong class="font-semibold">Locations:</strong> ${locations}</p>
+                    </div>
+                `;
+                
+                card.appendChild(imageContainer);
+                card.appendChild(contentDiv);
+                resultsContainer.appendChild(card);
+            }
+            // Add event listeners to the new clickable elements
+            document.querySelectorAll('[data-animal-name]').forEach(el => {
+                el.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const animalName = e.currentTarget.getAttribute('data-animal-name');
+                    const animalData = lastSearchResults.find(animal => animal.name === animalName);
+                    if (animalData) {
+                        showDetailView(animalData);
+                    }
+                });
+            });
+        }
+
+        /** Shows the detail view and populates it with all animal info. */
+        async function showDetailView(animal) {
+            mainView.classList.add('hidden');
+            detailView.classList.remove('hidden');
+            detailTitle.textContent = animal.name;
+            detailContent.innerHTML = '';
+            galleryGrid.innerHTML = '';
+            galleryLoader.classList.remove('hidden');
+
             const iconMap = {
                 'locations': { icon: 'fa-map-marker-alt', color: 'text-red-500' },
                 'diet': { icon: 'fa-utensils', color: 'text-yellow-500' },
@@ -245,85 +307,63 @@
                 'default': { icon: 'fa-info-circle', color: 'text-gray-500' }
             };
 
-            for (const animal of animals) {
-                const card = document.createElement('div');
-                card.className = 'bg-gradient-to-br from-white/90 to-gray-100/90 dark:from-gray-800/90 dark:to-gray-900/90 rounded-xl shadow-lg overflow-hidden flex flex-col';
-                
-                const name = animal.name || 'N/A';
-                const scientificName = animal.taxonomy?.scientific_name || 'N/A';
-                
-                let characteristicsHtml = '';
-                 if (animal.characteristics) {
-                    if (animal.locations && animal.locations.length > 0) {
-                        const iconInfo = iconMap['locations'] || iconMap['default'];
-                        characteristicsHtml += `<p><i class="fas ${iconInfo.icon} w-6 ${iconInfo.color}"></i> <strong class="font-semibold">Locations:</strong> ${animal.locations.join(', ')}</p>`;
-                    }
-                    for (const [key, value] of Object.entries(animal.characteristics)) {
-                        if (value && value.trim() !== '') {
-                            const label = key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-                            const iconInfo = iconMap[key] || iconMap['default'];
-                            characteristicsHtml += `<p><i class="fas ${iconInfo.icon} w-6 ${iconInfo.color}"></i> <strong class="font-semibold">${label}:</strong> ${value}</p>`;
-                        }
+            // Build Characteristics HTML
+            let characteristicsHtml = '';
+            if (animal.characteristics && Object.keys(animal.characteristics).length > 0) {
+                characteristicsHtml += '<div class="space-y-4 text-gray-800 dark:text-gray-200">';
+                if (animal.locations && animal.locations.length > 0) {
+                    const iconInfo = iconMap['locations'] || iconMap['default'];
+                    characteristicsHtml += `<p><i class="fas ${iconInfo.icon} w-6 ${iconInfo.color}"></i> <strong class="font-semibold">Locations:</strong> ${animal.locations.join(', ')}</p>`;
+                }
+                for (const [key, value] of Object.entries(animal.characteristics)) {
+                    if (value && value.trim() !== '') {
+                        const label = key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+                        const iconInfo = iconMap[key] || iconMap['default'];
+                        characteristicsHtml += `<p><i class="fas ${iconInfo.icon} w-6 ${iconInfo.color}"></i> <strong class="font-semibold">${label}:</strong> ${value}</p>`;
                     }
                 }
-
-                const imageUrl = await fetchAnimalImage(name);
-                let imageContainer;
-                if (imageUrl) {
-                    imageContainer = document.createElement('a');
-                    imageContainer.href = '#';
-                    imageContainer.className = 'cursor-pointer block';
-                    imageContainer.innerHTML = `<img src="${imageUrl}" alt="Photo of a ${name}" class="w-full h-48 object-cover" onerror="this.style.display='none'">`;
-                    imageContainer.addEventListener('click', (e) => {
-                        e.preventDefault();
-                        showImageGallery(name);
-                    });
-                } else {
-                    imageContainer = document.createElement('div'); // Placeholder
-                    imageContainer.className = 'w-full h-48 bg-gray-200 dark:bg-gray-700 flex items-center justify-center';
-                    imageContainer.innerHTML = `<i class="fas fa-image fa-3x text-gray-400"></i>`;
-                }
-
-                const contentDiv = document.createElement('div');
-                contentDiv.className = 'p-6 flex-grow';
-                contentDiv.innerHTML = `
-                    <h2 class="text-2xl font-bold text-teal-700 dark:text-teal-300 mb-2">${name}</h2>
-                    <p class="text-sm text-gray-500 dark:text-gray-400 font-medium mb-5 italic">${scientificName}</p>
-                    <div class="space-y-4 text-gray-800 dark:text-gray-200">
-                        ${characteristicsHtml || '<p>No characteristics available.</p>'}
-                    </div>
-                `;
-                
-                card.appendChild(imageContainer);
-                card.appendChild(contentDiv);
-                resultsContainer.appendChild(card);
+                characteristicsHtml += '</div>';
             }
-        }
 
-        /** Shows the gallery view and fetches images for it. */
-        async function showImageGallery(animalName) {
-            mainView.classList.add('hidden');
-            galleryView.classList.remove('hidden');
-            galleryTitle.textContent = `More Photos of: ${animalName}`;
-            galleryGrid.innerHTML = '';
-            galleryLoader.classList.remove('hidden');
-
-            const images = await fetchAllGalleryImages(animalName);
+            // Build Taxonomy HTML
+            let taxonomyHtml = '';
+            if (animal.taxonomy && Object.keys(animal.taxonomy).length > 1) {
+                taxonomyHtml += '<div class="space-y-4 text-gray-800 dark:text-gray-200">';
+                for (const [key, value] of Object.entries(animal.taxonomy)) {
+                    if (key !== 'scientific_name' && value) {
+                        const label = key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+                        taxonomyHtml += `<p><i class="fas fa-sitemap w-6 text-gray-500"></i> <strong class="font-semibold">${label}:</strong> ${value}</p>`;
+                    }
+                }
+                taxonomyHtml += '</div>';
+            }
             
-            galleryLoader.classList.add('hidden');
+            detailContent.innerHTML = `
+                <div>
+                    <h3 class="text-xl font-bold text-teal-700 dark:text-teal-300 mb-3">Characteristics</h3>
+                    ${characteristicsHtml || '<p>No characteristics available.</p>'}
+                </div>
+                <div>
+                    <h3 class="text-xl font-bold text-teal-700 dark:text-teal-300 mb-3">Classification</h3>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 font-medium mb-3 italic">${animal.taxonomy?.scientific_name || ''}</p>
+                    ${taxonomyHtml || '<p>No classification data available.</p>'}
+                </div>
+            `;
 
+            // Fetch and display gallery images
+            const images = await fetchAllGalleryImages(animal.name);
+            galleryLoader.classList.add('hidden');
             if (images.length === 0) {
                 galleryGrid.innerHTML = '<p class="col-span-full text-center">No additional photos could be found.</p>';
-                return;
+            } else {
+                images.forEach(imgUrl => {
+                    const imgElement = document.createElement('img');
+                    imgElement.src = imgUrl;
+                    imgElement.alt = `Photo of a ${animal.name}`;
+                    imgElement.className = 'w-full h-full object-cover rounded-lg shadow-md';
+                    galleryGrid.appendChild(imgElement);
+                });
             }
-
-            images.forEach(imgUrl => {
-                const imgElement = document.createElement('img');
-                imgElement.src = imgUrl;
-                imgElement.alt = `Photo of a ${animalName}`;
-                imgElement.className = 'w-full h-full object-cover rounded-lg shadow-md';
-                galleryGrid.appendChild(imgElement);
-            });
         }
 
         /** Displays a message to the user. */
