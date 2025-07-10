@@ -22,7 +22,7 @@
 </head>
 <body class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
 
-    <div class="container mx-auto p-4 sm:p-6 lg:p-8">
+    <div id="main-view" class="container mx-auto p-4 sm:p-6 lg:p-8">
         <div class="max-w-3xl mx-auto bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm rounded-2xl p-6 md:p-8 shadow-2xl">
             
             <!-- Header -->
@@ -59,6 +59,26 @@
         </div>
     </div>
 
+    <!-- Gallery View -->
+    <div id="gallery-view" class="hidden container mx-auto p-4 sm:p-6 lg:p-8">
+         <div class="max-w-5xl mx-auto bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm rounded-2xl p-6 md:p-8 shadow-2xl">
+            <header class="flex justify-between items-center mb-8">
+                <h2 id="gallery-title" class="text-3xl font-bold text-teal-600 dark:text-teal-400"></h2>
+                <button id="back-btn" class="px-6 py-3 bg-teal-500 text-white font-semibold rounded-lg shadow-lg hover:bg-teal-600 focus:outline-none focus:ring-4 focus:ring-teal-500/50">
+                    <i class="fas fa-arrow-left mr-2"></i> Back to Results
+                </button>
+            </header>
+            <div id="gallery-loader" class="text-center hidden my-8">
+                <div class="inline-block animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-teal-500"></div>
+                <p class="mt-4 text-gray-600 dark:text-gray-400">Fetching more photos...</p>
+            </div>
+            <div id="gallery-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                <!-- Gallery images will be inserted here -->
+            </div>
+        </div>
+    </div>
+
+
     <script>
         // --- Element References ---
         const searchBtn = document.getElementById('search-btn');
@@ -66,172 +86,253 @@
         const resultsContainer = document.getElementById('results');
         const loader = document.getElementById('loader');
         const messageBox = document.getElementById('message-box');
+        
+        const mainView = document.getElementById('main-view');
+        const galleryView = document.getElementById('gallery-view');
+        const backBtn = document.getElementById('back-btn');
+        const galleryTitle = document.getElementById('gallery-title');
+        const galleryGrid = document.getElementById('gallery-grid');
+        const galleryLoader = document.getElementById('gallery-loader');
+
 
         // --- API Configuration ---
         const ninjasApiKey = 'NBLzVtc9zEUgykvHHYEelQ==Nk1wfVKY9E9NGnQs'; 
         const pexelsApiKey = 'rNeFMYzKsFyZy2B9fv0M9dXHQariKslYt7kSJhD8KezlzTEPYdc1u9dQ';
+        const pixabayApiKey = '51881389-4d98b5fa44d0fd317a1d9b7fd';
+        
         const animalsApiUrl = 'https://api.api-ninjas.com/v1/animals?name=';
         const pexelsApiUrl = 'https://api.pexels.com/v1/search?query=';
+        const pixabayApiUrl = 'https://pixabay.com/api/';
 
         // --- Event Listeners ---
         searchBtn.addEventListener('click', searchForAnimal);
         animalNameInput.addEventListener('keyup', (event) => {
-            if (event.key === 'Enter') {
-                searchForAnimal();
-            }
+            if (event.key === 'Enter') searchForAnimal();
+        });
+        backBtn.addEventListener('click', () => {
+            galleryView.classList.add('hidden');
+            mainView.classList.remove('hidden');
         });
 
-        /**
-         * Main function to trigger the animal search.
-         */
+        /** Main function to trigger the animal search. */
         function searchForAnimal() {
             const animalName = animalNameInput.value.trim();
             if (!animalName) {
                 displayMessage('Please enter an animal name to start exploring!');
                 return;
             }
-            if (pexelsApiKey === 'YOUR_PEXELS_API_KEY' || !pexelsApiKey) {
-                displayMessage('Please add your Pexels API key to the script to fetch images.');
+            if (!isApiKeyAvailable(pexelsApiKey) && !isApiKeyAvailable(pixabayApiKey)) {
+                displayMessage('Please add an API key for Pexels or Pixabay to fetch images.');
                 return;
             }
             fetchAnimalData(animalName);
         }
 
-        /**
-         * Fetches an image for a given animal by searching Pexels and verifying the
-         * image's alt text for a more accurate match.
-         * @param {string} animalName - The name of the animal.
-         * @returns {Promise<string|null>} - A promise that resolves to the image URL or null if no accurate match is found.
-         */
+        /** Helper to check if an API key is valid and not a placeholder. */
+        function isApiKeyAvailable(key) {
+            return key && !key.startsWith('YOUR_');
+        }
+        
+        /** Main image fetching function for a single card image. */
         async function fetchAnimalImage(animalName) {
-            // Construct a more specific query to prioritize actual animals.
-            const query = encodeURIComponent(`${animalName} animal`);
-            const url = `${pexelsApiUrl}${query}&per_page=5`;
-
-            try {
-                const response = await fetch(url, {
-                    headers: { Authorization: pexelsApiKey }
-                });
-
-                if (!response.ok) {
-                    console.warn(`Pexels API request for "${animalName}" failed with status: ${response.status}`);
-                    return null;
-                }
-
-                const data = await response.json();
-
-                if (data.photos && data.photos.length > 0) {
-                    // Look for the first photo where the alt text contains the full animal name.
-                    const lowerCaseAnimalName = animalName.toLowerCase();
-                    for (const photo of data.photos) {
-                        const altText = (photo.alt || '').toLowerCase();
-                        if (altText.includes(lowerCaseAnimalName)) {
-                            console.log(`Found a matching image for "${animalName}" with alt text: "${photo.alt}"`);
-                            return photo.src.large; // Found a good match!
-                        }
-                    }
-                }
-                
-                // If no photo with a matching alt text was found in the top results.
-                console.log(`No image with an accurate alt text match was found for "${animalName}".`);
-                return null;
-
-            } catch (error) {
-                console.error(`Error fetching image for query "${animalName}" from Pexels:`, error);
-                return null;
+            let imageUrl = await fetchPexelsImages(animalName, 5, true);
+            if (!imageUrl) {
+                console.log('Pexels search failed, trying Pixabay...');
+                imageUrl = await fetchPixabayImages(animalName, 5, true);
             }
+            return imageUrl;
+        }
+        
+        /** Fetches multiple images for the gallery view. */
+        async function fetchAllGalleryImages(animalName) {
+            const pexelsPromise = fetchPexelsImages(animalName, 12, false);
+            const pixabayPromise = fetchPixabayImages(animalName, 12, false);
+
+            const [pexelsImages, pixabayImages] = await Promise.all([pexelsPromise, pixabayPromise]);
+            
+            // Combine and return results, filtering out any null/undefined entries
+            return [...(pexelsImages || []), ...(pixabayImages || [])];
         }
 
-        /**
-         * Fetches animal data from the API Ninjas endpoint.
-         * @param {string} animalName - The name of the animal to search for.
-         */
+        /** Fetches images from Pexels. Can return one or many. */
+        async function fetchPexelsImages(animalName, count, findOne) {
+             if (!isApiKeyAvailable(pexelsApiKey)) return null;
+            const query = encodeURIComponent(`${animalName} animal`);
+            const url = `${pexelsApiUrl}${query}&per_page=${count}`;
+            try {
+                const response = await fetch(url, { headers: { Authorization: pexelsApiKey } });
+                if (!response.ok) { console.warn(`Pexels API failed: ${response.status}`); return null; }
+                const data = await response.json();
+                if (findOne) {
+                    return findBestMatch(data.photos, animalName, photo => photo.alt, photo => photo.src.large, "Pexels");
+                }
+                const lowerCaseAnimalName = animalName.toLowerCase();
+                return data.photos
+                    .filter(photo => (photo.alt || '').toLowerCase().includes(lowerCaseAnimalName))
+                    .map(photo => photo.src.large);
+            } catch (error) { console.error('Error fetching from Pexels:', error); return null; }
+        }
+
+        /** Fetches images from Pixabay. Can return one or many. */
+        async function fetchPixabayImages(animalName, count, findOne) {
+            if (!isApiKeyAvailable(pixabayApiKey)) return null;
+            // FIX: Pixabay's API requires spaces to be replaced with '+'
+            const query = encodeURIComponent(animalName).replace(/%20/g, '+');
+            const url = `${pixabayApiUrl}?key=${pixabayApiKey}&q=${query}&per_page=${count}`;
+            console.log('Requesting URL from Pixabay:', url);
+            try {
+                const response = await fetch(url);
+                if (!response.ok) { console.warn(`Pixabay API failed: ${response.status}`); return null; }
+                const data = await response.json();
+                 if (findOne) {
+                    return findBestMatch(data.hits, animalName, photo => photo.tags, photo => photo.largeImageURL, "Pixabay");
+                }
+                const lowerCaseAnimalName = animalName.toLowerCase();
+                return data.hits
+                    .filter(photo => (photo.tags || '').toLowerCase().includes(lowerCaseAnimalName))
+                    .map(photo => photo.largeImageURL);
+            } catch (error) { console.error('Error fetching from Pixabay:', error); return null; }
+        }
+        
+        /** Generic helper function to find the best single image match from a list of results. */
+        function findBestMatch(photos, animalName, getAltText, getImageUrl, sourceName) {
+            if (!photos || photos.length === 0) return null;
+            const lowerCaseAnimalName = animalName.toLowerCase();
+            for (const photo of photos) {
+                const altText = (getAltText(photo) || '').toLowerCase();
+                if (altText.includes(lowerCaseAnimalName)) {
+                    console.log(`Found matching image on ${sourceName} with alt/tags: "${altText}"`);
+                    return getImageUrl(photo);
+                }
+            }
+            return null;
+        }
+
+        /** Fetches animal data from the API Ninjas endpoint. */
         async function fetchAnimalData(animalName) {
             loader.classList.remove('hidden');
             resultsContainer.innerHTML = '';
             hideMessage();
-
             try {
-                const response = await fetch(animalsApiUrl + animalName, {
-                    method: 'GET',
-                    headers: { 'X-Api-Key': ninjasApiKey }
-                });
-
-                if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
-                }
-
+                const response = await fetch(animalsApiUrl + animalName, { headers: { 'X-Api-Key': ninjasApiKey } });
+                if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
                 const data = await response.json();
                 await displayResults(data);
-
             } catch (error) {
                 console.error('Error fetching animal data:', error);
-                displayMessage('Oops! Couldn\'t fetch data. Please check your connection or try again.');
+                displayMessage('Oops! Couldn\'t fetch data. Please try again.');
             } finally {
                 loader.classList.add('hidden');
             }
         }
 
-        /**
-         * Displays the fetched animal data on the page, including an image from Pexels.
-         * @param {Array} animals - An array of animal objects from the API.
-         */
+        /** Displays the fetched animal data on the page. */
         async function displayResults(animals) {
             if (animals.length === 0) {
                 displayMessage('No animals found with that name. Try another one!');
                 return;
             }
 
-            // Use a for...of loop to handle async image fetching correctly for each card.
+            const iconMap = {
+                'locations': { icon: 'fa-map-marker-alt', color: 'text-red-500' },
+                'diet': { icon: 'fa-utensils', color: 'text-yellow-500' },
+                'lifespan': { icon: 'fa-heartbeat', color: 'text-green-500' },
+                'skin_type': { icon: 'fa-tshirt', color: 'text-blue-500' },
+                'habitat': { icon: 'fa-home', color: 'text-indigo-500' },
+                'top_speed': { icon: 'fa-tachometer-alt', color: 'text-purple-500' },
+                'weight': { icon: 'fa-weight-hanging', color: 'text-orange-500' },
+                'height': { icon: 'fa-ruler-vertical', color: 'text-pink-500' },
+                'default': { icon: 'fa-info-circle', color: 'text-gray-500' }
+            };
+
             for (const animal of animals) {
                 const card = document.createElement('div');
-                card.className = 'bg-gradient-to-br from-white/90 to-gray-100/90 dark:from-gray-800/90 dark:to-gray-900/90 rounded-xl shadow-lg overflow-hidden transform hover:scale-105 hover:shadow-2xl transition-all duration-300';
+                card.className = 'bg-gradient-to-br from-white/90 to-gray-100/90 dark:from-gray-800/90 dark:to-gray-900/90 rounded-xl shadow-lg overflow-hidden flex flex-col';
                 
                 const name = animal.name || 'N/A';
                 const scientificName = animal.taxonomy?.scientific_name || 'N/A';
-                const locations = (animal.locations && animal.locations.length > 0) ? animal.locations.join(', ') : 'Not specified';
-                const diet = animal.characteristics?.diet || 'N/A';
-                const lifespan = animal.characteristics?.lifespan || 'N/A';
-                const skinType = animal.characteristics?.skin_type || 'N/A';
+                
+                let characteristicsHtml = '';
+                 if (animal.characteristics) {
+                    if (animal.locations && animal.locations.length > 0) {
+                        const iconInfo = iconMap['locations'] || iconMap['default'];
+                        characteristicsHtml += `<p><i class="fas ${iconInfo.icon} w-6 ${iconInfo.color}"></i> <strong class="font-semibold">Locations:</strong> ${animal.locations.join(', ')}</p>`;
+                    }
+                    for (const [key, value] of Object.entries(animal.characteristics)) {
+                        if (value && value.trim() !== '') {
+                            const label = key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+                            const iconInfo = iconMap[key] || iconMap['default'];
+                            characteristicsHtml += `<p><i class="fas ${iconInfo.icon} w-6 ${iconInfo.color}"></i> <strong class="font-semibold">${label}:</strong> ${value}</p>`;
+                        }
+                    }
+                }
 
-                // Fetch a specific, more accurate image from Pexels for each animal.
                 const imageUrl = await fetchAnimalImage(name);
+                let imageContainer;
+                if (imageUrl) {
+                    imageContainer = document.createElement('a');
+                    imageContainer.href = '#';
+                    imageContainer.className = 'cursor-pointer block';
+                    imageContainer.innerHTML = `<img src="${imageUrl}" alt="Photo of a ${name}" class="w-full h-48 object-cover" onerror="this.style.display='none'">`;
+                    imageContainer.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        showImageGallery(name);
+                    });
+                } else {
+                    imageContainer = document.createElement('div'); // Placeholder
+                    imageContainer.className = 'w-full h-48 bg-gray-200 dark:bg-gray-700 flex items-center justify-center';
+                    imageContainer.innerHTML = `<i class="fas fa-image fa-3x text-gray-400"></i>`;
+                }
 
-                // Only create an image tag if a valid imageUrl was found.
-                const imageTag = imageUrl 
-                    ? `<img src="${imageUrl}" alt="Photo of a ${name}" class="w-full h-48 object-cover" onerror="this.style.display='none'">`
-                    : '';
-
-                card.innerHTML = `
-                    ${imageTag}
-                    <div class="p-6">
-                        <h2 class="text-2xl font-bold text-teal-700 dark:text-teal-300 mb-2">${name}</h2>
-                        <p class="text-sm text-gray-500 dark:text-gray-400 font-medium mb-5 italic">${scientificName}</p>
-                        
-                        <div class="space-y-4 text-gray-800 dark:text-gray-200">
-                            <p><i class="fas fa-map-marker-alt w-6 text-red-500"></i> <strong class="font-semibold">Locations:</strong> ${locations}</p>
-                            <p><i class="fas fa-utensils w-6 text-yellow-500"></i> <strong class="font-semibold">Diet:</strong> ${diet}</p>
-                            <p><i class="fas fa-heartbeat w-6 text-green-500"></i> <strong class="font-semibold">Lifespan:</strong> ${lifespan}</p>
-                            <p><i class="fas fa-tshirt w-6 text-blue-500"></i> <strong class="font-semibold">Skin Type:</strong> ${skinType}</p>
-                        </div>
+                const contentDiv = document.createElement('div');
+                contentDiv.className = 'p-6 flex-grow';
+                contentDiv.innerHTML = `
+                    <h2 class="text-2xl font-bold text-teal-700 dark:text-teal-300 mb-2">${name}</h2>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 font-medium mb-5 italic">${scientificName}</p>
+                    <div class="space-y-4 text-gray-800 dark:text-gray-200">
+                        ${characteristicsHtml || '<p>No characteristics available.</p>'}
                     </div>
                 `;
+                
+                card.appendChild(imageContainer);
+                card.appendChild(contentDiv);
                 resultsContainer.appendChild(card);
             }
         }
 
-        /**
-         * Displays a message to the user.
-         * @param {string} message - The message to display.
-         */
+        /** Shows the gallery view and fetches images for it. */
+        async function showImageGallery(animalName) {
+            mainView.classList.add('hidden');
+            galleryView.classList.remove('hidden');
+            galleryTitle.textContent = `More Photos of: ${animalName}`;
+            galleryGrid.innerHTML = '';
+            galleryLoader.classList.remove('hidden');
+
+            const images = await fetchAllGalleryImages(animalName);
+            
+            galleryLoader.classList.add('hidden');
+
+            if (images.length === 0) {
+                galleryGrid.innerHTML = '<p class="col-span-full text-center">No additional photos could be found.</p>';
+                return;
+            }
+
+            images.forEach(imgUrl => {
+                const imgElement = document.createElement('img');
+                imgElement.src = imgUrl;
+                imgElement.alt = `Photo of a ${animalName}`;
+                imgElement.className = 'w-full h-full object-cover rounded-lg shadow-md';
+                galleryGrid.appendChild(imgElement);
+            });
+        }
+
+        /** Displays a message to the user. */
         function displayMessage(message) {
             messageBox.textContent = message;
             messageBox.classList.remove('hidden');
         }
 
-        /**
-         * Hides the message box.
-         */
+        /** Hides the message box. */
         function hideMessage() {
             messageBox.classList.add('hidden');
         }
@@ -239,4 +340,3 @@
 
 </body>
 </html>
-
