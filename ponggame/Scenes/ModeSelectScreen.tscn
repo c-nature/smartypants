@@ -30,18 +30,20 @@ anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
 offset_left = -190.0
-offset_top = -300.0
+offset_top = -348.0
 offset_right = 1858.0
-offset_bottom = 3800.0
+offset_bottom = 3992.0
 grow_horizontal = 2
 grow_vertical = 2
 scale = Vector2(0.2, 0.2)
 size_flags_horizontal = 4
 size_flags_vertical = 4
-theme_override_constants/separation = -1152
+theme_override_constants/separation = -700
 
 [node name="OnePlayerButton" type="TextureButton" parent="UIContainer"]
 layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 4
 texture_normal = ExtResource("2_ak458")
 texture_pressed = ExtResource("4_56eig")
 texture_hover = ExtResource("3_vr38k")
@@ -60,6 +62,8 @@ vertical_alignment = 1
 
 [node name="TwoPlayersButton" type="TextureButton" parent="UIContainer"]
 layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
 texture_normal = ExtResource("2_ak458")
 texture_pressed = ExtResource("4_56eig")
 texture_hover = ExtResource("3_vr38k")

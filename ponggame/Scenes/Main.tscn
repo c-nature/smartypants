@@ -1,4 +1,4 @@
-[gd_scene load_steps=20 format=3 uid="uid://c1orecnybynmk"]
+[gd_scene load_steps=25 format=3 uid="uid://c1orecnybynmk"]
 
 [ext_resource type="Script" uid="uid://vb2h6lojc1kk" path="res://Scripts/Main.gd" id="1_ynf5e"]
 [ext_resource type="PackedScene" uid="uid://bo8vjvq2q7lq" path="res://Scenes/playerpaddle.tscn" id="2_hptm8"]
@@ -14,6 +14,11 @@
 [ext_resource type="AudioStream" uid="uid://b3r3ftv780cx8" path="res://Sounds/pongballsound1.mp3" id="12_jkdf5"]
 [ext_resource type="AudioStream" uid="uid://dnq866rb444g1" path="res://Sounds/pongballsound2.mp3" id="13_wsu2k"]
 [ext_resource type="AudioStream" uid="uid://bggjl14x1e3fg" path="res://Sounds/pongballsound3.mp3" id="14_k12tt"]
+[ext_resource type="Script" uid="uid://ncow8e22pofa" path="res://Scenes/MobileUILayer.gd" id="15_0sclb"]
+[ext_resource type="Texture2D" uid="uid://c8i1e17rgxnvl" path="res://Assets/uparrow.png" id="15_346fj"]
+[ext_resource type="Texture2D" uid="uid://c1au4wdqbecun" path="res://Assets/uparrowpressed.png" id="16_0sclb"]
+[ext_resource type="Texture2D" uid="uid://bgixcpl8l5jmh" path="res://Assets/downarrow.png" id="17_sxkr1"]
+[ext_resource type="Texture2D" uid="uid://eqlfgif2i0ew" path="res://Assets/downarrowpressed.png" id="18_fq0cl"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_kek77"]
 size = Vector2(2.8984, 12.025)
@@ -244,6 +249,23 @@ volume_db = 1.0
 [node name="BallHitSound3" type="AudioStreamPlayer2D" parent="."]
 stream = ExtResource("14_k12tt")
 volume_db = 1.0
+
+[node name="MobileUILayer" type="CanvasLayer" parent="."]
+script = ExtResource("15_0sclb")
+
+[node name="P1_Up_Button" type="TouchScreenButton" parent="MobileUILayer"]
+position = Vector2(-607, -280)
+scale = Vector2(0.05, 0.05)
+texture_normal = ExtResource("15_346fj")
+texture_pressed = ExtResource("16_0sclb")
+action = "move_up"
+
+[node name="P1_Down_Button" type="TouchScreenButton" parent="MobileUILayer"]
+position = Vector2(-607, 285)
+scale = Vector2(0.05, 0.05)
+texture_normal = ExtResource("17_sxkr1")
+texture_pressed = ExtResource("18_fq0cl")
+action = "move_down"
 
 [connection signal="body_entered" from="LeftGoal" to="." method="_on_LeftGoal_body_entered"]
 [connection signal="body_entered" from="RIghtGoal" to="." method="_on_RightGoal_body_entered"]

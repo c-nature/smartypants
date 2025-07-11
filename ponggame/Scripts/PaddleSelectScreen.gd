@@ -2,12 +2,15 @@ extends Control
 
 # Path to the main game scene.
 const MAIN_GAME_SCENE_PATH = "res://Scenes/Main.tscn"
+# Path to the mode select scene.
+const MODE_SELECT_SCENE_PATH = "res://Scenes/ModeSelectScreen.tscn"
 
 # Note: The UI_CLICK_SOUND_PATH is no longer needed here, as it's handled by GlobalAudio.gd
 
 # @onready variables for UI elements, ensuring paths are correct.
 @onready var instruction_label: Label = $TopUIContainer/InstructionLabel
 @onready var confirm_button: BaseButton = $TopUIContainer/ConfirmButton
+@onready var back_button: TextureButton = $BackButton # <--- CHANGED TO TextureButton
 
 # Player 1 elements
 @onready var player1_selection_block: Control = $SelectionBlocksContainer/Player1SelectionBlock
@@ -60,6 +63,9 @@ func _ready():
 	ai_left_arrow.pressed.connect(Callable(self, "_on_arrow_pressed").bind("ai", -1))
 	ai_right_arrow.pressed.connect(Callable(self, "_on_arrow_pressed").bind("ai", 1))
 	ai_select_button.pressed.connect(Callable(self, "_on_select_button_pressed").bind("ai"))
+
+	# Connect the Back button signal
+	back_button.pressed.connect(_on_BackButton_pressed)
 
 	# The Confirm button signal should be connected in the Godot editor.
 
@@ -339,3 +345,10 @@ func _start_transition(target_scene: String):
 	get_tree().create_timer(0.2).timeout.connect(func():
 		get_tree().change_scene_to_file(target_scene)
 	)
+
+func _on_BackButton_pressed():
+	# Play the UI click sound using the function from our global script.
+	GlobalAudio.play_ui_click()
+	
+	# Transition back to the mode select screen
+	_start_transition(MODE_SELECT_SCENE_PATH)

@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=3 uid="uid://dhice3aetposj"]
+[gd_scene load_steps=11 format=3 uid="uid://dhice3aetposj"]
 
 [ext_resource type="PackedScene" uid="uid://bp3w8htx06kl3" path="res://TopUI.tscn" id="1_1vq67"]
 [ext_resource type="Script" uid="uid://pm0pil6mixl3" path="res://Scripts/PaddleSelectScreen.gd" id="1_25w6v"]
@@ -6,6 +6,10 @@
 [ext_resource type="PackedScene" uid="uid://b2vlq3feilbhk" path="res://SelectionBlocksContainer.tscn" id="3_umobd"]
 [ext_resource type="FontFile" uid="uid://bewpidr0danru" path="res://Fonts/BebasNeue-Regular.ttf" id="5_b8dm6"]
 [ext_resource type="AudioStream" uid="uid://c7e81q1bcxojh" path="res://Sounds/ui-click-43196.mp3" id="5_psjxm"]
+[ext_resource type="Texture2D" uid="uid://rv21u66omgcx" path="res://Assets/playerbutton_removed.png" id="7_5yr7a"]
+[ext_resource type="Texture2D" uid="uid://b2ie82mgh3hkk" path="res://Assets/playerbuttonpressed.png" id="8_0r5y4"]
+[ext_resource type="Texture2D" uid="uid://blq0vk1j1gfet" path="res://Assets/playerbuttonhover.png" id="9_h0xlt"]
+[ext_resource type="FontFile" uid="uid://cwpc0d2b36u0l" path="res://Fonts/Komigo3D-Regular.ttf" id="10_m5i1k"]
 
 [node name="PaddleSelectionScreen" type="Control"]
 layout_mode = 3
@@ -31,6 +35,16 @@ grow_horizontal = 1
 theme_override_colors/font_outline_color = Color(0.976471, 0.192157, 0.117647, 1)
 
 [node name="Label" parent="TopUIContainer/ConfirmButton" index="0"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 1670.0
+offset_top = 170.0
+offset_right = -1695.0
+offset_bottom = -190.0
+grow_horizontal = 2
+grow_vertical = 2
 theme_override_font_sizes/font_size = 250
 text = "Start Game"
 
@@ -74,6 +88,9 @@ theme_override_font_sizes/font_size = 320
 text = "President's Name 2021-2022"
 horizontal_alignment = 1
 vertical_alignment = 1
+
+[node name="Label" parent="SelectionBlocksContainer/Player1SelectionBlock/Player1SelectButton" index="0"]
+theme_override_font_sizes/font_size = 400
 
 [node name="Player1\'sPresident" parent="SelectionBlocksContainer/Player1SelectionBlock" index="2"]
 theme_override_colors/font_outline_color = Color(0.976471, 0.192157, 0.117647, 1)
@@ -120,6 +137,9 @@ text = "President's Name 2021-2022"
 horizontal_alignment = 1
 vertical_alignment = 1
 
+[node name="Label" parent="SelectionBlocksContainer/RightSideSelectionWrapper/Player2SelectionBlock/Player2SelectButton" index="0"]
+theme_override_font_sizes/font_size = 400
+
 [node name="Player2\'sPresident" parent="SelectionBlocksContainer/RightSideSelectionWrapper/Player2SelectionBlock" index="2"]
 theme_override_colors/font_outline_color = Color(0.976471, 0.192157, 0.117647, 1)
 theme_override_constants/shadow_offset_x = 50
@@ -146,6 +166,9 @@ text = "President's Name 2021-2022"
 horizontal_alignment = 1
 vertical_alignment = 1
 
+[node name="Label" parent="SelectionBlocksContainer/RightSideSelectionWrapper/AISelectionBlock/AISelectButton" index="0"]
+theme_override_font_sizes/font_size = 400
+
 [node name="AI\'sPresident" parent="SelectionBlocksContainer/RightSideSelectionWrapper/AISelectionBlock" index="2"]
 theme_override_colors/font_outline_color = Color(0.976471, 0.192157, 0.117647, 1)
 theme_override_constants/shadow_offset_x = 50
@@ -155,6 +178,36 @@ theme_override_constants/shadow_outline_size = 50
 
 [node name="UIClickSound" type="AudioStreamPlayer2D" parent="."]
 stream = ExtResource("5_psjxm")
+
+[node name="BackButton" type="TextureButton" parent="."]
+layout_mode = 0
+offset_left = 183.0
+offset_top = -30.0
+offset_right = 2231.0
+offset_bottom = 2018.0
+scale = Vector2(0.1, 0.1)
+texture_normal = ExtResource("7_5yr7a")
+texture_pressed = ExtResource("8_0r5y4")
+texture_hover = ExtResource("9_h0xlt")
+
+[node name="Label" type="Label" parent="BackButton"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -360.0
+offset_top = -340.0
+offset_right = 360.0
+offset_bottom = 340.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_fonts/font = ExtResource("10_m5i1k")
+theme_override_font_sizes/font_size = 400
+text = "Back"
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [connection signal="pressed" from="TopUIContainer/ConfirmButton" to="." method="_on_ConfirmButton_pressed"]
 
