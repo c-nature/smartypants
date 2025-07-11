@@ -601,7 +601,7 @@
                 <img src="math.png" alt="Math Icon" class="category-icon" onerror="this.onerror=null; this.src='https://placehold.co/80x80/FFD700/000000?text=Math';" />
                 <h2 class="category-title">Math Games</h2>
                 <p class="category-description">Fun with numbers & logic!</p>
-                <button class="explore-button" onclick="playClickSound(); showMathCategoryView();">
+                <button class="explore-button" id="exploreMathBtn">
                     Explore <span style="margin-left: 0.5rem;">&#x276F;</span> </button>
             </div>
 
@@ -609,7 +609,7 @@
                 <img src="science.png" alt="Science Icon" class="category-icon" onerror="this.onerror=null; this.src='https://placehold.co/80x80/81C784/000000?text=Science';" />
                 <h2 class="category-title">Science Games</h2>
                 <p class="category-description">Discover the world around you!</p>
-                <button class="explore-button" onclick="playClickSound(); showScienceCategoryView();">
+                <button class="explore-button" id="exploreScienceBtn">
                     Explore <span style="margin-left: 0.5rem;">&#x276F;</span> </button>
             </div>
 
@@ -617,14 +617,14 @@
                 <img src="abc.png" alt="ELA Icon" class="category-icon" onerror="this.onerror=null; this.src='https://placehold.co/80x80/EF9A9A/000000?text=ABC';" />
                 <h2 class="category-title">ELA Games</h2>
                 <p class="category-description">Read, write, and communicate!</p>
-                <button class="explore-button" onclick="playClickSound(); showElaCategoryView();"> Explore <span style="margin-left: 0.5rem;">&#x276F;</span> </button>
+                <button class="explore-button" id="exploreElaBtn"> Explore <span style="margin-left: 0.5rem;">&#x276F;</span> </button>
             </div>
 
             <div class="category-card social-studies">
                 <img src="socialstudies.png" alt="Social Studies Icon" class="category-icon" onerror="this.onerror=null; this.src='https://placehold.co/80x80/FFA500/000000?text=History';" />
                 <h2 class="category-title">Social Studies</h2>
                 <p class="category-description">Explore history and cultures!</p>
-                <button class="explore-button" onclick="playClickSound(); showSocialStudiesCategoryView();"> Explore <span style="margin-left: 0.5rem;">&#x276F;</span> </button>
+                <button class="explore-button" id="exploreSocialStudiesBtn"> Explore <span style="margin-left: 0.5rem;">&#x276F;</span> </button>
             </div>
         </div>
 
@@ -634,60 +634,60 @@
     </div>
 
     <div id="math-category-view" class="category-view hidden">
-        <button onclick="playClickSound(); showMainMenu();" class="back-button"> &larr; Back to Main Menu </button>
+        <button class="back-button" id="backFromMathBtn"> &larr; Back to Main Menu </button>
         <h1 class="header-title">MATH</h1>
         <div class="game-list-layout">
             <div class="game-list-card">
                 <h3>Math Challenge</h3>
                 <p>Test your arithmetic skills!</p>
                 <div class="game-card-buttons">
-                    <button class="play-game-button" onclick="playClickSound(); showMathGame();">Play Here</button>
-                    <button class="play-game-button-new-window" onclick="playClickSound(); openGameInNewWindow('mathgame.html');">Open in New Window</button>
+                    <button class="play-game-button" id="playMathGameBtn">Play Here</button>
+                    <button class="play-game-button-new-window" id="openMathGameNewWindowBtn" data-game-url="mathgame.html">Open in New Window</button>
                 </div>
             </div>
             </div>
     </div>
 
     <div id="science-category-view" class="category-view hidden">
-        <button onclick="playClickSound(); showMainMenu();" class="back-button"> &larr; Back to Main Menu </button>
+        <button class="back-button" id="backFromScienceBtn"> &larr; Back to Main Menu </button>
         <h1 class="header-title">SCIENCE</h1>
         <div class="game-list-layout">
             <div class="game-list-card">
                 <h3>Animal Kingdom Explorer</h3>
                 <p>Learn about amazing animals!</p>
                 <div class="game-card-buttons">
-                    <button class="play-game-button" onclick="playClickSound(); showScienceGame();">Play Here</button>
-                    <button class="play-game-button-new-window" onclick="playClickSound(); openGameInNewWindow('animalapp.html');">Open in New Window</button>
+                    <button class="play-game-button" id="playScienceGameBtn">Play Here</button>
+                    <button class="play-game-button-new-window" id="openScienceGameNewWindowBtn" data-game-url="animalapp.html">Open in New Window</button>
                 </div>
             </div>
             </div>
     </div>
 
     <div id="ela-category-view" class="category-view hidden">
-        <button onclick="playClickSound(); showMainMenu();" class="back-button"> &larr; Back to Main Menu </button>
+        <button class="back-button" id="backFromElaBtn"> &larr; Back to Main Menu </button>
         <h1 class="header-title">ELA</h1>
         <div class="game-list-layout">
             <div class="game-list-card" style="background-image: url('wordweaver.png'); background-size: cover; background-position: center;">
                 <h3 style="color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);">Word Weaver</h3>
                 <p style="color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);">A fun adventure in vocabulary!</p>
                 <div class="game-card-buttons">
-                    <button class="play-game-button" onclick="playClickSound(); showElaGame();">Play Here</button>
-                    <button class="play-game-button-new-window" onclick="playClickSound(); openGameInNewWindow('WordWarrior.html');">Open in New Window</button>
+                    <button class="play-game-button" id="playElaGameBtn">Play Here</button>
+                    <button class="play-game-button-new-window" id="openElaGameNewWindowBtn" data-game-url="WordWarrior.html">Open in New Window</button>
                 </div>
             </div>
             </div>
     </div>
 
     <div id="social-studies-category-view" class="category-view hidden">
-        <button onclick="playClickSound(); showMainMenu();" class="back-button"> &larr; Back to Main Menu </button>
+        <button class="back-button" id="backFromSocialStudiesBtn"> &larr; Back to Main Menu </button>
         <h1 class="header-title">SOCIAL STUDIES</h1>
         <div class="game-list-layout">
             <div class="game-list-card" style="background-image: url('modeSelectScreen.png'); background-size: cover; background-position: center;">
                 <h3 style="color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);">Presidential Pong</h3>
                 <p style="color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);">A historic twist on a classic!</p>
                 <div class="game-card-buttons">
-                    <button class="play-game-button" onclick="playClickSound(); showPongGame();">Play Here</button>
-                    <button class="play-game-button-new-window" onclick="playClickSound(); openGameInNewWindow('ponggame/presidentialpong.html');">Open in New Window</button>
+                    <button class="play-game-button" id="playPongGameBtn">Play Here</button>
+                    <button class="play-game-button-new-window" id="openPongGameNewWindowBtn" data-game-url="ponggame/presidentialpong.html">Open in New Window</button>
                 </div>
             </div>
             </div>
@@ -695,28 +695,28 @@
 
 
     <div id="math-game-view" class="game-iframe-container">
-        <button onclick="playClickSound(); showMainMenu();" class="back-button">
+        <button class="back-button" id="backFromMathGameBtn">
             &larr; Back to Main Menu
         </button>
         <iframe id="math-game-iframe" src="" title="Math Challenge Game" class="game-iframe"></iframe>
     </div>
 
     <div id="science-game-view" class="game-iframe-container">
-        <button onclick="playClickSound(); showMainMenu();" class="back-button">
+        <button class="back-button" id="backFromScienceGameBtn">
             &larr; Back to Main Menu
         </button>
         <iframe id="science-game-iframe" src="" title="Animal Kingdom Explorer" class="game-iframe"></iframe>
     </div>
 
     <div id="ela-game-view" class="game-iframe-container">
-        <button onclick="playClickSound(); showMainMenu();" class="back-button">
+        <button class="back-button" id="backFromElaGameBtn">
             &larr; Back to Main Menu
         </button>
         <iframe id="ela-game-iframe" src="" title="Word Weaver Game" class="game-iframe"></iframe>
     </div>
 
     <div id="pong-game-view" class="game-iframe-container">
-        <button onclick="playClickSound(); showMainMenu();" class="back-button">
+        <button class="back-button" id="backFromPongGameBtn">
             &larr; Back to Main Menu
         </button>
         <iframe id="pong-game-iframe" src="" title="Presidential Pong Game" class="game-iframe"></iframe>
@@ -971,6 +971,48 @@
                         });
                     }
                     initializeAvatarCreatorOptions();
+
+                    // Attach event listeners for category buttons
+                    document.querySelectorAll('.explore-button').forEach(button => {
+                        button.addEventListener('click', (event) => {
+                            const category = event.target.closest('.category-card').classList[1]; // e.g., 'math', 'science'
+                            playClickSound();
+                            if (category === 'math') showMathCategoryView();
+                            else if (category === 'science') showScienceCategoryView();
+                            else if (category === 'ela') showElaCategoryView();
+                            else if (category === 'social-studies') showSocialStudiesCategoryView();
+                        });
+                    });
+
+                    // Attach event listeners for game play buttons
+                    document.querySelectorAll('.play-game-button').forEach(button => {
+                        button.addEventListener('click', (event) => {
+                            const categoryView = event.target.closest('.category-view').id;
+                            playClickSound();
+                            if (categoryView === 'math-category-view') showMathGame();
+                            else if (categoryView === 'science-category-view') showScienceGame();
+                            else if (categoryView === 'ela-category-view') showElaGame();
+                            else if (categoryView === 'social-studies-category-view') showPongGame();
+                        });
+                    });
+
+                    // Attach event listeners for "Open in New Window" buttons
+                    document.querySelectorAll('.play-game-button-new-window').forEach(button => {
+                        button.addEventListener('click', (event) => {
+                            // Extract URL from data-game-url attribute instead of onclick
+                            const gameUrl = event.target.dataset.gameUrl;
+                            playClickSound();
+                            openGameInNewWindow(gameUrl);
+                        });
+                    });
+
+                    // Attach event listeners for Back buttons
+                    document.querySelectorAll('.back-button').forEach(button => {
+                        button.addEventListener('click', () => {
+                            playClickSound();
+                            showMainMenu();
+                        });
+                    });
                 });
 
                 const loginBtn = document.getElementById('loginBtn');
@@ -1023,7 +1065,6 @@
                 const headerAvatarContainer = document.getElementById('header-avatar-container');
 
                 const BACKEND_URL = 'https://smartypantsbe.onrender.com/user';
-                // Moved from style tag to script tag
                 const AVATAR_PROXY_URL = 'https://smartypantsbe.onrender.com/avatar-proxy'; // New proxy URL
 
                 function updateAuthButtons() {
