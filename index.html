@@ -1133,7 +1133,7 @@
             skinColor: ['Tanned', 'Yellow', 'Pale', 'Light', 'Brown', 'DarkBrown', 'Black'],
             clotheType: ['BlazerShirt', 'BlazerSweater', 'CollarSweater', 'GraphicShirt', 'Hoodie', 'Overall', 'ShirtCrewNeck', 'ShirtScoopNeck', 'ShirtVNeck'],
             clotheColor: ['Black', 'Blue01', 'Blue02', 'Blue03', 'Gray01', 'Gray02', 'Heather', 'PastelBlue', 'PastelGreen', 'PastelOrange', 'PastelRed', 'PastelYellow', 'Pink', 'Red', 'White'],
-            clotheGraphicType: ['Bat', 'Cumbia', 'Deer', 'Diamond', 'Hola', 'Pizza', 'Resist', 'Selena', 'Bear', 'Skull', 'SkullOutline'],
+            graphicType: ['Bat', 'Cumbia', 'Deer', 'Diamond', 'Hola', 'Pizza', 'Resist', 'Selena', 'Bear', 'Skull', 'SkullOutline'],
             accessoriesType: ['Blank', 'Prescription01', 'Prescription02', 'Round', 'Sunglasses', 'Wayfarers'],
             topColor: ['Black', 'Blue01', 'Blue02', 'Blue03', 'Gray01', 'Gray02', 'Heather', 'PastelBlue', 'PastelGreen', 'PastelOrange', 'PastelRed', 'PastelYellow', 'Pink', 'Red', 'White'],
         };
@@ -1151,11 +1151,11 @@
                 delete randomConfig.facialHairColor;
             }
             if (randomConfig.clotheType === 'GraphicShirt') {
-                if (!randomConfig.clotheGraphicType) {
-                    randomConfig.clotheGraphicType = avatarFeatures.clotheGraphicType[Math.floor(Math.random() * avatarFeatures.clotheGraphicType.length)];
+                if (!randomConfig.graphicType) {
+                    randomConfig.graphicType = avatarFeatures.graphicType[Math.floor(Math.random() * avatarFeatures.graphicType.length)];
                 }
             } else {
-                delete randomConfig.clotheGraphicType;
+                delete randomConfig.graphicType;
             }
             return randomConfig;
         }
@@ -1211,12 +1211,12 @@
 
             if (currentAvatarConfig.clotheType === 'GraphicShirt') {
                 clotheGraphicTypeGroup.classList.remove('hidden');
-                if (!currentAvatarConfig.clotheGraphicType) {
-                    currentAvatarConfig.clotheGraphicType = clotheGraphicTypeSelect.value;
+                if (!currentAvatarConfig.graphicType) {
+                    currentAvatarConfig.graphicType = clotheGraphicTypeSelect.value;
                 }
             } else {
                 clotheGraphicTypeGroup.classList.add('hidden');
-                delete currentAvatarConfig.clotheGraphicType;
+                delete currentAvatarConfig.graphicType;
             }
             updateAvatarPreview(currentAvatarConfig);
         }
@@ -1235,7 +1235,7 @@
             populateSelect(skinColorSelect, avatarFeatures.skinColor);
             populateSelect(clotheTypeSelect, avatarFeatures.clotheType);
             populateSelect(clotheColorSelect, avatarFeatures.clotheColor);
-            populateSelect(clotheGraphicTypeSelect, avatarFeatures.clotheGraphicType);
+            populateSelect(clotheGraphicTypeSelect, avatarFeatures.graphicType);
             populateSelect(accessoriesTypeSelect, avatarFeatures.accessoriesType);
             
             avatarStyleSelect.addEventListener('change', (event) => { currentAvatarConfig.avatarStyle = event.target.value; handleConditionalAvatarFields(); updateAvatarPreview(currentAvatarConfig); });
@@ -1250,7 +1250,7 @@
             skinColorSelect.addEventListener('change', (event) => { currentAvatarConfig.skinColor = event.target.value; updateAvatarPreview(currentAvatarConfig); });
             clotheTypeSelect.addEventListener('change', (event) => { currentAvatarConfig.clotheType = event.target.value; handleConditionalAvatarFields(); updateAvatarPreview(currentAvatarConfig); });
             clotheColorSelect.addEventListener('change', (event) => { currentAvatarConfig.clotheColor = event.target.value; updateAvatarPreview(currentAvatarConfig); });
-            clotheGraphicTypeSelect.addEventListener('change', (event) => { currentAvatarConfig.clotheGraphicType = event.target.value; updateAvatarPreview(currentAvatarConfig); });
+            clotheGraphicTypeSelect.addEventListener('change', (event) => { currentAvatarConfig.graphicType = event.target.value; updateAvatarPreview(currentAvatarConfig); });
             accessoriesTypeSelect.addEventListener('change', (event) => { currentAvatarConfig.accessoriesType = event.target.value; updateAvatarPreview(currentAvatarConfig); });
         }
 
@@ -1267,7 +1267,7 @@
             skinColorSelect.value = config.skinColor || avatarFeatures.skinColor[0];
             clotheTypeSelect.value = config.clotheType || avatarFeatures.clotheType[0];
             clotheColorSelect.value = config.clotheColor || avatarFeatures.clotheColor[0];
-            clotheGraphicTypeSelect.value = config.clotheGraphicType || avatarFeatures.clotheGraphicType[0];
+            clotheGraphicTypeSelect.value = config.graphicType || avatarFeatures.graphicType[0];
             accessoriesTypeSelect.value = config.accessoriesType || avatarFeatures.accessoriesType[0];
             
             handleConditionalAvatarFields();
@@ -1482,7 +1482,7 @@
             } else if (action === 'signup') {
                 requestBody = { username: usernameInput.value, email: emailInput.value, password: passwordInput.value };
                 endpoint = `${BACKEND_URL}/signup`;
-                if (!requestBody.email || !/^[\w-\.]+@([\w-]+\.)+[\w-\]]{2,4}$/.test(requestBody.email)) {
+                if (!requestBody.email || !/^[\w-\.]+@([\w-]+\.)+[\w-\.]{2,4}$/.test(requestBody.email)) {
                     authMessage.textContent = 'Please enter a valid email address.';
                     authMessage.style.color = 'red';
                     submitAuthBtn.disabled = false;
