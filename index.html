@@ -1021,7 +1021,7 @@
         const profileAvatarImg = document.getElementById('profileAvatarImg');
         const headerAvatarContainer = document.getElementById('header-avatar-container');
 
-        const BACKEND_URL = '[https://smartypantsbe.onrender.com/user](https://smartypantsbe.onrender.com/user)'; 
+        const BACKEND_URL = 'https://smartypantsbe.onrender.com/user'; 
 
         function updateAuthButtons() {
             const token = localStorage.getItem('token');
@@ -1455,8 +1455,8 @@
 
                     // Merge the updates from the server response into the existing user object
                     const updatedUser = {
-                        ...existingUser, // Keeps old avatar_config
-                        ...data.data     // Overwrites with fresh data from login (_id, username, etc.)
+                        ...existingUser, // Keeps old avatar_config if not explicitly returned
+                        ...data.data     // Overwrites with fresh data from the avatar save response
                     };
 
                     // Save the complete, merged user object back to localStorage
@@ -1572,22 +1572,9 @@
 
                 if (response.ok) {
                     if (data.status === "Success") {
-                        if (action === 'login') {
-                            // --- CORRECTED LOGIN LOGIC ---
-                            // Get existing user data to preserve avatar config if it exists
-                            const existingUser = JSON.parse(localStorage.getItem('user')) || {};
-                            
-                            // Merge new login data with existing data
-                            const mergedUser = {
-                                ...existingUser, // Keeps old avatar_config
-                                ...data.data     // Overwrites with fresh data from login (_id, username, etc.)
-                            };
-
-                            localStorage.setItem('user', JSON.stringify(mergedUser));
-                        } else {
-                            // For signup, the response is the full user object, so we can set it directly
-                            localStorage.setItem('user', JSON.stringify(data.data));
-                        }
+                        // Crucial change: Always set the 'user' object from the backend response.
+                        // This 'data.data' should contain the username and other user details.
+                        localStorage.setItem('user', JSON.stringify(data.data)); 
                         
                         localStorage.setItem('token', data.token); 
                         
@@ -1597,7 +1584,7 @@
                             authModal.classList.add('hidden');
                             updateAuthButtons();
                             const user = JSON.parse(localStorage.getItem('user'));
-                            if (!user.has_created_avatar) {
+                            if (user && !user.has_created_avatar) { // Check if user exists before checking has_created_avatar
                                 showAvatarCreatorModal(user.avatar_config || {});
                             }
                         }, 1000);
