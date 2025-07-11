@@ -4,8 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SMARTY PANTS Online</title>
-    <!-- ADDED: Self-hosted Tailwind CSS. Make sure to download the content from https://cdn.tailwindcss.com/ and save it to ./styles/tailwind.min.css -->
-    <link href="./styles/tailwind.min.css" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap" rel="stylesheet">
     <style>
         body {
@@ -17,7 +16,7 @@
             justify-content: center;
             min-height: 100vh;
             padding: 2rem;
-            overflow-y: auto;
+            overflow-y: auto; 
             overflow-x: hidden; /* Keep horizontal overflow hidden unless specified */
         }
 
@@ -65,13 +64,13 @@
                 grid-template-columns: repeat(2, 1fr);
             }
         }
-
+        
         /* On large screens (desktops), show 4 columns */
         @media (min-width: 1024px) {
             .grid-layout {
                 grid-template-columns: repeat(4, 1fr);
             }
-            }
+        }
 
         .category-card {
             background-color: rgba(255, 255, 255, 0.95);
@@ -113,7 +112,7 @@
         }
         .category-card.ela .title { color: #880e4f; }
         .category-card.ela .description { color: #d32f2f; }
-
+        
         /* New styles for Social Studies card */
         .category-card.social-studies {
             background-color: rgba(255, 165, 0, 0.9); /* Orange background */
@@ -204,8 +203,8 @@
             padding: 1rem;
             box-sizing: border-box;
             position: fixed;
-            top: 6rem;
-            height: calc(100vh - 6rem);
+            top: 6rem; 
+            height: calc(100vh - 6rem); 
             left: 0;
             z-index: 50;
         }
@@ -218,7 +217,7 @@
             box-shadow: 0 4px 15px rgba(0,0,0,0.2);
             background-color: #fff;
         }
-
+        
         .game-list-layout {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -250,7 +249,7 @@
             color: #333;
             margin-bottom: 0.5rem;
         }
-
+        
         .game-list-card p {
             font-size: 1.1rem;
             color: #555;
@@ -286,7 +285,7 @@
             background-color: #f50057;
             transform: scale(1.05);
         }
-
+        
         .play-game-button-new-window {
             background-color: #0288d1;
             color: white;
@@ -351,7 +350,7 @@
             }
             .game-iframe-container {
                 padding: 0.5rem;
-                top: 5rem;
+                top: 5rem; 
                 height: calc(100vh - 5rem);
             }
             .back-button {
@@ -363,7 +362,7 @@
             }
         }
 
-        .auth-modal, .avatar-modal {
+        .auth-modal, .avatar-modal { 
             position: fixed;
             inset: 0;
             background-color: rgba(0, 0, 0, 0.75);
@@ -373,7 +372,7 @@
             z-index: 1000;
             transition: opacity 0.3s ease-in-out;
         }
-        .auth-modal.hidden, .avatar-modal.hidden, .category-view.hidden {
+        .auth-modal.hidden, .avatar-modal.hidden, .category-view.hidden { 
             opacity: 0;
             pointer-events: none;
             display: none;
@@ -397,7 +396,7 @@
             width: 100%;
             font-family: 'Fredoka One', cursive;
         }
-        .auth-modal-title, .avatar-modal-title {
+        .auth-modal-title, .avatar-modal-title { 
             font-size: 1.5rem;
             font-weight: 700;
             text-align: center;
@@ -428,7 +427,7 @@
         .auth-input:focus {
             box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.5);
         }
-        .auth-submit-btn, .auth-close-btn, .avatar-btn {
+        .auth-submit-btn, .auth-close-btn, .avatar-btn { 
             font-weight: 700;
             padding: 0.5rem 1rem;
             border-radius: 0.25rem;
@@ -558,9 +557,9 @@
             background-image: url('wordweaver.png');
             background-size: cover;
             background-position: center;
-            background-color: #6a0dad;
+            background-color: #6a0dad; 
             background-blend-mode: multiply;
-
+            
             color: white;
             font-weight: 700;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
@@ -577,7 +576,7 @@
 </head>
 <body>
 
-    <header class="fixed top-0 left-0 right-0 p-4 flex justify-between items-center z-60">
+    <header class="fixed top-0 left-0 right-0 p-4 flex justify-between items-center z-60"> 
         <div id="header-avatar-container" class="w-12 h-12"></div>
         <nav class="flex space-x-2 items-center">
             <button id="loginBtn" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-full font-semibold shadow-md">Login</button>
@@ -601,7 +600,7 @@
                 <img src="math.png" alt="Math Icon" class="category-icon" onerror="this.onerror=null; this.src='https://placehold.co/80x80/FFD700/000000?text=Math';" />
                 <h2 class="category-title">Math Games</h2>
                 <p class="category-description">Fun with numbers & logic!</p>
-                <button class="explore-button" id="exploreMathBtn">
+                <button class="explore-button" onclick="playClickSound(); showMathCategoryView();">
                     Explore <span style="margin-left: 0.5rem;">&#x276F;</span> </button>
             </div>
 
@@ -609,7 +608,7 @@
                 <img src="science.png" alt="Science Icon" class="category-icon" onerror="this.onerror=null; this.src='https://placehold.co/80x80/81C784/000000?text=Science';" />
                 <h2 class="category-title">Science Games</h2>
                 <p class="category-description">Discover the world around you!</p>
-                <button class="explore-button" id="exploreScienceBtn">
+                <button class="explore-button" onclick="playClickSound(); showScienceCategoryView();">
                     Explore <span style="margin-left: 0.5rem;">&#x276F;</span> </button>
             </div>
 
@@ -617,14 +616,14 @@
                 <img src="abc.png" alt="ELA Icon" class="category-icon" onerror="this.onerror=null; this.src='https://placehold.co/80x80/EF9A9A/000000?text=ABC';" />
                 <h2 class="category-title">ELA Games</h2>
                 <p class="category-description">Read, write, and communicate!</p>
-                <button class="explore-button" id="exploreElaBtn"> Explore <span style="margin-left: 0.5rem;">&#x276F;</span> </button>
+                <button class="explore-button" onclick="playClickSound(); showElaCategoryView();"> Explore <span style="margin-left: 0.5rem;">&#x276F;</span> </button>
             </div>
 
             <div class="category-card social-studies">
                 <img src="socialstudies.png" alt="Social Studies Icon" class="category-icon" onerror="this.onerror=null; this.src='https://placehold.co/80x80/FFA500/000000?text=History';" />
                 <h2 class="category-title">Social Studies</h2>
                 <p class="category-description">Explore history and cultures!</p>
-                <button class="explore-button" id="exploreSocialStudiesBtn"> Explore <span style="margin-left: 0.5rem;">&#x276F;</span> </button>
+                <button class="explore-button" onclick="playClickSound(); showSocialStudiesCategoryView();"> Explore <span style="margin-left: 0.5rem;">&#x276F;</span> </button>
             </div>
         </div>
 
@@ -634,60 +633,60 @@
     </div>
 
     <div id="math-category-view" class="category-view hidden">
-        <button class="back-button" id="backFromMathBtn"> &larr; Back to Main Menu </button>
+        <button onclick="playClickSound(); showMainMenu();" class="back-button"> &larr; Back to Main Menu </button>
         <h1 class="header-title">MATH</h1>
         <div class="game-list-layout">
             <div class="game-list-card">
                 <h3>Math Challenge</h3>
                 <p>Test your arithmetic skills!</p>
                 <div class="game-card-buttons">
-                    <button class="play-game-button" id="playMathGameBtn">Play Here</button>
-                    <button class="play-game-button-new-window" id="openMathGameNewWindowBtn" data-game-url="mathgame.html">Open in New Window</button>
+                    <button class="play-game-button" onclick="playClickSound(); showMathGame();">Play Here</button>
+                    <button class="play-game-button-new-window" onclick="playClickSound(); openGameInNewWindow('mathgame.html');">Open in New Window</button>
                 </div>
             </div>
             </div>
     </div>
 
     <div id="science-category-view" class="category-view hidden">
-        <button class="back-button" id="backFromScienceBtn"> &larr; Back to Main Menu </button>
+        <button onclick="playClickSound(); showMainMenu();" class="back-button"> &larr; Back to Main Menu </button>
         <h1 class="header-title">SCIENCE</h1>
         <div class="game-list-layout">
             <div class="game-list-card">
                 <h3>Animal Kingdom Explorer</h3>
                 <p>Learn about amazing animals!</p>
                 <div class="game-card-buttons">
-                    <button class="play-game-button" id="playScienceGameBtn">Play Here</button>
-                    <button class="play-game-button-new-window" id="openScienceGameNewWindowBtn" data-game-url="animalapp.html">Open in New Window</button>
+                    <button class="play-game-button" onclick="playClickSound(); showScienceGame();">Play Here</button>
+                    <button class="play-game-button-new-window" onclick="playClickSound(); openGameInNewWindow('animalapp.html');">Open in New Window</button>
                 </div>
             </div>
             </div>
     </div>
-
+    
     <div id="ela-category-view" class="category-view hidden">
-        <button class="back-button" id="backFromElaBtn"> &larr; Back to Main Menu </button>
+        <button onclick="playClickSound(); showMainMenu();" class="back-button"> &larr; Back to Main Menu </button>
         <h1 class="header-title">ELA</h1>
         <div class="game-list-layout">
             <div class="game-list-card" style="background-image: url('wordweaver.png'); background-size: cover; background-position: center;">
                 <h3 style="color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);">Word Weaver</h3>
                 <p style="color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);">A fun adventure in vocabulary!</p>
                 <div class="game-card-buttons">
-                    <button class="play-game-button" id="playElaGameBtn">Play Here</button>
-                    <button class="play-game-button-new-window" id="openElaGameNewWindowBtn" data-game-url="WordWarrior.html">Open in New Window</button>
+                    <button class="play-game-button" onclick="playClickSound(); showElaGame();">Play Here</button>
+                    <button class="play-game-button-new-window" onclick="playClickSound(); openGameInNewWindow('WordWarrior.html');">Open in New Window</button>
                 </div>
             </div>
             </div>
     </div>
 
     <div id="social-studies-category-view" class="category-view hidden">
-        <button class="back-button" id="backFromSocialStudiesBtn"> &larr; Back to Main Menu </button>
+        <button onclick="playClickSound(); showMainMenu();" class="back-button"> &larr; Back to Main Menu </button>
         <h1 class="header-title">SOCIAL STUDIES</h1>
         <div class="game-list-layout">
             <div class="game-list-card" style="background-image: url('modeSelectScreen.png'); background-size: cover; background-position: center;">
                 <h3 style="color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);">Presidential Pong</h3>
                 <p style="color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);">A historic twist on a classic!</p>
                 <div class="game-card-buttons">
-                    <button class="play-game-button" id="playPongGameBtn">Play Here</button>
-                    <button class="play-game-button-new-window" id="openPongGameNewWindowBtn" data-game-url="ponggame/presidentialpong.html">Open in New Window</button>
+                    <button class="play-game-button" onclick="playClickSound(); showPongGame();">Play Here</button>
+                    <button class="play-game-button-new-window" onclick="playClickSound(); openGameInNewWindow('ponggame/presidentialpong.html');">Open in New Window</button>
                 </div>
             </div>
             </div>
@@ -695,28 +694,28 @@
 
 
     <div id="math-game-view" class="game-iframe-container">
-        <button class="back-button" id="backFromMathGameBtn">
+        <button onclick="playClickSound(); showMainMenu();" class="back-button">
             &larr; Back to Main Menu
         </button>
         <iframe id="math-game-iframe" src="" title="Math Challenge Game" class="game-iframe"></iframe>
     </div>
 
     <div id="science-game-view" class="game-iframe-container">
-        <button class="back-button" id="backFromScienceGameBtn">
+        <button onclick="playClickSound(); showMainMenu();" class="back-button">
             &larr; Back to Main Menu
         </button>
         <iframe id="science-game-iframe" src="" title="Animal Kingdom Explorer" class="game-iframe"></iframe>
     </div>
 
     <div id="ela-game-view" class="game-iframe-container">
-        <button class="back-button" id="backFromElaGameBtn">
+        <button onclick="playClickSound(); showMainMenu();" class="back-button">
             &larr; Back to Main Menu
         </button>
         <iframe id="ela-game-iframe" src="" title="Word Weaver Game" class="game-iframe"></iframe>
     </div>
 
     <div id="pong-game-view" class="game-iframe-container">
-        <button class="back-button" id="backFromPongGameBtn">
+        <button onclick="playClickSound(); showMainMenu();" class="back-button">
             &larr; Back to Main Menu
         </button>
         <iframe id="pong-game-iframe" src="" title="Presidential Pong Game" class="game-iframe"></iframe>
@@ -749,7 +748,7 @@
                         <input type="password" id="password" class="auth-input" required>
                     </div>
                 </div>
-
+                
                 <div id="forgotPasswordFields" class="hidden">
                     <div class="auth-form-group">
                         <label for="forgotPasswordEmail" class="auth-label">Enter your email:</label>
@@ -764,518 +763,850 @@
             <button id="changeAvatarProfileBtn" class="auth-submit-btn mt-4 bg-purple-500 hover:bg-purple-600 hidden">Change Avatar</button>
             <button id="logoutBtn" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-full font-semibold shadow-md mt-4 hidden">Logout</button>
             <button id="closeModalBtn" class="auth-close-btn">Close</button>
+        </div>
+    </div>
+
+    <div id="avatarModal" class="avatar-modal hidden">
+        <div class="avatar-modal-content">
+            <h2 class="avatar-modal-title">Create Your Avatar</h2>
+            <div class="flex flex-col items-center justify-center">
+                <img id="avatarPreview" class="avatar-preview" src="https://avataaars.io/?avatarStyle=Circle&topType=ShortHairDreads02&hairColor=Black&facialHairType=MoustacheMagnum&facialHairColor=Black&noseType=Default&eyeType=Squint&eyebrowType=FrownNatural&mouthType=Concerned&skinColor=DarkBrown&clotheType=Hoodie&clotheColor=Blue01&graphicType=Skull&accessoriesType=Prescription02" alt="Avatar Preview">
+                <p id="avatarMessage" class="auth-message"></p>
+            </div>
+            <div id="avatarOptionsContainer" class="avatar-options">
+                <div class="avatar-option-group">
+                    <label for="avatarStyleSelect" class="avatar-option-label">Avatar Style:</label>
+                    <select id="avatarStyleSelect" class="avatar-option-select"></select>
+                </div>
+                <div class="avatar-option-group">
+                    <label for="topTypeSelect" class="avatar-option-label">Hair/Top:</label>
+                    <select id="topTypeSelect" class="avatar-option-select"></select>
+                </div>
+                <div id="topColorGroup" class="avatar-option-group hidden"> <label for="topColorSelect" class="avatar-option-label">Top Color:</label>
+                    <select id="topColorSelect" class="avatar-option-select"></select>
+                </div>
+                <div class="avatar-option-group">
+                    <label for="hairColorSelect" class="avatar-option-label">Hair Color:</label>
+                    <select id="hairColorSelect" class="avatar-option-select"></select>
+                </div>
+                <div class="avatar-option-group">
+                    <label for="facialHairTypeSelect" class="avatar-option-label">Facial Hair:</label>
+                    <select id="facialHairTypeSelect" class="avatar-option-select"></select>
+                </div>
+                <div id="facialHairColorGroup" class="avatar-option-group hidden"> <label for="facialHairColorSelect" class="avatar-option-label">Facial Hair Color:</label>
+                    <select id="facialHairColorSelect" class="avatar-option-select"></select>
+                </div>
+                <div class="avatar-option-group">
+                    <label for="eyeTypeSelect" class="avatar-option-label">Eyes:</label>
+                    <select id="eyeTypeSelect" class="avatar-option-select"></select>
+                </div>
+                <div class="avatar-option-group">
+                    <label for="eyebrowTypeSelect" class="avatar-option-label">Eyebrows:</label>
+                    <select id="eyebrowTypeSelect" class="avatar-option-select"></select>
+                </div>
+                <div class="avatar-option-group">
+                    <label for="mouthTypeSelect" class="avatar-option-label">Mouth:</label>
+                    <select id="mouthTypeSelect" class="avatar-option-select"></select>
+                </div>
+                <div class="avatar-option-group">
+                    <label for="skinColorSelect" class="avatar-option-label">Skin Color:</label>
+                    <select id="skinColorSelect" class="avatar-option-select"></select>
+                </div>
+                <div class="avatar-option-group">
+                    <label for="clotheTypeSelect" class="avatar-option-label">Clothes:</label>
+                    <select id="clotheTypeSelect" class="avatar-option-select"></select>
+                </div>
+                <div class="avatar-option-group">
+                    <label for="clotheColorSelect" class="avatar-option-label">Clothes Color:</label>
+                    <select id="clotheColorSelect" class="avatar-option-select"></select>
+                </div>
+                <div id="graphicTypeGroup" class="avatar-option-group hidden"> <label for="graphicTypeSelect" class="avatar-option-label">Graphic:</label>
+                    <select id="graphicTypeSelect" class="avatar-option-select"></select>
+                </div>
+                <div class="avatar-option-group">
+                    <label for="accessoriesTypeSelect" class="avatar-option-label">Accessories:</label>
+                    <select id="accessoriesTypeSelect" class="avatar-option-select"></select>
                 </div>
             </div>
-
-            <div id="avatarModal" class="avatar-modal hidden">
-                <div class="avatar-modal-content">
-                    <h2 class="avatar-modal-title">Create Your Avatar</h2>
-                    <div class="flex flex-col items-center justify-center">
-                        <img id="avatarPreview" class="avatar-preview" src="https://avataaars.io/?avatarStyle=Circle&topType=ShortHairDreads02&hairColor=Black&facialHairType=MoustacheMagnum&facialHairColor=Black&noseType=Default&eyeType=Squint&eyebrowType=FrownNatural&mouthType=Concerned&skinColor=DarkBrown&clotheType=Hoodie&clotheColor=Blue01&graphicType=Skull&accessoriesType=Prescription02" alt="Avatar Preview">
-                        <p id="avatarMessage" class="auth-message"></p>
-                    </div>
-                    <div id="avatarOptionsContainer" class="avatar-options">
-                        <div class="avatar-option-group">
-                            <label for="avatarStyleSelect" class="avatar-option-label">Avatar Style:</label>
-                            <select id="avatarStyleSelect" class="avatar-option-select"></select>
-                        </div>
-                        <div class="avatar-option-group">
-                            <label for="topTypeSelect" class="avatar-option-label">Hair/Top:</label>
-                            <select id="topTypeSelect" class="avatar-option-select"></select>
-                        </div>
-                        <div id="topColorGroup" class="avatar-option-group hidden"> <label for="topColorSelect" class="avatar-option-label">Top Color:</label>
-                            <select id="topColorSelect" class="avatar-option-select"></select>
-                        </div>
-                        <div class="avatar-option-group">
-                            <label for="hairColorSelect" class="avatar-option-label">Hair Color:</label>
-                            <select id="hairColorSelect" class="avatar-option-select"></select>
-                        </div>
-                        <div class="avatar-option-group">
-                            <label for="facialHairTypeSelect" class="avatar-option-label">Facial Hair:</label>
-                            <select id="facialHairTypeSelect" class="avatar-option-select"></select>
-                        </div>
-                        <div id="facialHairColorGroup" class="avatar-option-group hidden"> <label for="facialHairColorSelect" class="avatar-option-label">Facial Hair Color:</label>
-                            <select id="facialHairColorSelect" class="avatar-option-select"></select>
-                        </div>
-                        <div class="avatar-option-group">
-                            <label for="eyeTypeSelect" class="avatar-option-label">Eyes:</label>
-                            <select id="eyeTypeSelect" class="avatar-option-select"></select>
-                        </div>
-                        <div class="avatar-option-group">
-                            <label for="eyebrowTypeSelect" class="avatar-option-label">Eyebrows:</label>
-                            <select id="eyebrowTypeSelect" class="avatar-option-select"></select>
-                        </div>
-                        <div class="avatar-option-group">
-                            <label for="mouthTypeSelect" class="avatar-option-label">Mouth:</label>
-                            <select id="mouthTypeSelect" class="avatar-option-select"></select>
-                        </div>
-                        <div class="avatar-option-group">
-                            <label for="skinColorSelect" class="avatar-option-label">Skin Color:</label>
-                            <select id="skinColorSelect" class="avatar-option-select"></select>
-                        </div>
-                        <div class="avatar-option-group">
-                            <label for="clotheTypeSelect" class="avatar-option-label">Clothes:</label>
-                            <select id="clotheTypeSelect" class="avatar-option-select"></select>
-                        </div>
-                        <div class="avatar-option-group">
-                            <label for="clotheColorSelect" class="avatar-option-label">Clothes Color:</label>
-                            <select id="clotheColorSelect" class="avatar-option-select"></select>
-                        </div>
-                        <div id="graphicTypeGroup" class="avatar-option-group hidden"> <label for="graphicTypeSelect" class="avatar-option-label">Graphic:</label>
-                            <select id="graphicTypeSelect" class="avatar-option-select"></select>
-                        </div>
-                        <div class="avatar-option-group">
-                            <label for="accessoriesTypeSelect" class="avatar-option-label">Accessories:</label>
-                            <select id="accessoriesTypeSelect" class="avatar-option-select"></select>
-                        </div>
-                    </div>
-                    <div class="avatar-btn-group mt-4">
-                        <button id="generateRandomAvatarBtn" class="avatar-btn avatar-btn-secondary">Generate Random</button>
-                        <button id="saveAvatarBtn" class="avatar-btn avatar-btn-primary">Save Avatar</button>
-                    </div>
-                    <button id="closeAvatarModalBtn" class="auth-close-btn">Close</button>
-                </div>
+            <div class="avatar-btn-group mt-4">
+                <button id="generateRandomAvatarBtn" class="avatar-btn avatar-btn-secondary">Generate Random</button>
+                <button id="saveAvatarBtn" class="avatar-btn avatar-btn-primary">Save Avatar</button>
             </div>
+            <button id="closeAvatarModalBtn" class="auth-close-btn">Close</button>
+        </div>
+    </div>
 
 
-            <script>
-                // --- Get references to all view containers ---
-                const mainMenuContainer = document.getElementById('main-menu-container');
+    <script>
+        // --- Get references to all view containers ---
+        const mainMenuContainer = document.getElementById('main-menu-container');
+        
+        // Category Views
+        const mathCategoryView = document.getElementById('math-category-view');
+        const scienceCategoryView = document.getElementById('science-category-view');
+        const elaCategoryView = document.getElementById('ela-category-view');
+        const socialStudiesCategoryView = document.getElementById('social-studies-category-view');
 
-                // Category Views
-                const mathCategoryView = document.getElementById('math-category-view');
-                const scienceCategoryView = document.getElementById('science-category-view');
-                const elaCategoryView = document.getElementById('ela-category-view');
-                const socialStudiesCategoryView = document.getElementById('social-studies-category-view');
+        // Game Iframe Views
+        const mathGameView = document.getElementById('math-game-view');
+        const scienceGameView = document.getElementById('science-game-view');
+        const elaGameView = document.getElementById('ela-game-view');
+        const pongGameView = document.getElementById('pong-game-view');
 
-                // Game Iframe Views
-                const mathGameView = document.getElementById('math-game-view');
-                const scienceGameView = document.getElementById('science-game-view');
-                const elaGameView = document.getElementById('ela-game-view');
-                const pongGameView = document.getElementById('pong-game-view');
+        // Game Iframes
+        const mathGameIframe = document.getElementById('math-game-iframe');
+        const scienceGameIframe = document.getElementById('science-game-iframe');
+        const elaGameIframe = document.getElementById('ela-game-iframe');
+        const pongGameIframe = document.getElementById('pong-game-iframe');
 
-                // Game Iframes
-                const mathGameIframe = document.getElementById('math-game-iframe');
-                const scienceGameIframe = document.getElementById('science-game-iframe');
-                const elaGameIframe = document.getElementById('ela-game-iframe');
-                const pongGameIframe = document.getElementById('pong-game-iframe');
+        const mainClickSoundElement = document.getElementById('mainClickSoundElement');
 
-                const mainClickSoundElement = document.getElementById('mainClickSoundElement');
+        function playClickSound() {
+            if (mainClickSoundElement) {
+                mainClickSoundElement.currentTime = 0;
+                mainClickSoundElement.play().catch(e => {
+                    console.warn("Error playing click sound (main page):", e);
+                });
+            } else {
+                console.warn("mainClickSoundElement not found. Click sound may not work.");
+            }
+        }
 
-                function playClickSound() {
-                    if (mainClickSoundElement) {
-                        mainClickSoundElement.currentTime = 0;
-                        mainClickSoundElement.play().catch(e => {
-                            console.warn("Error playing click sound (main page):", e);
-                        });
-                    } else {
-                        console.warn("mainClickSoundElement not found. Click sound may not work.");
-                    }
+        // --- View Management Functions ---
+
+        function hideAllViews() {
+            mainMenuContainer.style.display = 'none';
+            mathCategoryView.classList.add('hidden');
+            scienceCategoryView.classList.add('hidden');
+            elaCategoryView.classList.add('hidden');
+            socialStudiesCategoryView.classList.add('hidden');
+            mathGameView.style.display = 'none';
+            scienceGameView.style.display = 'none';
+            elaGameView.style.display = 'none';
+            pongGameView.style.display = 'none';
+        }
+
+        function showMainMenu() {
+            hideAllViews();
+            mainMenuContainer.style.display = 'block';
+            mathGameIframe.src = '';
+            scienceGameIframe.src = '';
+            elaGameIframe.src = '';
+            pongGameIframe.src = '';
+            document.body.style.overflow = 'auto';
+        }
+
+        // --- Show Category View Functions ---
+        function showMathCategoryView() {
+            hideAllViews();
+            mathCategoryView.classList.remove('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        function showScienceCategoryView() {
+            hideAllViews();
+            scienceCategoryView.classList.remove('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        function showElaCategoryView() {
+            hideAllViews();
+            elaCategoryView.classList.remove('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        function showSocialStudiesCategoryView() {
+            hideAllViews();
+            socialStudiesCategoryView.classList.remove('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        // --- Show Game View Functions ---
+        function showMathGame() {
+            hideAllViews();
+            mathGameView.style.display = 'flex';
+            mathGameIframe.src = 'mathgame.html';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function showScienceGame() {
+            hideAllViews();
+            scienceGameView.style.display = 'flex';
+            scienceGameIframe.src = 'animalapp.html';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function showElaGame() {
+            hideAllViews();
+            elaGameView.style.display = 'flex';
+            elaGameIframe.src = 'WordWarrior.html';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function showPongGame() {
+            hideAllViews();
+            pongGameView.style.display = 'flex';
+            pongGameIframe.src = 'webgames/pong/presidentialpong.html';
+            document.body.style.overflow = 'hidden';
+        }
+        
+        // NEW: Function to open a game in a new window
+        function openGameInNewWindow(gameUrl) {
+            window.open(gameUrl, '_blank');
+        }
+
+        // --- DOMContentLoaded and Auth Logic ---
+        document.addEventListener('DOMContentLoaded', () => {
+            showMainMenu();
+            updateAuthButtons();
+
+            const changeAvatarProfileBtn = document.getElementById('changeAvatarProfileBtn');
+            if (changeAvatarProfileBtn) {
+                changeAvatarProfileBtn.addEventListener('click', () => {
+                    playClickSound();
+                    authModal.classList.add('hidden');
+                    const user = JSON.parse(localStorage.getItem('user'));
+                    showAvatarCreatorModal(user.avatar_config || {});
+                });
+            }
+            initializeAvatarCreatorOptions();
+        });
+
+        const loginBtn = document.getElementById('loginBtn');
+        const signupBtn = document.getElementById('signupBtn');
+        const profileBtn = document.getElementById('profileBtn');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const authModal = document.getElementById('authModal');
+        const authTitle = document.getElementById('authTitle');
+        const authForm = document.getElementById('authForm');
+        const usernameInput = document.getElementById('username');
+        const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
+        const submitAuthBtn = document.getElementById('submitAuth');
+        const authMessage = document.getElementById('authMessage');
+        const closeModalBtn = document.getElementById('closeModalBtn');
+        const emailGroup = document.getElementById('emailGroup');
+        const loginSignupFields = document.getElementById('loginSignupFields');
+        const forgotPasswordFields = document.getElementById('forgotPasswordFields');
+        const forgotPasswordEmailInput = document.getElementById('forgotPasswordEmail');
+        const forgotPasswordLink = document.getElementById('forgotPasswordLink');
+        const changeAvatarProfileBtn = document.getElementById('changeAvatarProfileBtn');
+
+        const avatarModal = document.getElementById('avatarModal');
+        const avatarPreview = document.getElementById('avatarPreview');
+        const generateRandomAvatarBtn = document.getElementById('generateRandomAvatarBtn');
+        const saveAvatarBtn = document.getElementById('saveAvatarBtn');
+        const closeAvatarModalBtn = document.getElementById('closeAvatarModalBtn');
+        const avatarMessage = document.getElementById('avatarMessage');
+        const avatarOptionsContainer = document.getElementById('avatarOptionsContainer');
+        const avatarStyleSelect = document.getElementById('avatarStyleSelect');
+        const topTypeSelect = document.getElementById('topTypeSelect');
+        const topColorSelect = document.getElementById('topColorSelect');
+        const hairColorSelect = document.getElementById('hairColorSelect');
+        const facialHairTypeSelect = document.getElementById('facialHairTypeSelect');
+        const facialHairColorSelect = document.getElementById('facialHairColorSelect');
+        const eyeTypeSelect = document.getElementById('eyeTypeSelect');
+        const eyebrowTypeSelect = document.getElementById('eyebrowTypeSelect');
+        const mouthTypeSelect = document.getElementById('mouthTypeSelect');
+        const skinColorSelect = document.getElementById('skinColorSelect');
+        const clotheTypeSelect = document.getElementById('clotheTypeSelect');
+        const clotheColorSelect = document.getElementById('clotheColorSelect');
+        const graphicTypeSelect = document.getElementById('graphicTypeSelect');
+        const accessoriesTypeSelect = document.getElementById('accessoriesTypeSelect');
+
+        const topColorGroup = document.getElementById('topColorGroup');
+        const facialHairColorGroup = document.getElementById('facialHairColorGroup');
+        const graphicTypeGroup = document.getElementById('graphicTypeGroup');
+        const profileAvatarDisplay = document.getElementById('profileAvatarDisplay');
+        const profileAvatarImg = document.getElementById('profileAvatarImg');
+        const headerAvatarContainer = document.getElementById('header-avatar-container');
+
+        const BACKEND_URL = 'https://smartypantsbe.onrender.com/user'; 
+
+        function updateAuthButtons() {
+            const token = localStorage.getItem('token');
+            const user = JSON.parse(localStorage.getItem('user'));
+            
+            loginBtn.classList.toggle('hidden', !!token);
+            signupBtn.classList.toggle('hidden', !!token);
+            profileBtn.classList.toggle('hidden', !token);
+            headerAvatarContainer.innerHTML = ''; // Clear previous avatar
+
+            if (token && user) {
+                if (user.has_created_avatar && user.avatar_config && Object.keys(user.avatar_config).length > 0) {
+                    const avatarUrl = `https://avataaars.io/?${new URLSearchParams(user.avatar_config).toString()}`;
+                    headerAvatarContainer.innerHTML = `<img src="${avatarUrl}" alt="Avatar" class="h-12 w-12 rounded-full object-cover cursor-pointer border-2 border-purple-400">`;
+                    headerAvatarContainer.addEventListener('click', () => profileBtn.click());
+                    profileBtn.classList.add('hidden'); // Hide the text button if avatar is shown
+                } else {
+                    profileBtn.classList.remove('hidden'); // Show text button if no avatar
+                }
+            }
+        }
+
+        function showLoginForm() {
+            authTitle.textContent = 'Login';
+            submitAuthBtn.textContent = 'Login';
+            authForm.dataset.currentAction = 'login';
+            loginSignupFields.classList.remove('hidden');
+            emailGroup.classList.add('hidden');
+            forgotPasswordFields.classList.add('hidden');
+            forgotPasswordLink.classList.remove('hidden');
+            authMessage.textContent = '';
+            usernameInput.value = '';
+            emailInput.value = '';
+            passwordInput.value = '';
+            submitAuthBtn.classList.remove('hidden');
+            if (changeAvatarProfileBtn) changeAvatarProfileBtn.classList.add('hidden'); 
+            profileAvatarDisplay.classList.add('hidden');
+            logoutBtn.classList.add('hidden');
+        }
+
+        function showSignupForm() {
+            authTitle.textContent = 'Sign Up';
+            submitAuthBtn.textContent = 'Sign Up';
+            authForm.dataset.currentAction = 'signup';
+            loginSignupFields.classList.remove('hidden');
+            emailGroup.classList.remove('hidden');
+            forgotPasswordFields.classList.add('hidden');
+            forgotPasswordLink.classList.add('hidden');
+            authMessage.textContent = '';
+            usernameInput.value = '';
+            emailInput.value = '';
+            passwordInput.value = '';
+            submitAuthBtn.classList.remove('hidden');
+            if (changeAvatarProfileBtn) changeAvatarProfileBtn.classList.add('hidden');
+            profileAvatarDisplay.classList.add('hidden');
+            logoutBtn.classList.add('hidden');
+        }
+
+        function showForgotPasswordForm() {
+            authTitle.textContent = 'Forgot Password';
+            submitAuthBtn.textContent = 'Send Reset Link';
+            authForm.dataset.currentAction = 'forgot-password';
+            loginSignupFields.classList.add('hidden');
+            emailGroup.classList.add('hidden');
+            forgotPasswordFields.classList.remove('hidden');
+            forgotPasswordEmailInput.setAttribute('required', 'true');
+            forgotPasswordLink.classList.add('hidden');
+            authMessage.textContent = '';
+            submitAuthBtn.classList.remove('hidden');
+            if (changeAvatarProfileBtn) changeAvatarProfileBtn.classList.add('hidden');
+            profileAvatarDisplay.classList.add('hidden');
+            logoutBtn.classList.add('hidden');
+        }
+
+        let currentAvatarConfig = {};
+
+        function showAvatarCreatorModal(userAvatarConfig = {}) {
+            authModal.classList.add('hidden');
+            avatarModal.classList.remove('hidden');
+            avatarMessage.textContent = '';
+
+            if (userAvatarConfig && Object.keys(userAvatarConfig).length > 0) {
+                currentAvatarConfig = { ...userAvatarConfig };
+            } else {
+                currentAvatarConfig = generateRandomAvatarConfig();
+            }
+            updateAvatarPreview(currentAvatarConfig);
+            setAvatarCreatorOptions(currentAvatarConfig);
+            handleConditionalAvatarFields(); 
+        }
+
+        function hideAvatarCreatorModal() { 
+            avatarModal.classList.add('hidden');
+        }
+
+        const avatarFeatures = {
+            avatarStyle: ['Circle', 'Transparent'],
+            topType: ['NoHair', 'Eyepatch', 'Hat', 'Hijab', 'Turban', 'WinterHat1', 'WinterHat2', 'WinterHat3', 'WinterHat4', 'LongHairBigHair', 'LongHairBob', 'LongHairBun', 'LongHairCurly', 'LongHairCurvy', 'LongHairDreads', 'LongHairFrida', 'LongHairFro', 'LongHairMiaWallace', 'LongHairStraight', 'LongHairStraight2', 'LongHairStraightStrand', 'ShortHairDreads01', 'ShortHairDreads02', 'ShortHairFrizzle', 'ShortHairShaggy', 'ShortHairShaggyMullet', 'ShortHairShortCurly', 'ShortHairShortFlat', 'ShortHairShortRound', 'ShortHairShortWaved', 'ShortHairSides', 'ShortHairTheCaesar', 'ShortHairTheCaesarSidePart'],
+            hairColor: ['Auburn', 'Black', 'Blonde', 'BlondeGolden', 'Brown', 'BrownDark', 'PastelPink', 'Platinum', 'Red', 'SilverGray'],
+            hatColor: ['Black', 'Blue01', 'Blue02', 'Blue03', 'Gray01', 'Gray02', 'Heather', 'PastelBlue', 'PastelGreen', 'PastelOrange', 'PastelRed', 'PastelYellow', 'Pink', 'Red', 'White'],
+            facialHairType: ['Blank', 'BeardLight', 'BeardMajestic', 'MoustacheFancy', 'MoustacheMagnum'],
+            facialHairColor: ['Auburn', 'Black', 'Blonde', 'BlondeGolden', 'Brown', 'BrownDark', 'PastelPink', 'Platinum', 'Red', 'SilverGray'],
+            noseType: ['Default'],
+            eyeType: ['Default', 'Close', 'Cry', 'Dizzy', 'EyeRoll', 'Happy', 'Hearts', 'Side', 'Squint', 'Surprised', 'Wink', 'WinkWacky'],
+            eyebrowType: ['Default', 'Angry', 'AngryNatural', 'FlatNatural', 'FrownNatural', 'RaisedExcited', 'RaisedExcitedNatural', 'SadConcerned', 'SadConcernedNatural', 'UnibrowNatural', 'Updown', 'UpDownNatural'],
+            mouthType: ['Default', 'Smile', 'Concerned', 'Disbelief', 'Eating', 'Grimace', 'Sad', 'Twinkle'],
+            skinColor: ['Tanned', 'Yellow', 'Pale', 'Light', 'Brown', 'DarkBrown', 'Black'],
+            clotheType: ['BlazerShirt', 'BlazerSweater', 'CollarSweater', 'GraphicShirt', 'Hoodie', 'Overall', 'ShirtCrewNeck', 'ShirtScoopNeck', 'ShirtVNeck'],
+            clotheColor: ['Black', 'Blue01', 'Blue02', 'Blue03', 'Gray01', 'Gray02', 'Heather', 'PastelBlue', 'PastelGreen', 'PastelOrange', 'PastelRed', 'PastelYellow', 'Pink', 'Red', 'White'],
+            graphicType: ['Bat', 'Cumbia', 'Deer', 'Diamond', 'Hola', 'Pizza', 'Resist', 'Selena', 'Bear', 'Skull', 'SkullOutline'],
+            accessoriesType: ['Blank', 'Prescription01', 'Prescription02', 'Round', 'Sunglasses', 'Wayfarers'],
+            topColor: ['Black', 'Blue01', 'Blue02', 'Blue03', 'Gray01', 'Gray02', 'Heather', 'PastelBlue', 'PastelGreen', 'PastelOrange', 'PastelRed', 'PastelYellow', 'Pink', 'Red', 'White'],
+        };
+
+        function generateRandomAvatarConfig() {
+            const randomConfig = {};
+            const hatTypes = ['Hat', 'Turban', 'WinterHat1', 'WinterHat2', 'WinterHat3', 'WinterHat4'];
+
+            for (const feature in avatarFeatures) {
+                const possibleValues = avatarFeatures[feature];
+                randomConfig[feature] = possibleValues[Math.floor(Math.random() * possibleValues.length)];
+            }
+            
+            // Clean up conditional properties
+            if (hatTypes.includes(randomConfig.topType)) {
+                delete randomConfig.topColor; // Use hatColor instead
+            } else if (randomConfig.topType === 'Hijab') {
+                delete randomConfig.hatColor; // Use topColor instead
+            } else {
+                // It's regular hair, so delete both hat and top colors
+                delete randomConfig.hatColor;
+                delete randomConfig.topColor;
+            }
+
+            if (randomConfig.facialHairType === 'Blank') {
+                delete randomConfig.facialHairColor;
+            }
+
+            if (randomConfig.clotheType !== 'GraphicShirt') {
+                delete randomConfig.graphicType;
+            }
+            return randomConfig;
+        }
+
+
+        function updateAvatarPreview(config) {
+            const queryParams = new URLSearchParams(config).toString();
+            avatarPreview.src = `https://avataaars.io/?${queryParams}`;
+            avatarPreview.parentElement.style.backgroundColor = 'transparent';
+        }
+
+        function createOption(value, text) {
+            const option = document.createElement('option');
+            option.value = value;
+            option.textContent = text;
+            return option;
+        }
+
+        function populateSelect(selectElement, featureArray) {
+            selectElement.innerHTML = '';
+            featureArray.forEach(value => {
+                let text = value.replace(/([A-Z])/g, ' $1').replace(/([0-9])/, ' $1').trim();
+                if (selectElement.id === 'skinColorSelect') {
+                    if (value === 'Pale') { text = 'Pale'; } 
+                    else if (value === 'Yellow') { text = 'Light Tan'; } 
+                    else if (value === 'Light') { text = 'Pale Beige'; }
+                }
+                selectElement.appendChild(createOption(value, text));
+            });
+        }
+
+        function handleConditionalAvatarFields() {
+            const topType = currentAvatarConfig.topType;
+            const hatTypes = ['Hat', 'Turban', 'WinterHat1', 'WinterHat2', 'WinterHat3', 'WinterHat4'];
+            const hijabType = 'Hijab';
+
+            // Show/Hide Top Color dropdown for Hats and Hijab
+            if (hatTypes.includes(topType) || topType === hijabType) {
+                topColorGroup.classList.remove('hidden');
+            } else {
+                topColorGroup.classList.add('hidden');
+            }
+
+            // Clean up config object based on topType
+            if (hatTypes.includes(topType)) {
+                delete currentAvatarConfig.topColor; // Remove incorrect property
+                if (!currentAvatarConfig.hatColor) {
+                    currentAvatarConfig.hatColor = topColorSelect.value;
+                }
+            } else if (topType === hijabType) {
+                delete currentAvatarConfig.hatColor; // Remove incorrect property
+                if (!currentAvatarConfig.topColor) {
+                    currentAvatarConfig.topColor = topColorSelect.value;
+                }
+            } else {
+                // It's regular hair, so delete both
+                delete currentAvatarConfig.hatColor;
+                delete currentAvatarConfig.topColor;
+            }
+
+
+            // Show/Hide Facial Hair Color
+            if (currentAvatarConfig.facialHairType !== 'Blank') {
+                facialHairColorGroup.classList.remove('hidden');
+                if (!currentAvatarConfig.facialHairColor) {
+                    currentAvatarConfig.facialHairColor = facialHairColorSelect.value;
+                }
+            } else {
+                facialHairColorGroup.classList.add('hidden');
+                delete currentAvatarConfig.facialHairColor;
+            }
+
+            // Show/Hide Graphic Type
+            if (currentAvatarConfig.clotheType === 'GraphicShirt') {
+                graphicTypeGroup.classList.remove('hidden');
+                if (!currentAvatarConfig.graphicType) {
+                    currentAvatarConfig.graphicType = graphicTypeSelect.value;
+                }
+            } else {
+                graphicTypeGroup.classList.add('hidden');
+                delete currentAvatarConfig.graphicType;
+            }
+            updateAvatarPreview(currentAvatarConfig);
+        }
+
+
+        function initializeAvatarCreatorOptions() {
+            populateSelect(avatarStyleSelect, avatarFeatures.avatarStyle);
+            populateSelect(topTypeSelect, avatarFeatures.topType);
+            populateSelect(topColorSelect, avatarFeatures.topColor);
+            populateSelect(hairColorSelect, avatarFeatures.hairColor);
+            populateSelect(facialHairTypeSelect, avatarFeatures.facialHairType);
+            populateSelect(facialHairColorSelect, avatarFeatures.facialHairColor);
+            populateSelect(eyeTypeSelect, avatarFeatures.eyeType);
+            populateSelect(eyebrowTypeSelect, avatarFeatures.eyebrowType);
+            populateSelect(mouthTypeSelect, avatarFeatures.mouthType);
+            populateSelect(skinColorSelect, avatarFeatures.skinColor);
+            populateSelect(clotheTypeSelect, avatarFeatures.clotheType);
+            populateSelect(clotheColorSelect, avatarFeatures.clotheColor);
+            populateSelect(graphicTypeSelect, avatarFeatures.graphicType);
+            populateSelect(accessoriesTypeSelect, avatarFeatures.accessoriesType);
+            
+            avatarStyleSelect.addEventListener('change', (event) => { currentAvatarConfig.avatarStyle = event.target.value; handleConditionalAvatarFields(); });
+            topTypeSelect.addEventListener('change', (event) => { currentAvatarConfig.topType = event.target.value; handleConditionalAvatarFields(); });
+            
+            // This listener now handles both hat and top colors
+            topColorSelect.addEventListener('change', (event) => { 
+                const selectedColor = event.target.value;
+                const hatTypes = ['Hat', 'Turban', 'WinterHat1', 'WinterHat2', 'WinterHat3', 'WinterHat4'];
+                if (hatTypes.includes(currentAvatarConfig.topType)) {
+                    currentAvatarConfig.hatColor = selectedColor;
+                } else if (currentAvatarConfig.topType === 'Hijab') {
+                    currentAvatarConfig.topColor = selectedColor;
+                }
+                updateAvatarPreview(currentAvatarConfig); 
+            });
+
+            hairColorSelect.addEventListener('change', (event) => { currentAvatarConfig.hairColor = event.target.value; updateAvatarPreview(currentAvatarConfig); });
+            facialHairTypeSelect.addEventListener('change', (event) => { currentAvatarConfig.facialHairType = event.target.value; handleConditionalAvatarFields(); });
+            facialHairColorSelect.addEventListener('change', (event) => { currentAvatarConfig.facialHairColor = event.target.value; updateAvatarPreview(currentAvatarConfig); });
+            eyeTypeSelect.addEventListener('change', (event) => { currentAvatarConfig.eyeType = event.target.value; updateAvatarPreview(currentAvatarConfig); });
+            eyebrowTypeSelect.addEventListener('change', (event) => { currentAvatarConfig.eyebrowType = event.target.value; updateAvatarPreview(currentAvatarConfig); });
+            mouthTypeSelect.addEventListener('change', (event) => { currentAvatarConfig.mouthType = event.target.value; updateAvatarPreview(currentAvatarConfig); });
+            skinColorSelect.addEventListener('change', (event) => { currentAvatarConfig.skinColor = event.target.value; updateAvatarPreview(currentAvatarConfig); });
+            clotheTypeSelect.addEventListener('change', (event) => { currentAvatarConfig.clotheType = event.target.value; handleConditionalAvatarFields(); });
+            clotheColorSelect.addEventListener('change', (event) => { currentAvatarConfig.clotheColor = event.target.value; updateAvatarPreview(currentAvatarConfig); });
+            graphicTypeSelect.addEventListener('change', (event) => { currentAvatarConfig.graphicType = event.target.value; updateAvatarPreview(currentAvatarConfig); });
+            accessoriesTypeSelect.addEventListener('change', (event) => { currentAvatarConfig.accessoriesType = event.target.value; updateAvatarPreview(currentAvatarConfig); });
+        }
+
+        function setAvatarCreatorOptions(config) {
+            avatarStyleSelect.value = config.avatarStyle || avatarFeatures.avatarStyle[0];
+            topTypeSelect.value = config.topType || avatarFeatures.topType[0];
+            
+            // Set the top color dropdown based on hatColor or topColor
+            const hatTypes = ['Hat', 'Turban', 'WinterHat1', 'WinterHat2', 'WinterHat3', 'WinterHat4'];
+            if(hatTypes.includes(config.topType)) {
+                topColorSelect.value = config.hatColor || avatarFeatures.hatColor[0];
+            } else if (config.topType === 'Hijab') {
+                topColorSelect.value = config.topColor || avatarFeatures.topColor[0];
+            }
+
+            hairColorSelect.value = config.hairColor || avatarFeatures.hairColor[0];
+            facialHairTypeSelect.value = config.facialHairType || avatarFeatures.facialHairType[0];
+            facialHairColorSelect.value = config.facialHairColor || avatarFeatures.facialHairColor[0];
+            eyeTypeSelect.value = config.eyeType || avatarFeatures.eyeType[0];
+            eyebrowTypeSelect.value = config.eyebrowType || avatarFeatures.eyebrowType[0];
+            mouthTypeSelect.value = config.mouthType || avatarFeatures.mouthType[0];
+            skinColorSelect.value = config.skinColor || avatarFeatures.skinColor[0];
+            clotheTypeSelect.value = config.clotheType || avatarFeatures.clotheType[0];
+            clotheColorSelect.value = config.clotheColor || avatarFeatures.clotheColor[0];
+            graphicTypeSelect.value = config.graphicType || avatarFeatures.graphicType[0];
+            accessoriesTypeSelect.value = config.accessoriesType || avatarFeatures.accessoriesType[0];
+            
+            handleConditionalAvatarFields();
+        }
+
+
+        loginBtn.addEventListener('click', () => {
+            playClickSound();
+            showLoginForm();
+            authModal.classList.remove('hidden');
+        });
+
+        signupBtn.addEventListener('click', () => {
+            playClickSound();
+            showSignupForm();
+            authModal.classList.remove('hidden');
+        });
+
+        profileBtn.addEventListener('click', () => {
+            playClickSound();
+            const user = JSON.parse(localStorage.getItem('user')); 
+            console.log("User object from localStorage on profile click:", user);
+
+            authMessage.textContent = '';
+            authMessage.style.color = 'black';
+            submitAuthBtn.classList.add('hidden');
+            loginSignupFields.classList.add('hidden');
+            forgotPasswordFields.classList.add('hidden');
+            forgotPasswordLink.classList.add('hidden');
+            if (changeAvatarProfileBtn) changeAvatarProfileBtn.classList.add('hidden');
+            profileAvatarDisplay.classList.add('hidden');
+            logoutBtn.classList.add('hidden');
+
+            if (!user) {
+                authMessage.textContent = 'Please log in to view your profile.';
+                authMessage.style.color = 'red';
+                authModal.classList.remove('hidden');
+                showLoginForm();
+                return;
+            }
+
+            if (user.has_created_avatar === false || user.has_created_avatar === undefined || user.has_created_avatar === null) { 
+                showAvatarCreatorModal(user.avatar_config || {});
+            } else {
+                authTitle.textContent = 'User Profile';
+                // Updated line to remove "Coins" and "Avatar saved", and use "Welcome (username)"
+                authMessage.textContent = `Welcome, ${user.username}!\nBadges: ${user.badges && user.badges.length > 0 ? user.badges.join(', ') : 'None'}`;
+                authModal.classList.remove('hidden');
+                
+                if (changeAvatarProfileBtn) changeAvatarProfileBtn.classList.remove('hidden');
+                logoutBtn.classList.remove('hidden');
+
+                if (user.avatar_config && Object.keys(user.avatar_config).length > 0) {
+                    const avatarUrl = `https://avataaars.io/?${new URLSearchParams(user.avatar_config).toString()}`;
+                    profileAvatarImg.src = avatarUrl;
+                    profileAvatarDisplay.classList.remove('hidden');
+                }
+            }
+        });
+
+
+        forgotPasswordLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            playClickSound();
+            showForgotPasswordForm();
+        });
+
+        closeModalBtn.addEventListener('click', () => {
+            playClickSound();
+            if (changeAvatarProfileBtn) changeAvatarProfileBtn.classList.add('hidden'); 
+            profileAvatarDisplay.classList.add('hidden');
+            logoutBtn.classList.add('hidden');
+            authModal.classList.add('hidden');
+            authMessage.textContent = '';
+            showLoginForm();
+        });
+
+        closeAvatarModalBtn.addEventListener('click', () => {
+            playClickSound();
+            hideAvatarCreatorModal(); 
+        });
+
+        generateRandomAvatarBtn.addEventListener('click', () => {
+            playClickSound();
+            currentAvatarConfig = generateRandomAvatarConfig();
+            updateAvatarPreview(currentAvatarConfig);
+            avatarMessage.textContent = 'New random avatar generated!';
+            avatarMessage.style.color = 'gray';
+            setAvatarCreatorOptions(currentAvatarConfig);
+        });
+
+        saveAvatarBtn.addEventListener('click', async () => {
+            playClickSound();
+            avatarMessage.textContent = 'Saving avatar...';
+            avatarMessage.style.color = 'gray';
+            saveAvatarBtn.disabled = true;
+
+            const user = JSON.parse(localStorage.getItem('user'));
+            console.log('Save Avatar: User from localStorage before saving:', user);
+
+            if (!user || !user._id) {
+                avatarMessage.textContent = 'Error: User not logged in.';
+                avatarMessage.style.color = 'red';
+                saveAvatarBtn.disabled = false;
+                hideAvatarCreatorModal();
+                console.error('Save Avatar: User not found or _id missing. Hiding avatar modal.');
+                return;
+            }
+
+            console.log('Save Avatar: Current avatar config being sent:', currentAvatarConfig);
+            try {
+                const response = await fetch(`${BACKEND_URL}/avatar/${user._id}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(currentAvatarConfig)
+                });
+
+                console.log('Save Avatar: Fetch response received. Status:', response.status, response.statusText);
+
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({ message: 'Could not parse error response.' }));
+                    avatarMessage.textContent = errorData.message || `Error saving avatar: ${response.status} ${response.statusText}`;
+                    avatarMessage.style.color = 'red';
+                    console.error('Save Avatar: Server responded with error:', response.status, errorData);
+                    return;
                 }
 
-                // --- View Management Functions ---
+                const data = await response.json();
+                console.log('Save Avatar: Parsed response data:', data);
 
-                function hideAllViews() {
-                    mainMenuContainer.style.display = 'none';
-                    mathCategoryView.classList.add('hidden');
-                    scienceCategoryView.classList.add('hidden');
-                    elaCategoryView.classList.add('hidden');
-                    socialStudiesCategoryView.classList.add('hidden');
-                    mathGameView.style.display = 'none';
-                    scienceGameView.style.display = 'none';
-                    elaGameView.style.display = 'none';
-                    pongGameView.style.display = 'none';
-                }
+                if (data.status === "Success") {
+                    avatarMessage.textContent = data.message;
+                    avatarMessage.style.color = 'green';
+                    
+                    // Get the full user object from storage
+                    const existingUser = JSON.parse(localStorage.getItem('user'));
 
-                function showMainMenu() {
-                    hideAllViews();
-                    mainMenuContainer.style.display = 'block';
-                    mathGameIframe.src = '';
-                    scienceGameIframe.src = '';
-                    elaGameIframe.src = '';
-                    pongGameIframe.src = '';
-                    document.body.style.overflow = 'auto';
-                }
+                    // Merge the updates from the server response into the existing user object
+                    const updatedUser = {
+                        ...existingUser, // Keeps old avatar_config if not explicitly returned
+                        ...data.data     // Overwrites with fresh data from the avatar save response
+                    };
 
-                // --- Show Category View Functions ---
-                function showMathCategoryView() {
-                    hideAllViews();
-                    mathCategoryView.classList.remove('hidden');
-                    document.body.style.overflow = 'auto';
-                }
-
-                function showScienceCategoryView() {
-                    hideAllViews();
-                    scienceCategoryView.classList.remove('hidden');
-                    document.body.style.overflow = 'auto';
-                }
-
-                function showElaCategoryView() {
-                    hideAllViews();
-                    elaCategoryView.classList.remove('hidden');
-                    document.body.style.overflow = 'auto';
-                }
-
-                function showSocialStudiesCategoryView() {
-                    hideAllViews();
-                    socialStudiesCategoryView.classList.remove('hidden');
-                    document.body.style.overflow = 'auto';
-                }
-
-                // --- Show Game View Functions ---
-                function showMathGame() {
-                    hideAllViews();
-                    mathGameView.style.display = 'flex';
-                    mathGameIframe.src = 'mathgame.html';
-                    document.body.style.overflow = 'hidden';
-                }
-
-                function showScienceGame() {
-                    hideAllViews();
-                    scienceGameView.style.display = 'flex';
-                    scienceGameIframe.src = 'animalapp.html';
-                    document.body.style.overflow = 'hidden';
-                }
-
-                function showElaGame() {
-                    hideAllViews();
-                    elaGameView.style.display = 'flex';
-                    elaGameIframe.src = 'WordWarrior.html';
-                    document.body.style.overflow = 'hidden';
-                }
-
-                function showPongGame() {
-                    hideAllViews();
-                    pongGameView.style.display = 'flex';
-                    pongGameIframe.src = 'webgames/pong/presidentialpong.html';
-                    document.body.style.overflow = 'hidden';
-                }
-
-                // NEW: Function to open a game in a new window
-                function openGameInNewWindow(gameUrl) {
-                    window.open(gameUrl, '_blank');
-                }
-
-                // --- DOMContentLoaded and Auth Logic ---
-                document.addEventListener('DOMContentLoaded', () => {
-                    showMainMenu();
+                    // Save the complete, merged user object back to localStorage
+                    localStorage.setItem('user', JSON.stringify(updatedUser));
+                    console.log('Save Avatar: User data updated in localStorage:', updatedUser);
+                    
+                    // Now, reliably update the UI by calling the main function
                     updateAuthButtons();
 
-                    // Attach event listeners for main header buttons
-                    loginBtn.addEventListener('click', () => {
-                        playClickSound();
-                        showLoginForm();
-                        authModal.classList.remove('hidden');
-                    });
+                    setTimeout(() => {
+                        hideAvatarCreatorModal(); 
+                    }, 1000);
 
-                    signupBtn.addEventListener('click', () => {
-                        playClickSound();
-                        showSignupForm();
-                        authModal.classList.remove('hidden');
-                    });
+                } else {
+                    avatarMessage.textContent = data.message || 'An application error occurred (backend status not Success).';
+                    avatarMessage.style.color = 'red';
+                }
+            } catch (error) {
+                console.error('Save Avatar: Network error or JSON parse error:', error);
+                avatarMessage.textContent = 'Network error saving avatar. Please try again.';
+                avatarMessage.style.color = 'red';
+            } finally {
+                saveAvatarBtn.disabled = false;
+                console.log('Save Avatar: Save button re-enabled.');
+            }
+        });
 
-                    profileBtn.addEventListener('click', () => {
-                        playClickSound();
-                        const user = JSON.parse(localStorage.getItem('user'));
-                        console.log("User object from localStorage on profile click:", user);
 
-                        authMessage.textContent = '';
-                        authMessage.style.color = 'black';
-                        submitAuthBtn.classList.add('hidden');
-                        loginSignupFields.classList.add('hidden');
-                        forgotPasswordFields.classList.add('hidden');
-                        forgotPasswordLink.classList.add('hidden');
-                        if (changeAvatarProfileBtn) changeAvatarProfileBtn.classList.add('hidden');
-                        profileAvatarDisplay.classList.add('hidden');
-                        logoutBtn.classList.add('hidden');
+        logoutBtn.addEventListener('click', () => {
+            playClickSound();
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            updateAuthButtons();
+            authMessage.textContent = 'You have been logged out.';
+            authMessage.style.color = 'blue';
+            authModal.classList.remove('hidden');
+            authTitle.textContent = 'Logout';
+            submitAuthBtn.classList.add('hidden');
+            loginSignupFields.classList.add('hidden');
+            forgotPasswordFields.classList.add('hidden');
+            forgotPasswordLink.classList.add('hidden');
+            profileAvatarDisplay.classList.add('hidden');
+            logoutBtn.classList.add('hidden');
+            setTimeout(() => {
+                authModal.classList.add('hidden');
+                authMessage.textContent = '';
+            }, 2000);
+        });
 
-                        if (!user) {
-                            authMessage.textContent = 'Please log in to view your profile.';
-                            authMessage.style.color = 'red';
-                            authModal.classList.remove('hidden');
-                            showLoginForm();
-                            return;
-                        }
+        async function handleAuthSubmission(e) {
+            if (e && e.preventDefault) {
+                e.preventDefault(); 
+            }
+            playClickSound();
 
-                        if (user.has_created_avatar === false || user.has_created_avatar === undefined || user.has_created_avatar === null) {
-                            showAvatarCreatorModal(user.avatar_config || {});
-                        } else {
-                            authTitle.textContent = 'User Profile';
-                            authMessage.textContent = `Welcome, ${user.username}!\nBadges: ${user.badges && user.badges.length > 0 ? user.badges.join(', ') : 'None'}`;
-                            authModal.classList.remove('hidden');
+            const action = authForm.dataset.currentAction;
 
-                            if (changeAvatarProfileBtn) changeAvatarProfileBtn.classList.remove('hidden');
-                            logoutBtn.classList.remove('hidden');
+            authMessage.textContent = 'Processing...';
+            authMessage.style.color = 'gray';
+            submitAuthBtn.disabled = true;
 
-                            if (user.avatar_config && Object.keys(user.avatar_config).length > 0) {
-                                const avatarUrl = `https://avataaars.io/?${new URLSearchParams(user.avatar_config).toString()}`;
-                                profileAvatarImg.src = avatarUrl;
-                                profileAvatarDisplay.classList.remove('hidden');
-                            }
-                        }
-                    });
+            let requestBody = {};
+            let endpoint = '';
 
-                    // Attach event listeners for category explore buttons
-                    document.getElementById('exploreMathBtn').addEventListener('click', () => {
-                        playClickSound();
-                        showMathCategoryView();
-                    });
-                    document.getElementById('exploreScienceBtn').addEventListener('click', () => {
-                        playClickSound();
-                        showScienceCategoryView();
-                    });
-                    document.getElementById('exploreElaBtn').addEventListener('click', () => {
-                        playClickSound();
-                        showElaCategoryView();
-                    });
-                    document.getElementById('exploreSocialStudiesBtn').addEventListener('click', () => {
-                        playClickSound();
-                        showSocialStudiesCategoryView();
-                    });
+            if (action === 'login') {
+                requestBody = { username: usernameInput.value, password: passwordInput.value };
+                endpoint = `${BACKEND_URL}/login`;
+            } else if (action === 'signup') {
+                requestBody = { username: usernameInput.value, email: emailInput.value, password: passwordInput.value };
+                endpoint = `${BACKEND_URL}/signup`;
+                if (!requestBody.email || !/^[\w-\.]+@([\w-]+\.)+[\w-\.]{2,4}$/.test(requestBody.email)) {
+                    authMessage.textContent = 'Please enter a valid email address.';
+                    authMessage.style.color = 'red';
+                    submitAuthBtn.disabled = false;
+                    return;
+                }
+                if (requestBody.password.length < 8) {
+                    authMessage.textContent = 'Password must be at least 8 characters long.';
+                    authMessage.style.color = 'red';
+                    submitAuthBtn.disabled = false;
+                    return;
+                }
+                if (!/^[a-zA-Z0-9]+$/.test(requestBody.username)) {
+                    authMessage.textContent = 'Invalid username. Only alphanumeric characters are allowed.';
+                    authMessage.style.color = 'red';
+                    submitAuthBtn.disabled = false;
+                    return;
+                }
+            } else if (action === 'forgot-password') {
+                requestBody = { email: forgotPasswordEmailInput.value };
+                endpoint = `${BACKEND_URL}/reset-password-request`;
+                if (!requestBody.email) {
+                    authMessage.textContent = 'Please enter your email address.';
+                    authMessage.style.color = 'red';
+                    submitAuthBtn.disabled = false;
+                    return;
+                }
+            }
 
-                    // Attach event listeners for game play buttons
-                    document.getElementById('playMathGameBtn').addEventListener('click', () => {
-                        playClickSound();
-                        showMathGame();
-                    });
-                    document.getElementById('playScienceGameBtn').addEventListener('click', () => {
-                        playClickSound();
-                        showScienceGame();
-                    });
-                    document.getElementById('playElaGameBtn').addEventListener('click', () => {
-                        playClickSound();
-                        showElaGame();
-                    });
-                    document.getElementById('playPongGameBtn').addEventListener('click', () => {
-                        playClickSound();
-                        showPongGame();
-                    });
+            try {
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(requestBody)
+                });
 
-                    // Attach event listeners for "Open in New Window" buttons
-                    document.getElementById('openMathGameNewWindowBtn').addEventListener('click', (event) => {
-                        const gameUrl = event.target.dataset.gameUrl;
-                        playClickSound();
-                        openGameInNewWindow(gameUrl);
-                    });
-                    document.getElementById('openScienceGameNewWindowBtn').addEventListener('click', (event) => {
-                        const gameUrl = event.target.dataset.gameUrl;
-                        playClickSound();
-                        openGameInNewWindow(gameUrl);
-                    });
-                    document.getElementById('openElaGameNewWindowBtn').addEventListener('click', (event) => {
-                        const gameUrl = event.target.dataset.gameUrl;
-                        playClickSound();
-                        openGameInNewWindow(gameUrl);
-                    });
-                    document.getElementById('openPongGameNewWindowBtn').addEventListener('click', (event) => {
-                        const gameUrl = event.target.dataset.gameUrl;
-                        playClickSound();
-                        openGameInNewWindow(gameUrl);
-                    });
+                const data = await response.json(); 
+                console.log('Auth Backend Response Status:', response.status);
+                console.log('Auth Backend Response Data:', data);
 
-                    // Attach event listeners for Back buttons
-                    document.getElementById('backFromMathBtn').addEventListener('click', () => {
-                        playClickSound();
-                        showMainMenu();
-                    });
-                    document.getElementById('backFromScienceBtn').addEventListener('click', () => {
-                        playClickSound();
-                        showMainMenu();
-                    });
-                    document.getElementById('backFromElaBtn').addEventListener('click', () => {
-                        playClickSound();
-                        showMainMenu();
-                    });
-                    document.getElementById('backFromSocialStudiesBtn').addEventListener('click', () => {
-                        playClickSound();
-                        showMainMenu();
-                    });
-                    document.getElementById('backFromMathGameBtn').addEventListener('click', () => {
-                        playClickSound();
-                        showMainMenu();
-                    });
-                    document.getElementById('backFromScienceGameBtn').addEventListener('click', () => {
-                        playClickSound();
-                        showMainMenu();
-                    });
-                    document.getElementById('backFromElaGameBtn').addEventListener('click', () => {
-                        playClickSound();
-                        showMainMenu();
-                    });
-                    document.getElementById('backFromPongGameBtn').addEventListener('click', () => {
-                        playClickSound();
-                        showMainMenu();
-                    });
 
-                    // Attach event listeners for auth modal buttons
-                    document.getElementById('changeAvatarProfileBtn').addEventListener('click', () => {
-                        playClickSound();
-                        authModal.classList.add('hidden');
-                        const user = JSON.parse(localStorage.getItem('user'));
-                        showAvatarCreatorModal(user.avatar_config || {});
-                    });
-
-                    forgotPasswordLink.addEventListener('click', (e) => {
-                        e.preventDefault();
-                        playClickSound();
-                        showForgotPasswordForm();
-                    });
-
-                    closeModalBtn.addEventListener('click', () => {
-                        playClickSound();
-                        if (changeAvatarProfileBtn) changeAvatarProfileBtn.classList.add('hidden');
-                        profileAvatarDisplay.classList.add('hidden');
-                        logoutBtn.classList.add('hidden');
-                        authModal.classList.add('hidden');
-                        authMessage.textContent = '';
-                        showLoginForm();
-                    });
-
-                    logoutBtn.addEventListener('click', () => {
-                        playClickSound();
-                        localStorage.removeItem('token');
-                        localStorage.removeItem('user');
-                        updateAuthButtons();
-                        authMessage.textContent = 'You have been logged out.';
-                        authMessage.style.color = 'blue';
-                        authModal.classList.remove('hidden');
-                        authTitle.textContent = 'Logout';
-                        submitAuthBtn.classList.add('hidden');
-                        loginSignupFields.classList.add('hidden');
-                        forgotPasswordFields.classList.add('hidden');
-                        forgotPasswordLink.classList.add('hidden');
-                        profileAvatarDisplay.classList.add('hidden');
-                        logoutBtn.classList.add('hidden');
+                if (response.ok) {
+                    if (data.status === "Success") {
+                        // Crucial change: Always set the 'user' object from the backend response.
+                        // This 'data.data' should contain the username and other user details.
+                        localStorage.setItem('user', JSON.stringify(data.data)); 
+                        
+                        localStorage.setItem('token', data.token); 
+                        
+                        authMessage.textContent = data.message;
+                        authMessage.style.color = 'green';
                         setTimeout(() => {
                             authModal.classList.add('hidden');
-                            authMessage.textContent = '';
-                        }, 2000);
-                    });
-
-                    // Attach event listeners for avatar modal buttons
-                    closeAvatarModalBtn.addEventListener('click', () => {
-                        playClickSound();
-                        hideAvatarCreatorModal();
-                    });
-
-                    generateRandomAvatarBtn.addEventListener('click', () => {
-                        playClickSound();
-                        currentAvatarConfig = generateRandomAvatarConfig();
-                        updateAvatarPreview(currentAvatarConfig);
-                        avatarMessage.textContent = 'New random avatar generated!';
-                        avatarMessage.style.color = 'gray';
-                        setAvatarCreatorOptions(currentAvatarConfig);
-                    });
-
-                    saveAvatarBtn.addEventListener('click', async () => {
-                        playClickSound();
-                        avatarMessage.textContent = 'Saving avatar...';
-                        avatarMessage.style.color = 'gray';
-                        saveAvatarBtn.disabled = true;
-
-                        const user = JSON.parse(localStorage.getItem('user'));
-                        console.log('Save Avatar: User from localStorage before saving:', user);
-
-                        if (!user || !user._id) {
-                            avatarMessage.textContent = 'Error: User not logged in.';
-                            avatarMessage.style.color = 'red';
-                            saveAvatarBtn.disabled = false;
-                            hideAvatarCreatorModal();
-                            console.error('Save Avatar: User not found or _id missing. Hiding avatar modal.');
-                            return;
-                        }
-
-                        console.log('Save Avatar: Current avatar config being sent:', currentAvatarConfig);
-                        try {
-                            const response = await fetch(`${BACKEND_URL}/avatar/${user._id}`, {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json',
-                                },
-                                body: JSON.stringify(currentAvatarConfig)
-                            });
-
-                            console.log('Save Avatar: Fetch response received. Status:', response.status, response.statusText);
-
-                            if (!response.ok) {
-                                const errorData = await response.json().catch(() => ({ message: 'Could not parse error response.' }));
-                                avatarMessage.textContent = errorData.message || `Error saving avatar: ${response.status} ${response.statusText}`;
-                                avatarMessage.style.color = 'red';
-                                console.error('Save Avatar: Server responded with error:', response.status, errorData);
-                                return;
+                            updateAuthButtons();
+                            const user = JSON.parse(localStorage.getItem('user'));
+                            if (user && !user.has_created_avatar) { // Check if user exists before checking has_created_avatar
+                                showAvatarCreatorModal(user.avatar_config || {});
                             }
+                        }, 1000);
+                    } else {
+                        authMessage.textContent = data.message || 'An application error occurred.';
+                        authMessage.style.color = 'red';
+                    }
+                } else {
+                    authMessage.textContent = data.message || `An HTTP error occurred: ${response.status}`;
+                    authMessage.style.color = 'red';
+                }
+            } catch (error) {
+                console.error('Fetch error (network or JSON parse):', error);
+                authMessage.textContent = 'Network error or invalid response. Please check backend server and console for details.';
+                authMessage.style.color = 'red';
+            } finally {
+                submitAuthBtn.disabled = false;
+            }
+        }
 
-                            const data = await response.json();
-                            console.log('Save Avatar: Parsed response data:', data);
-
-                            if (data.status === "Success") {
-                                avatarMessage.textContent = data.message;
-                                avatarMessage.style.color = 'green';
-
-                                // Get the full user object from storage
-                                const existingUser = JSON.parse(localStorage.getItem('user'));
-
-                                // Merge the updates from the server response into the existing user object
-                                const updatedUser = {
-                                    ...existingUser, // Keeps old avatar_config if not explicitly returned
-                                    ...data.data     // Overwrites with fresh data from the avatar save response
-                                };
-
-                                // Save the complete, merged user object back to localStorage
-                                localStorage.setItem('user', JSON.stringify(updatedUser));
-                                console.log('Save Avatar: User data updated in localStorage:', updatedUser);
-
-                                // Now, reliably update the UI by calling the main function
-                                updateAuthButtons();
-
-                                setTimeout(() => {
-                                    hideAvatarCreatorModal();
-                                }, 1000);
-
-                            } else {
-                                avatarMessage.textContent = data.message || 'An application error occurred (backend status not Success).';
-                                avatarMessage.style.color = 'red';
-                            }
-                        } catch (error) {
-                            console.error('Save Avatar: Network error or JSON parse error:', error);
-                            avatarMessage.textContent = 'Network error saving avatar. Please try again.';
-                            avatarMessage.style.color = 'red';
-                        } finally {
-                            saveAvatarBtn.disabled = false;
-                            console.log('Save Avatar: Save button re-enabled.');
-                        }
-                    });
-
-                    authForm.addEventListener('submit', handleAuthSubmission);
-                    submitAuthBtn.addEventListener('click', handleAuthSubmission);
-
-                    // Attach event listeners for avatar option selects
-                    avatarStyleSelect.addEventListener('change', (event) => { currentAvatarConfig.avatarStyle = event.target.value; handleConditionalAvatarFields(); });
-                    topTypeSelect.addEventListener('change', (event) => { currentAvatarConfig.topType = event.target.value; handleConditionalAvatarFields(); });
-                    topColorSelect.addEventListener('change', (event) => {
-                        const selectedColor = event.target.value;
-                        const hatTypes = ['Hat', 'Turban', 'WinterHat1', 'WinterHat2', 'WinterHat3', 'WinterHat4'];
-                        if (hatTypes.includes(currentAvatarConfig.topType)) {
-                            currentAvatarConfig.hatColor = selectedColor;
-                        } else if (currentAvatarConfig.topType === 'Hijab') {
-                            currentAvatarConfig.topColor = selectedColor;
-                        }
-                        updateAvatarPreview(currentAvatarConfig);
-                    });
-                    hairColorSelect.addEventListener('change', (event) => { currentAvatarConfig.hairColor = event.target.value; updateAvatarPreview(currentAvatarConfig); });
-                    facialHairTypeSelect.addEventListener('change', (event) => { currentAvatarConfig.facialHairType = event.target.value; handleConditionalAvatarFields(); });
-                    facialHairColorSelect.addEventListener('change', (event) => { currentAvatarConfig.facialHairColor = event.target.value; updateAvatarPreview(currentAvatarConfig); });
-                    eyeTypeSelect.addEventListener('change', (event) => { currentAvatarConfig.eyeType = event.target.value; updateAvatarPreview(currentAvatarConfig); });
-                    eyebrowTypeSelect.addEventListener('change', (event) => { currentAvatarConfig.eyebrowType = event.target.value; updateAvatarPreview(currentAvatarConfig); });
-                    mouthTypeSelect.addEventListener('change', (event) => { currentAvatarConfig.mouthType = event.target.value; updateAvatarPreview(currentAvatarConfig); });
-                    skinColorSelect.addEventListener('change', (event) => { currentAvatarConfig.skinColor = event.target.value; updateAvatarPreview(currentAvatarConfig); });
-                    clotheTypeSelect.addEventListener('change', (event) => { currentAvatarConfig.clotheType = event.target.value; handleConditionalAvatarFields(); });
-                    clotheColorSelect.addEventListener('change', (event) => { currentAvatarConfig.clotheColor = event.target.value; updateAvatarPreview(currentAvatarConfig); });
-                    graphicTypeSelect.addEventListener('change', (event) => { currentAvatarConfig.graphicType = event.target.value; updateAvatarPreview(currentAvatarConfig); });
-                    accessoriesTypeSelect.addEventListener('change', (event) => { currentAvatarConfig.accessoriesType = event.target.value; updateAvatarPreview(currentAvatarConfig); });
-
-                    initializeAvatarCreatorOptions(); // Call this here to ensure it runs after all elements are available
-                });
-            </script>
-        </body>
-        </html>
+        authForm.addEventListener('submit', handleAuthSubmission);
+        submitAuthBtn.addEventListener('click', handleAuthSubmission);
+    </script>
+</body>
+</html>
