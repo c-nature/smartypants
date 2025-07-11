@@ -1,769 +1,768 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SMARTY PANTS Online</title>
-    <!-- ADDED: Self-hosted Tailwind CSS. Make sure to download the content from https://cdn.tailwindcss.com/ and save it to ./styles/tailwind.min.css -->
-    <link href="./styles/tailwind.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap" rel="stylesheet">
-    <style>
-        body {
-            margin: 0;
-            font-family: 'Fredoka One', cursive;
-            background: linear-gradient(to bottom right, #e0b0ff, #a0d9ff, #98fb98);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            padding: 2rem;
-            overflow-y: auto;
-            overflow-x: hidden; /* Keep horizontal overflow hidden unless specified */
-        }
-
-        .main-container, .category-view {
-            padding: 0;
-            width: 100%;
-            text-align: center;
-            max-width: 1200px; /* Increased max-width for 4 cards */
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        /* Adjust content padding to prevent it from being hidden by the fixed header */
-        .main-container-with-header-offset, .category-view {
-            padding-top: 6rem; /* Adjust based on header height */
-        }
-
-        .header-title {
-            font-size: 3.5rem;
-            font-weight: 800;
-            color: #1e90ff;
-            margin-bottom: 1.5rem;
-            animation: bounce-slow 3s infinite;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
-        }
-
-        .subtitle {
-            font-size: 1.5rem;
-            color: #4a4a4a;
-            margin-bottom: 2.5rem;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
-            font-weight: 400;
-        }
-
-        .grid-layout {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 2rem;
-            padding: 1rem;
-        }
-
-        /* On medium screens (tablets), show 2 columns */
-        @media (min-width: 768px) {
-            .grid-layout {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-
-        /* On large screens (desktops), show 4 columns */
-        @media (min-width: 1024px) {
-            .grid-layout {
-                grid-template-columns: repeat(4, 1fr);
-            }
-            }
-
-        .category-card {
-            background-color: rgba(255, 255, 255, 0.95);
-            border-radius: 1.5rem;
-            padding: 2rem;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: space-between;
-            min-height: 20rem;
-            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
-            border-bottom: 6px solid;
-            text-align: center;
-        }
-
-        .category-card:hover {
-            transform: scale(1.05);
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
-        }
-
-        .category-card.math {
-            background-color: rgba(59, 255, 131, 0.9);
-            border-color:rgb(22, 189, 122);
-        }
-        .category-card.math .title { color:rgb(200, 103, 51); }
-        .category-card.math .description { color: #fbc02d; }
-
-        .category-card.science {
-            background-color: rgba(21, 178, 235, 0.9);
-            border-color:rgb(67, 144, 160);
-        }
-        .category-card.science .title { color: #004d40; }
-        .category-card.science .description { color: #43a047; }
-
-        .category-card.ela {
-            background-color: rgba(240, 60, 60, 0.9);
-            border-color:rgb(189, 37, 37);
-        }
-        .category-card.ela .title { color: #880e4f; }
-        .category-card.ela .description { color: #d32f2f; }
-
-        /* New styles for Social Studies card */
-        .category-card.social-studies {
-            background-color: rgba(255, 165, 0, 0.9); /* Orange background */
-            border-color: rgb(204, 132, 0); /* Darker orange border */
-        }
-        .category-card.social-studies .title { color: #a0522d; } /* Sienna title color */
-        .category-card.social-studies .description { color: #8b4513; } /* SaddleBrown description color */
-
-
-        .category-icon {
-            width: 5rem;
-            height: 5rem;
-            margin-bottom: 1rem;
-            object-fit: contain;
-            filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.2));
-        }
-
-        .category-title {
-            font-size: 2.25rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-        }
-
-        .category-description {
-            font-size: 1.25rem;
-            font-weight: 400;
-            flex-grow: 1;
-            margin-bottom: 1rem;
-        }
-
-        .explore-button {
-            background-color: #6a0dad;
-            color: white;
-            padding: 0.75rem 1.75rem;
-            border-radius: 9999px;
-            font-size: 1.2rem;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out;
-            border: none;
-            cursor: pointer;
-        }
-
-        .explore-button:hover {
-            background-color: #8a2be2;
-            transform: translateY(-2px);
-        }
-        .explore-button:active {
-            transform: translateY(0);
-        }
-
-        .explore-button-icon {
-            margin-left: 0.5rem;
-            width: 1.25rem;
-            height: 1.25rem;
-        }
-
-        .footer-text {
-            color: #777;
-            font-size: 0.875rem;
-            margin-top: 2.5rem;
-            text-shadow: 1px 1px 2px rgba(255,255,255,0.1);
-            font-weight: 400;
-        }
-
-        @keyframes bounce-slow {
-            0%, 100% {
-                transform: translateY(-5%);
-                animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
-            }
-            50% {
-                transform: translateY(0);
-                animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
-            }
-        }
-
-        .game-iframe-container {
-            width: 100vw;
-            height: 100vh;
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            justify-content: flex-start;
-            background: linear-gradient(to bottom right, #e0b0ff, #a0d9ff, #98fb98);
-            padding: 1rem;
-            box-sizing: border-box;
-            position: fixed;
-            top: 6rem;
-            height: calc(100vh - 6rem);
-            left: 0;
-            z-index: 50;
-        }
-
-        .game-iframe {
-            flex-grow: 1;
-            width: 100%;
-            border: none;
-            border-radius: 1rem;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-            background-color: #fff;
-        }
-
-        .game-list-layout {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 2rem;
-            padding: 1rem;
-            margin-top: 2rem;
-        }
-
-        .game-list-card {
-            background-color: rgba(255, 255, 255, 0.9);
-            border-radius: 1.5rem;
-            padding: 2rem;
-            box-shadow: 0 8px 12px -3px rgba(0, 0, 0, 0.1);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-
-        .game-list-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 12px 20px -5px rgba(0, 0, 0, 0.15);
-        }
-
-        .game-list-card h3 {
-            font-size: 1.8rem;
-            font-weight: 700;
-            color: #333;
-            margin-bottom: 0.5rem;
-        }
-
-        .game-list-card p {
-            font-size: 1.1rem;
-            color: #555;
-            margin-bottom: 1.5rem;
-            font-weight: 400;
-        }
-
-        .game-card-buttons {
-            display: flex;
-            flex-direction: column;
-            gap: 0.75rem;
-            width: 100%;
-            align-items: center;
-        }
-
-        .play-game-button, .play-game-button-new-window {
-            padding: 0.7rem 1.5rem;
-            border-radius: 9999px;
-            font-size: 1.1rem;
-            font-weight: 600;
-            transition: background-color 0.2s, transform 0.1s;
-            border: none;
-            width: 90%;
-            cursor: pointer;
-        }
-
-        .play-game-button {
-            background-color: #ff4081;
-            color: white;
-        }
-
-        .play-game-button:hover {
-            background-color: #f50057;
-            transform: scale(1.05);
-        }
-
-        .play-game-button-new-window {
-            background-color: #0288d1;
-            color: white;
-        }
-
-        .play-game-button-new-window:hover {
-            background-color: #01579b;
-            transform: scale(1.05);
-        }
-
-        .back-button {
-            background-color: #6a0dad;
-            color: white;
-            padding: 0.75rem 1.5rem;
-            border-radius: 0.75rem;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            border: none;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-            margin-bottom: 1rem;
-            transition: background-color 0.2s, transform 0.1s;
-            z-index: 51;
-            align-self: flex-start;
-        }
-
-        .back-button:hover {
-            background-color: #8a2be2;
-            transform: translateY(-1px);
-        }
-        .back-button:active {
-            transform: translateY(0);
-        }
-
-        @media (max-width: 768px) {
-            body {
-                padding: 1rem;
-            }
-            .header-title {
-                font-size: 2.5rem;
-            }
-            .subtitle {
-                font-size: 1.2rem;
-            }
-            .category-card {
-                padding: 1.5rem;
-                min-height: 10rem;
-            }
-            .category-icon {
-                width: 4rem;
-                height: 4rem;
-            }
-            .category-title {
-                font-size: 1.8rem;
-            }
-            .category-description {
-                font-size: 1rem;
-            }
-            .explore-button {
-                padding: 0.6rem 1.5rem;
-                font-size: 1rem;
-            }
-            .game-iframe-container {
-                padding: 0.5rem;
-                top: 5rem;
-                height: calc(100vh - 5rem);
-            }
-            .back-button {
-                padding: 0.6rem 1.2rem;
-                font-size: 0.9rem;
-            }
-            .main-container-with-header-offset, .category-view {
-                padding-top: 5rem;
-            }
-        }
-
-        .auth-modal, .avatar-modal {
-            position: fixed;
-            inset: 0;
-            background-color: rgba(0, 0, 0, 0.75);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-            transition: opacity 0.3s ease-in-out;
-        }
-        .auth-modal.hidden, .avatar-modal.hidden, .category-view.hidden {
-            opacity: 0;
-            pointer-events: none;
-            display: none;
-        }
-        .auth-modal-content {
-            background-color: white;
-            padding: 2rem;
-            border-radius: 0.75rem;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-            max-width: 40rem;
-            width: 100%;
-            font-family: 'Fredoka One', cursive;
-            position: relative;
-        }
-        .avatar-modal-content {
-            background-color: white;
-            padding: 2rem;
-            border-radius: 0.75rem;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-            max-width: 28rem;
-            width: 100%;
-            font-family: 'Fredoka One', cursive;
-        }
-        .auth-modal-title, .avatar-modal-title {
-            font-size: 1.5rem;
-            font-weight: 700;
-            text-align: center;
-            margin-bottom: 1.5rem;
-            color: #1a202c;
-        }
-        .auth-form-group {
-            margin-bottom: 1rem;
-        }
-        .auth-label {
-            display: block;
-            color: #4a4a4a;
-            font-size: 0.875rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-        }
-        .auth-input {
-            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-            appearance: none;
-            border-width: 1px;
-            border-radius: 0.25rem;
-            width: 100%;
-            padding: 0.5rem 0.75rem;
-            color: #4a4a4a;
-            line-height: 1.25;
-            outline: none;
-        }
-        .auth-input:focus {
-            box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.5);
-        }
-        .auth-submit-btn, .auth-close-btn, .avatar-btn {
-            font-weight: 700;
-            padding: 0.5rem 1rem;
-            border-radius: 0.25rem;
-            outline: none;
-            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-            width: 100%;
-            cursor: pointer;
-            transition: background-color 0.2s ease-in-out;
-        }
-        .auth-submit-btn {
-            background-color: #4299e1;
-            color: white;
-        }
-        .auth-submit-btn:hover {
-            background-color: #3182ce;
-        }
-        .auth-close-btn {
-            margin-top: 1rem;
-            background-color: #e2e8f0;
-            color: #2d3748;
-        }
-        .auth-close-btn:hover {
-            background-color: #cbd5e0;
-        }
-        .auth-message {
-            text-align: center;
-            font-size: 0.875rem;
-            margin-top: 1rem;
-            white-space: pre-wrap;
-        }
-
-        .avatar-preview {
-            width: 150px;
-            height: 150px;
-            border-radius: 50%;
-            background-color: #f0f0f0;
-            margin: 0 auto 1rem;
-            display: block;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-            border: 2px solid #ddd;
-        }
-        .avatar-options {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-            gap: 1rem;
-            margin-top: 1.5rem;
-            max-height: 300px;
-            overflow-y: auto;
-            padding-right: 0.5rem;
-        }
-        .avatar-option-group {
-            display: flex;
-            flex-direction: column;
-            gap: 0.25rem;
-        }
-        .avatar-option-label {
-            font-size: 0.9rem;
-            font-weight: 600;
-            color: #4a4a4a;
-        }
-        .avatar-option-select {
-            border: 1px solid #ccc;
-            border-radius: 0.5rem;
-            padding: 0.4rem 0.6rem;
-            font-size: 0.85rem;
-            background-color: #f9f9f9;
-            cursor: pointer;
-            transition: border-color 0.2s;
-        }
-        .avatar-option-select:focus {
-            border-color: #4299e1;
-            outline: none;
-            box-shadow: 0 0 0 2px rgba(66, 153, 225, 0.3);
-        }
-
-        .avatar-btn-group {
-            display: flex;
-            gap: 0.5rem;
-            margin-top: 1rem;
-        }
-        .avatar-btn-group button {
-            flex: 1;
-        }
-        .avatar-btn-primary {
-            background-color: #4CAF50;
-            color: white;
-        }
-        .avatar-btn-primary:hover {
-            background-color: #45a049;
-        }
-        .avatar-btn-secondary {
-            background-color: #f44336;
-            color: white;
-        }
-        .avatar-btn-secondary:hover {
-            background-color: #da190b;
-        }
-
-        .profile-avatar-display {
-            position: absolute;
-            top: 1rem;
-            right: 1rem;
-            z-index: 10;
-        }
-
-        .profile-avatar-img {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 3px solid #8a2be2;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-        }
-
-        @media (max-width: 768px) {
-            .auth-modal-content {
-                max-width: 95%;
-                padding: 1.5rem;
-            }
-            .profile-avatar-img {
-                width: 60px;
-                height: 60px;
-            }
-        }
-
-        #ela-category-view .game-card-buttons button {
-            background-image: url('wordweaver.png');
-            background-size: cover;
-            background-position: center;
-            background-color: #6a0dad;
-            background-blend-mode: multiply;
-
-            color: white;
-            font-weight: 700;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
-            border: 2px solid rgba(255, 255, 255, 0.6);
-            transition: filter 0.2s, transform 0.2s, border-color 0.2s;
-        }
-
-        #ela-category-view .game-card-buttons button:hover {
-            filter: brightness(1.2);
-            transform: scale(1.05);
-            border-color: white;
-        }
-    </style>
-</head>
-<body>
-
-    <header class="fixed top-0 left-0 right-0 p-4 flex justify-between items-center z-60">
-        <div id="header-avatar-container" class="w-12 h-12"></div>
-        <nav class="flex space-x-2 items-center">
-            <button id="loginBtn" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-full font-semibold shadow-md">Login</button>
-            <button id="signupBtn" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-full font-semibold shadow-md">Sign Up</button>
-            <button id="profileBtn" class="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded-full font-semibold shadow-md hidden">
-                Profile
-            </button>
-        </nav>
-    </header>
-
-    <div id="main-menu-container" class="main-container main-container-with-header-offset">
-        <h1 class="header-title">
-            SMARTY PANTS Online
-        </h1>
-        <p class="subtitle">
-            Ready to learn and play? Choose your adventure!
-        </p>
-
-        <div class="grid-layout">
-            <div class="category-card math">
-                <img src="math.png" alt="Math Icon" class="category-icon" onerror="this.onerror=null; this.src='https://placehold.co/80x80/FFD700/000000?text=Math';" />
-                <h2 class="category-title">Math Games</h2>
-                <p class="category-description">Fun with numbers & logic!</p>
-                <button class="explore-button" id="exploreMathBtn">
-                    Explore <span style="margin-left: 0.5rem;">&#x276F;</span> </button>
-            </div>
-
-            <div class="category-card science">
-                <img src="science.png" alt="Science Icon" class="category-icon" onerror="this.onerror=null; this.src='https://placehold.co/80x80/81C784/000000?text=Science';" />
-                <h2 class="category-title">Science Games</h2>
-                <p class="category-description">Discover the world around you!</p>
-                <button class="explore-button" id="exploreScienceBtn">
-                    Explore <span style="margin-left: 0.5rem;">&#x276F;</span> </button>
-            </div>
-
-            <div class="category-card ela">
-                <img src="abc.png" alt="ELA Icon" class="category-icon" onerror="this.onerror=null; this.src='https://placehold.co/80x80/EF9A9A/000000?text=ABC';" />
-                <h2 class="category-title">ELA Games</h2>
-                <p class="category-description">Read, write, and communicate!</p>
-                <button class="explore-button" id="exploreElaBtn"> Explore <span style="margin-left: 0.5rem;">&#x276F;</span> </button>
-            </div>
-
-            <div class="category-card social-studies">
-                <img src="socialstudies.png" alt="Social Studies Icon" class="category-icon" onerror="this.onerror=null; this.src='https://placehold.co/80x80/FFA500/000000?text=History';" />
-                <h2 class="category-title">Social Studies</h2>
-                <p class="category-description">Explore history and cultures!</p>
-                <button class="explore-button" id="exploreSocialStudiesBtn"> Explore <span style="margin-left: 0.5rem;">&#x276F;</span> </button>
-            </div>
-        </div>
-
-        <p class="footer-text">
-            (More games and apps comings soon!!!)
-        </p>
-    </div>
-
-    <div id="math-category-view" class="category-view hidden">
-        <button class="back-button" id="backFromMathBtn"> &larr; Back to Main Menu </button>
-        <h1 class="header-title">MATH</h1>
-        <div class="game-list-layout">
-            <div class="game-list-card">
-                <h3>Math Challenge</h3>
-                <p>Test your arithmetic skills!</p>
-                <div class="game-card-buttons">
-                    <button class="play-game-button" id="playMathGameBtn">Play Here</button>
-                    <button class="play-game-button-new-window" id="openMathGameNewWindowBtn" data-game-url="mathgame.html">Open in New Window</button>
-                </div>
-            </div>
-            </div>
-    </div>
-
-    <div id="science-category-view" class="category-view hidden">
-        <button class="back-button" id="backFromScienceBtn"> &larr; Back to Main Menu </button>
-        <h1 class="header-title">SCIENCE</h1>
-        <div class="game-list-layout">
-            <div class="game-list-card">
-                <h3>Animal Kingdom Explorer</h3>
-                <p>Learn about amazing animals!</p>
-                <div class="game-card-buttons">
-                    <button class="play-game-button" id="playScienceGameBtn">Play Here</button>
-                    <button class="play-game-button-new-window" id="openScienceGameNewWindowBtn" data-game-url="animalapp.html">Open in New Window</button>
-                </div>
-            </div>
-            </div>
-    </div>
-
-    <div id="ela-category-view" class="category-view hidden">
-        <button class="back-button" id="backFromElaBtn"> &larr; Back to Main Menu </button>
-        <h1 class="header-title">ELA</h1>
-        <div class="game-list-layout">
-            <div class="game-list-card" style="background-image: url('wordweaver.png'); background-size: cover; background-position: center;">
-                <h3 style="color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);">Word Weaver</h3>
-                <p style="color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);">A fun adventure in vocabulary!</p>
-                <div class="game-card-buttons">
-                    <button class="play-game-button" id="playElaGameBtn">Play Here</button>
-                    <button class="play-game-button-new-window" id="openElaGameNewWindowBtn" data-game-url="WordWarrior.html">Open in New Window</button>
-                </div>
-            </div>
-            </div>
-    </div>
-
-    <div id="social-studies-category-view" class="category-view hidden">
-        <button class="back-button" id="backFromSocialStudiesBtn"> &larr; Back to Main Menu </button>
-        <h1 class="header-title">SOCIAL STUDIES</h1>
-        <div class="game-list-layout">
-            <div class="game-list-card" style="background-image: url('modeSelectScreen.png'); background-size: cover; background-position: center;">
-                <h3 style="color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);">Presidential Pong</h3>
-                <p style="color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);">A historic twist on a classic!</p>
-                <div class="game-card-buttons">
-                    <button class="play-game-button" id="playPongGameBtn">Play Here</button>
-                    <button class="play-game-button-new-window" id="openPongGameNewWindowBtn" data-game-url="ponggame/presidentialpong.html">Open in New Window</button>
-                </div>
-            </div>
-            </div>
-    </div>
-
-
-    <div id="math-game-view" class="game-iframe-container">
-        <button class="back-button" id="backFromMathGameBtn">
-            &larr; Back to Main Menu
-        </button>
-        <iframe id="math-game-iframe" src="" title="Math Challenge Game" class="game-iframe"></iframe>
-    </div>
-
-    <div id="science-game-view" class="game-iframe-container">
-        <button class="back-button" id="backFromScienceGameBtn">
-            &larr; Back to Main Menu
-        </button>
-        <iframe id="science-game-iframe" src="" title="Animal Kingdom Explorer" class="game-iframe"></iframe>
-    </div>
-
-    <div id="ela-game-view" class="game-iframe-container">
-        <button class="back-button" id="backFromElaGameBtn">
-            &larr; Back to Main Menu
-        </button>
-        <iframe id="ela-game-iframe" src="" title="Word Weaver Game" class="game-iframe"></iframe>
-    </div>
-
-    <div id="pong-game-view" class="game-iframe-container">
-        <button class="back-button" id="backFromPongGameBtn">
-            &larr; Back to Main Menu
-        </button>
-        <iframe id="pong-game-iframe" src="" title="Presidential Pong Game" class="game-iframe"></iframe>
-    </div>
-
-    <audio id="mainClickSoundElement" preload="auto">
-        <source src="click.mp3" type="audio/mpeg">
-        <source src="click.ogg" type="audio/ogg">
-        <source src="click.wav" type="audio/wav"> Your browser does not support the audio element.
-    </audio>
-
-    <div id="authModal" class="auth-modal hidden">
-        <div class="auth-modal-content">
-            <h2 id="authTitle" class="auth-modal-title"></h2>
-            <div id="profileAvatarDisplay" class="profile-avatar-display hidden">
-                <img id="profileAvatarImg" class="profile-avatar-img" alt="User Avatar">
-            </div>
-            <form id="authForm" class="space-y-4">
-                <div id="loginSignupFields">
-                    <div class="auth-form-group">
-                        <label for="username" class="auth-label">Username:</label>
-                        <input type="text" id="username" class="auth-input" required>
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>SMARTY PANTS Online</title>
+            <script src="https://cdn.tailwindcss.com"></script>
+            <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap" rel="stylesheet">
+            <style>
+                body {
+                    margin: 0;
+                    font-family: 'Fredoka One', cursive;
+                    background: linear-gradient(to bottom right, #e0b0ff, #a0d9ff, #98fb98);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    min-height: 100vh;
+                    padding: 2rem;
+                    overflow-y: auto;
+                    overflow-x: hidden; /* Keep horizontal overflow hidden unless specified */
+                }
+
+                .main-container, .category-view {
+                    padding: 0;
+                    width: 100%;
+                    text-align: center;
+                    max-width: 1200px; /* Increased max-width for 4 cards */
+                    margin-left: auto;
+                    margin-right: auto;
+                }
+
+                /* Adjust content padding to prevent it from being hidden by the fixed header */
+                .main-container-with-header-offset, .category-view {
+                    padding-top: 6rem; /* Adjust based on header height */
+                }
+
+                .header-title {
+                    font-size: 3.5rem;
+                    font-weight: 800;
+                    color: #1e90ff;
+                    margin-bottom: 1.5rem;
+                    animation: bounce-slow 3s infinite;
+                    text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+                }
+
+                .subtitle {
+                    font-size: 1.5rem;
+                    color: #4a4a4a;
+                    margin-bottom: 2.5rem;
+                    text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+                    font-weight: 400;
+                }
+
+                .grid-layout {
+                    display: grid;
+                    grid-template-columns: 1fr;
+                    gap: 2rem;
+                    padding: 1rem;
+                }
+
+                /* On medium screens (tablets), show 2 columns */
+                @media (min-width: 768px) {
+                    .grid-layout {
+                        grid-template-columns: repeat(2, 1fr);
+                    }
+                }
+
+                /* On large screens (desktops), show 4 columns */
+                @media (min-width: 1024px) {
+                    .grid-layout {
+                        grid-template-columns: repeat(4, 1fr);
+                    }
+                }
+
+                .category-card {
+                    background-color: rgba(255, 255, 255, 0.95);
+                    border-radius: 1.5rem;
+                    padding: 2rem;
+                    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    justify-content: space-between;
+                    min-height: 20rem;
+                    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+                    border-bottom: 6px solid;
+                    text-align: center;
+                }
+
+                .category-card:hover {
+                    transform: scale(1.05);
+                    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+                }
+
+                .category-card.math {
+                    background-color: rgba(59, 255, 131, 0.9);
+                    border-color:rgb(22, 189, 122);
+                }
+                .category-card.math .title { color:rgb(200, 103, 51); }
+                .category-card.math .description { color: #fbc02d; }
+
+                .category-card.science {
+                    background-color: rgba(21, 178, 235, 0.9);
+                    border-color:rgb(67, 144, 160);
+                }
+                .category-card.science .title { color: #004d40; }
+                .category-card.science .description { color: #43a047; }
+
+                .category-card.ela {
+                    background-color: rgba(240, 60, 60, 0.9);
+                    border-color:rgb(189, 37, 37);
+                }
+                .category-card.ela .title { color: #880e4f; }
+                .category-card.ela .description { color: #d32f2f; }
+
+                /* New styles for Social Studies card */
+                .category-card.social-studies {
+                    background-color: rgba(255, 165, 0, 0.9); /* Orange background */
+                    border-color: rgb(204, 132, 0); /* Darker orange border */
+                }
+                .category-card.social-studies .title { color: #a0522d; } /* Sienna title color */
+                .category-card.social-studies .description { color: #8b4513; } /* SaddleBrown description color */
+
+
+                .category-icon {
+                    width: 5rem;
+                    height: 5rem;
+                    margin-bottom: 1rem;
+                    object-fit: contain;
+                    filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.2));
+                }
+
+                .category-title {
+                    font-size: 2.25rem;
+                    font-weight: 700;
+                    margin-bottom: 0.5rem;
+                }
+
+                .category-description {
+                    font-size: 1.25rem;
+                    font-weight: 400;
+                    flex-grow: 1;
+                    margin-bottom: 1rem;
+                }
+
+                .explore-button {
+                    background-color: #6a0dad;
+                    color: white;
+                    padding: 0.75rem 1.75rem;
+                    border-radius: 9999px;
+                    font-size: 1.2rem;
+                    font-weight: 600;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+                    transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out;
+                    border: none;
+                    cursor: pointer;
+                }
+
+                .explore-button:hover {
+                    background-color: #8a2be2;
+                    transform: translateY(-2px);
+                }
+                .explore-button:active {
+                    transform: translateY(0);
+                }
+
+                .explore-button-icon {
+                    margin-left: 0.5rem;
+                    width: 1.25rem;
+                    height: 1.25rem;
+                }
+
+                .footer-text {
+                    color: #777;
+                    font-size: 0.875rem;
+                    margin-top: 2.5rem;
+                    text-shadow: 1px 1px 2px rgba(255,255,255,0.1);
+                    font-weight: 400;
+                }
+
+                @keyframes bounce-slow {
+                    0%, 100% {
+                        transform: translateY(-5%);
+                        animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+                    }
+                    50% {
+                        transform: translateY(0);
+                        animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+                    }
+                }
+
+                .game-iframe-container {
+                    width: 100vw;
+                    height: 100vh;
+                    display: none;
+                    flex-direction: column;
+                    align-items: center;
+                    justify-content: flex-start;
+                    background: linear-gradient(to bottom right, #e0b0ff, #a0d9ff, #98fb98);
+                    padding: 1rem;
+                    box-sizing: border-box;
+                    position: fixed;
+                    top: 6rem;
+                    height: calc(100vh - 6rem);
+                    left: 0;
+                    z-index: 50;
+                }
+
+                .game-iframe {
+                    flex-grow: 1;
+                    width: 100%;
+                    border: none;
+                    border-radius: 1rem;
+                    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+                    background-color: #fff;
+                }
+
+                .game-list-layout {
+                    display: grid;
+                    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+                    gap: 2rem;
+                    padding: 1rem;
+                    margin-top: 2rem;
+                }
+
+                .game-list-card {
+                    background-color: rgba(255, 255, 255, 0.9);
+                    border-radius: 1.5rem;
+                    padding: 2rem;
+                    box-shadow: 0 8px 12px -3px rgba(0, 0, 0, 0.1);
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    justify-content: center;
+                    transition: transform 0.3s ease, box-shadow 0.3s ease;
+                }
+
+                .game-list-card:hover {
+                    transform: translateY(-5px);
+                    box-shadow: 0 12px 20px -5px rgba(0, 0, 0, 0.15);
+                }
+
+                .game-list-card h3 {
+                    font-size: 1.8rem;
+                    font-weight: 700;
+                    color: #333;
+                    margin-bottom: 0.5rem;
+                }
+
+                .game-list-card p {
+                    font-size: 1.1rem;
+                    color: #555;
+                    margin-bottom: 1.5rem;
+                    font-weight: 400;
+                }
+
+                .game-card-buttons {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 0.75rem;
+                    width: 100%;
+                    align-items: center;
+                }
+
+                .play-game-button, .play-game-button-new-window {
+                    padding: 0.7rem 1.5rem;
+                    border-radius: 9999px;
+                    font-size: 1.1rem;
+                    font-weight: 600;
+                    transition: background-color 0.2s, transform 0.1s;
+                    border: none;
+                    width: 90%;
+                    cursor: pointer;
+                }
+
+                .play-game-button {
+                    background-color: #ff4081;
+                    color: white;
+                }
+
+                .play-game-button:hover {
+                    background-color: #f50057;
+                    transform: scale(1.05);
+                }
+
+                .play-game-button-new-window {
+                    background-color: #0288d1;
+                    color: white;
+                }
+
+                .play-game-button-new-window:hover {
+                    background-color: #01579b;
+                    transform: scale(1.05);
+                }
+
+                .back-button {
+                    background-color: #6a0dad;
+                    color: white;
+                    padding: 0.75rem 1.5rem;
+                    border-radius: 0.75rem;
+                    font-size: 1rem;
+                    font-weight: 600;
+                    cursor: pointer;
+                    border: none;
+                    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+                    margin-bottom: 1rem;
+                    transition: background-color 0.2s, transform 0.1s;
+                    z-index: 51;
+                    align-self: flex-start;
+                }
+
+                .back-button:hover {
+                    background-color: #8a2be2;
+                    transform: translateY(-1px);
+                }
+                .back-button:active {
+                    transform: translateY(0);
+                }
+
+                @media (max-width: 768px) {
+                    body {
+                        padding: 1rem;
+                    }
+                    .header-title {
+                        font-size: 2.5rem;
+                    }
+                    .subtitle {
+                        font-size: 1.2rem;
+                    }
+                    .category-card {
+                        padding: 1.5rem;
+                        min-height: 10rem;
+                    }
+                    .category-icon {
+                        width: 4rem;
+                        height: 4rem;
+                    }
+                    .category-title {
+                        font-size: 1.8rem;
+                    }
+                    .category-description {
+                        font-size: 1rem;
+                    }
+                    .explore-button {
+                        padding: 0.6rem 1.5rem;
+                        font-size: 1rem;
+                    }
+                    .game-iframe-container {
+                        padding: 0.5rem;
+                        top: 5rem;
+                        height: calc(100vh - 5rem);
+                    }
+                    .back-button {
+                        padding: 0.6rem 1.2rem;
+                        font-size: 0.9rem;
+                    }
+                    .main-container-with-header-offset, .category-view {
+                        padding-top: 5rem;
+                    }
+                }
+
+                .auth-modal, .avatar-modal {
+                    position: fixed;
+                    inset: 0;
+                    background-color: rgba(0, 0, 0, 0.75);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    z-index: 1000;
+                    transition: opacity 0.3s ease-in-out;
+                }
+                .auth-modal.hidden, .avatar-modal.hidden, .category-view.hidden {
+                    opacity: 0;
+                    pointer-events: none;
+                    display: none;
+                }
+                .auth-modal-content {
+                    background-color: white;
+                    padding: 2rem;
+                    border-radius: 0.75rem;
+                    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+                    max-width: 40rem;
+                    width: 100%;
+                    font-family: 'Fredoka One', cursive;
+                    position: relative;
+                }
+                .avatar-modal-content {
+                    background-color: white;
+                    padding: 2rem;
+                    border-radius: 0.75rem;
+                    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+                    max-width: 28rem;
+                    width: 100%;
+                    font-family: 'Fredoka One', cursive;
+                }
+                .auth-modal-title, .avatar-modal-title {
+                    font-size: 1.5rem;
+                    font-weight: 700;
+                    text-align: center;
+                    margin-bottom: 1.5rem;
+                    color: #1a202c;
+                }
+                .auth-form-group {
+                    margin-bottom: 1rem;
+                }
+                .auth-label {
+                    display: block;
+                    color: #4a4a4a;
+                    font-size: 0.875rem;
+                    font-weight: 700;
+                    margin-bottom: 0.5rem;
+                }
+                .auth-input {
+                    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+                    appearance: none;
+                    border-width: 1px;
+                    border-radius: 0.25rem;
+                    width: 100%;
+                    padding: 0.5rem 0.75rem;
+                    color: #4a4a4a;
+                    line-height: 1.25;
+                    outline: none;
+                }
+                .auth-input:focus {
+                    box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.5);
+                }
+                .auth-submit-btn, .auth-close-btn, .avatar-btn {
+                    font-weight: 700;
+                    padding: 0.5rem 1rem;
+                    border-radius: 0.25rem;
+                    outline: none;
+                    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+                    width: 100%;
+                    cursor: pointer;
+                    transition: background-color 0.2s ease-in-out;
+                }
+                .auth-submit-btn {
+                    background-color: #4299e1;
+                    color: white;
+                }
+                .auth-submit-btn:hover {
+                    background-color: #3182ce;
+                }
+                .auth-close-btn {
+                    margin-top: 1rem;
+                    background-color: #e2e8f0;
+                    color: #2d3748;
+                }
+                .auth-close-btn:hover {
+                    background-color: #cbd5e0;
+                }
+                .auth-message {
+                    text-align: center;
+                    font-size: 0.875rem;
+                    margin-top: 1rem;
+                    white-space: pre-wrap;
+                }
+
+                .avatar-preview {
+                    width: 150px;
+                    height: 150px;
+                    border-radius: 50%;
+                    background-color: #f0f0f0;
+                    margin: 0 auto 1rem;
+                    display: block;
+                    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+                    border: 2px solid #ddd;
+                }
+                .avatar-options {
+                    display: grid;
+                    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+                    gap: 1rem;
+                    margin-top: 1.5rem;
+                    max-height: 300px;
+                    overflow-y: auto;
+                    padding-right: 0.5rem;
+                }
+                .avatar-option-group {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 0.25rem;
+                }
+                .avatar-option-label {
+                    font-size: 0.9rem;
+                    font-weight: 600;
+                    color: #4a4a4a;
+                }
+                .avatar-option-select {
+                    border: 1px solid #ccc;
+                    border-radius: 0.5rem;
+                    padding: 0.4rem 0.6rem;
+                    font-size: 0.85rem;
+                    background-color: #f9f9f9;
+                    cursor: pointer;
+                    transition: border-color 0.2s;
+                }
+                .avatar-option-select:focus {
+                    border-color: #4299e1;
+                    outline: none;
+                    box-shadow: 0 0 0 2px rgba(66, 153, 225, 0.3);
+                }
+
+                .avatar-btn-group {
+                    display: flex;
+                    gap: 0.5rem;
+                    margin-top: 1rem;
+                }
+                .avatar-btn-group button {
+                    flex: 1;
+                }
+                .avatar-btn-primary {
+                    background-color: #4CAF50;
+                    color: white;
+                }
+                .avatar-btn-primary:hover {
+                    background-color: #45a049;
+                }
+                .avatar-btn-secondary {
+                    background-color: #f44336;
+                    color: white;
+                }
+                .avatar-btn-secondary:hover {
+                    background-color: #da190b;
+                }
+
+                .profile-avatar-display {
+                    position: absolute;
+                    top: 1rem;
+                    right: 1rem;
+                    z-index: 10;
+                }
+
+                .profile-avatar-img {
+                    width: 80px;
+                    height: 80px;
+                    border-radius: 50%;
+                    object-fit: cover;
+                    border: 3px solid #8a2be2;
+                    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+                }
+
+                @media (max-width: 768px) {
+                    .auth-modal-content {
+                        max-width: 95%;
+                        padding: 1.5rem;
+                    }
+                    .profile-avatar-img {
+                        width: 60px;
+                        height: 60px;
+                    }
+                }
+
+                #ela-category-view .game-card-buttons button {
+                    background-image: url('wordweaver.png');
+                    background-size: cover;
+                    background-position: center;
+                    background-color: #6a0dad;
+                    background-blend-mode: multiply;
+
+                    color: white;
+                    font-weight: 700;
+                    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+                    border: 2px solid rgba(255, 255, 255, 0.6);
+                    transition: filter 0.2s, transform 0.2s, border-color 0.2s;
+                }
+
+                #ela-category-view .game-card-buttons button:hover {
+                    filter: brightness(1.2);
+                    transform: scale(1.05);
+                    border-color: white;
+                }
+            </style>
+        </head>
+        <body>
+
+            <header class="fixed top-0 left-0 right-0 p-4 flex justify-between items-center z-60">
+                <div id="header-avatar-container" class="w-12 h-12"></div>
+                <nav class="flex space-x-2 items-center">
+                    <button id="loginBtn" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-full font-semibold shadow-md">Login</button>
+                    <button id="signupBtn" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-full font-semibold shadow-md">Sign Up</button>
+                    <button id="profileBtn" class="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded-full font-semibold shadow-md hidden">
+                        Profile
+                    </button>
+                </nav>
+            </header>
+
+            <div id="main-menu-container" class="main-container main-container-with-header-offset">
+                <h1 class="header-title">
+                    SMARTY PANTS Online
+                </h1>
+                <p class="subtitle">
+                    Ready to learn and play? Choose your adventure!
+                </p>
+
+                <div class="grid-layout">
+                    <div class="category-card math">
+                        <img src="math.png" alt="Math Icon" class="category-icon" onerror="this.onerror=null; this.src='https://placehold.co/80x80/FFD700/000000?text=Math';" />
+                        <h2 class="category-title">Math Games</h2>
+                        <p class="category-description">Fun with numbers & logic!</p>
+                        <button class="explore-button" onclick="playClickSound(); showMathCategoryView();">
+                            Explore <span style="margin-left: 0.5rem;">&#x276F;</span> </button>
                     </div>
-                    <div id="emailGroup" class="auth-form-group hidden">
-                        <label for="email" class="auth-label">Email:</label>
-                        <input type="email" id="email" class="auth-input">
+
+                    <div class="category-card science">
+                        <img src="science.png" alt="Science Icon" class="category-icon" onerror="this.onerror=null; this.src='https://placehold.co/80x80/81C784/000000?text=Science';" />
+                        <h2 class="category-title">Science Games</h2>
+                        <p class="category-description">Discover the world around you!</p>
+                        <button class="explore-button" onclick="playClickSound(); showScienceCategoryView();">
+                            Explore <span style="margin-left: 0.5rem;">&#x276F;</span> </button>
                     </div>
-                    <div class="auth-form-group">
-                        <label for="password" class="auth-label">Password:</label>
-                        <input type="password" id="password" class="auth-input" required>
+
+                    <div class="category-card ela">
+                        <img src="abc.png" alt="ELA Icon" class="category-icon" onerror="this.onerror=null; this.src='https://placehold.co/80x80/EF9A9A/000000?text=ABC';" />
+                        <h2 class="category-title">ELA Games</h2>
+                        <p class="category-description">Read, write, and communicate!</p>
+                        <button class="explore-button" onclick="playClickSound(); showElaCategoryView();"> Explore <span style="margin-left: 0.5rem;">&#x276F;</span> </button>
+                    </div>
+
+                    <div class="category-card social-studies">
+                        <img src="socialstudies.png" alt="Social Studies Icon" class="category-icon" onerror="this.onerror=null; this.src='https://placehold.co/80x80/FFA500/000000?text=History';" />
+                        <h2 class="category-title">Social Studies</h2>
+                        <p class="category-description">Explore history and cultures!</p>
+                        <button class="explore-button" onclick="playClickSound(); showSocialStudiesCategoryView();"> Explore <span style="margin-left: 0.5rem;">&#x276F;</span> </button>
                     </div>
                 </div>
 
-                <div id="forgotPasswordFields" class="hidden">
-                    <div class="auth-form-group">
-                        <label for="forgotPasswordEmail" class="auth-label">Enter your email:</label>
-                        <input type="email" id="forgotPasswordEmail" class="auth-input">
-                    </div>
-                </div>
+                <p class="footer-text">
+                    (More games and apps comings soon!!!)
+                </p>
+            </div>
 
-                <button type="button" id="submitAuth" class="auth-submit-btn"></button>
-            </form>
-            <p id="authMessage" class="auth-message"></p>
-            <a href="#" id="forgotPasswordLink" class="text-blue-500 hover:text-blue-700 text-sm mt-2 block text-center">Forgot password?</a>
-            <button id="changeAvatarProfileBtn" class="auth-submit-btn mt-4 bg-purple-500 hover:bg-purple-600 hidden">Change Avatar</button>
-            <button id="logoutBtn" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-full font-semibold shadow-md mt-4 hidden">Logout</button>
-            <button id="closeModalBtn" class="auth-close-btn">Close</button>
+            <div id="math-category-view" class="category-view hidden">
+                <button onclick="playClickSound(); showMainMenu();" class="back-button"> &larr; Back to Main Menu </button>
+                <h1 class="header-title">MATH</h1>
+                <div class="game-list-layout">
+                    <div class="game-list-card">
+                        <h3>Math Challenge</h3>
+                        <p>Test your arithmetic skills!</p>
+                        <div class="game-card-buttons">
+                            <button class="play-game-button" onclick="playClickSound(); showMathGame();">Play Here</button>
+                            <button class="play-game-button-new-window" onclick="playClickSound(); openGameInNewWindow('mathgame.html');">Open in New Window</button>
+                        </div>
+                    </div>
+                    </div>
+            </div>
+
+            <div id="science-category-view" class="category-view hidden">
+                <button onclick="playClickSound(); showMainMenu();" class="back-button"> &larr; Back to Main Menu </button>
+                <h1 class="header-title">SCIENCE</h1>
+                <div class="game-list-layout">
+                    <div class="game-list-card">
+                        <h3>Animal Kingdom Explorer</h3>
+                        <p>Learn about amazing animals!</p>
+                        <div class="game-card-buttons">
+                            <button class="play-game-button" onclick="playClickSound(); showScienceGame();">Play Here</button>
+                            <button class="play-game-button-new-window" onclick="playClickSound(); openGameInNewWindow('animalapp.html');">Open in New Window</button>
+                        </div>
+                    </div>
+                    </div>
+            </div>
+
+            <div id="ela-category-view" class="category-view hidden">
+                <button onclick="playClickSound(); showMainMenu();" class="back-button"> &larr; Back to Main Menu </button>
+                <h1 class="header-title">ELA</h1>
+                <div class="game-list-layout">
+                    <div class="game-list-card" style="background-image: url('wordweaver.png'); background-size: cover; background-position: center;">
+                        <h3 style="color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);">Word Weaver</h3>
+                        <p style="color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);">A fun adventure in vocabulary!</p>
+                        <div class="game-card-buttons">
+                            <button class="play-game-button" onclick="playClickSound(); showElaGame();">Play Here</button>
+                            <button class="play-game-button-new-window" onclick="playClickSound(); openGameInNewWindow('WordWarrior.html');">Open in New Window</button>
+                        </div>
+                    </div>
+                    </div>
+            </div>
+
+            <div id="social-studies-category-view" class="category-view hidden">
+                <button onclick="playClickSound(); showMainMenu();" class="back-button"> &larr; Back to Main Menu </button>
+                <h1 class="header-title">SOCIAL STUDIES</h1>
+                <div class="game-list-layout">
+                    <div class="game-list-card" style="background-image: url('modeSelectScreen.png'); background-size: cover; background-position: center;">
+                        <h3 style="color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);">Presidential Pong</h3>
+                        <p style="color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);">A historic twist on a classic!</p>
+                        <div class="game-card-buttons">
+                            <button class="play-game-button" onclick="playClickSound(); showPongGame();">Play Here</button>
+                            <button class="play-game-button-new-window" onclick="playClickSound(); openGameInNewWindow('ponggame/presidentialpong.html');">Open in New Window</button>
+                        </div>
+                    </div>
+                    </div>
+            </div>
+
+
+            <div id="math-game-view" class="game-iframe-container">
+                <button onclick="playClickSound(); showMainMenu();" class="back-button">
+                    &larr; Back to Main Menu
+                </button>
+                <iframe id="math-game-iframe" src="" title="Math Challenge Game" class="game-iframe"></iframe>
+            </div>
+
+            <div id="science-game-view" class="game-iframe-container">
+                <button onclick="playClickSound(); showMainMenu();" class="back-button">
+                    &larr; Back to Main Menu
+                </button>
+                <iframe id="science-game-iframe" src="" title="Animal Kingdom Explorer" class="game-iframe"></iframe>
+            </div>
+
+            <div id="ela-game-view" class="game-iframe-container">
+                <button onclick="playClickSound(); showMainMenu();" class="back-button">
+                    &larr; Back to Main Menu
+                </button>
+                <iframe id="ela-game-iframe" src="" title="Word Weaver Game" class="game-iframe"></iframe>
+            </div>
+
+            <div id="pong-game-view" class="game-iframe-container">
+                <button onclick="playClickSound(); showMainMenu();" class="back-button">
+                    &larr; Back to Main Menu
+                </button>
+                <iframe id="pong-game-iframe" src="" title="Presidential Pong Game" class="game-iframe"></iframe>
+            </div>
+
+            <audio id="mainClickSoundElement" preload="auto">
+                <source src="click.mp3" type="audio/mpeg">
+                <source src="click.ogg" type="audio/ogg">
+                <source src="click.wav" type="audio/wav"> Your browser does not support the audio element.
+            </audio>
+
+            <div id="authModal" class="auth-modal hidden">
+                <div class="auth-modal-content">
+                    <h2 id="authTitle" class="auth-modal-title"></h2>
+                    <div id="profileAvatarDisplay" class="profile-avatar-display hidden">
+                        <img id="profileAvatarImg" class="profile-avatar-img" alt="User Avatar">
+                    </div>
+                    <form id="authForm" class="space-y-4">
+                        <div id="loginSignupFields">
+                            <div class="auth-form-group">
+                                <label for="username" class="auth-label">Username:</label>
+                                <input type="text" id="username" class="auth-input" required>
+                            </div>
+                            <div id="emailGroup" class="auth-form-group hidden">
+                                <label for="email" class="auth-label">Email:</label>
+                                <input type="email" id="email" class="auth-input">
+                            </div>
+                            <div class="auth-form-group">
+                                <label for="password" class="auth-label">Password:</label>
+                                <input type="password" id="password" class="auth-input" required>
+                            </div>
+                        </div>
+
+                        <div id="forgotPasswordFields" class="hidden">
+                            <div class="auth-form-group">
+                                <label for="forgotPasswordEmail" class="auth-label">Enter your email:</label>
+                                <input type="email" id="forgotPasswordEmail" class="auth-input">
+                            </div>
+                        </div>
+
+                        <button type="button" id="submitAuth" class="auth-submit-btn"></button>
+                    </form>
+                    <p id="authMessage" class="auth-message"></p>
+                    <a href="#" id="forgotPasswordLink" class="text-blue-500 hover:text-blue-700 text-sm mt-2 block text-center">Forgot password?</a>
+                    <button id="changeAvatarProfileBtn" class="auth-submit-btn mt-4 bg-purple-500 hover:bg-purple-600 hidden">Change Avatar</button>
+                    <button id="logoutBtn" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-full font-semibold shadow-md mt-4 hidden">Logout</button>
+                    <button id="closeModalBtn" class="auth-close-btn">Close</button>
                 </div>
             </div>
 
@@ -862,13 +861,7 @@
 
                 const mainClickSoundElement = document.getElementById('mainClickSoundElement');
 
-                // Global constants (moved to top of script)
-                const BACKEND_URL = 'https://smartypantsbe.onrender.com/user';
-                const AVATAR_PROXY_URL = 'https://avataaars.io/?avatarStyle=Circle&topType=ShortHairDreads02&hairColor=Black&facialHairType=MoustacheMagnum&facialHairColor=Black&noseType=Default&eyeType=Squint&eyebrowType=FrownNatural&mouthType=Concerned&skinColor=DarkBrown&clotheType=Hoodie&clotheColor=Blue01&graphicType=Skull&accessoriesType=Prescription02'; // Removed proxy URL, reverted to direct avataaars.io
-
-                // Function Definitions (moved to top of script)
                 function playClickSound() {
-                    console.log("playClickSound called."); // Debugging log
                     if (mainClickSoundElement) {
                         mainClickSoundElement.currentTime = 0;
                         mainClickSoundElement.play().catch(e => {
@@ -879,8 +872,9 @@
                     }
                 }
 
+                // --- View Management Functions ---
+
                 function hideAllViews() {
-                    console.log("hideAllViews called."); // Debugging log
                     mainMenuContainer.style.display = 'none';
                     mathCategoryView.classList.add('hidden');
                     scienceCategoryView.classList.add('hidden');
@@ -893,7 +887,6 @@
                 }
 
                 function showMainMenu() {
-                    console.log("showMainMenu called."); // Debugging log
                     hideAllViews();
                     mainMenuContainer.style.display = 'block';
                     mathGameIframe.src = '';
@@ -903,36 +896,33 @@
                     document.body.style.overflow = 'auto';
                 }
 
+                // --- Show Category View Functions ---
                 function showMathCategoryView() {
-                    console.log("showMathCategoryView called."); // Debugging log
                     hideAllViews();
                     mathCategoryView.classList.remove('hidden');
                     document.body.style.overflow = 'auto';
                 }
 
                 function showScienceCategoryView() {
-                    console.log("showScienceCategoryView called."); // Debugging log
                     hideAllViews();
                     scienceCategoryView.classList.remove('hidden');
                     document.body.style.overflow = 'auto';
                 }
 
                 function showElaCategoryView() {
-                    console.log("showElaCategoryView called."); // Debugging log
                     hideAllViews();
                     elaCategoryView.classList.remove('hidden');
                     document.body.style.overflow = 'auto';
                 }
 
                 function showSocialStudiesCategoryView() {
-                    console.log("showSocialStudiesCategoryView called."); // Debugging log
                     hideAllViews();
                     socialStudiesCategoryView.classList.remove('hidden');
                     document.body.style.overflow = 'auto';
                 }
 
+                // --- Show Game View Functions ---
                 function showMathGame() {
-                    console.log("showMathGame called."); // Debugging log
                     hideAllViews();
                     mathGameView.style.display = 'flex';
                     mathGameIframe.src = 'mathgame.html';
@@ -940,7 +930,6 @@
                 }
 
                 function showScienceGame() {
-                    console.log("showScienceGame called."); // Debugging log
                     hideAllViews();
                     scienceGameView.style.display = 'flex';
                     scienceGameIframe.src = 'animalapp.html';
@@ -948,7 +937,6 @@
                 }
 
                 function showElaGame() {
-                    console.log("showElaGame called."); // Debugging log
                     hideAllViews();
                     elaGameView.style.display = 'flex';
                     elaGameIframe.src = 'WordWarrior.html';
@@ -956,23 +944,88 @@
                 }
 
                 function showPongGame() {
-                    console.log("showPongGame called."); // Debugging log
                     hideAllViews();
                     pongGameView.style.display = 'flex';
                     pongGameIframe.src = 'webgames/pong/presidentialpong.html';
                     document.body.style.overflow = 'hidden';
                 }
 
+                // NEW: Function to open a game in a new window
                 function openGameInNewWindow(gameUrl) {
-                    console.log("openGameInNewWindow called with URL:", gameUrl); // Debugging log
                     window.open(gameUrl, '_blank');
                 }
 
+                // --- DOMContentLoaded and Auth Logic ---
+                document.addEventListener('DOMContentLoaded', () => {
+                    showMainMenu();
+                    updateAuthButtons();
+
+                    const changeAvatarProfileBtn = document.getElementById('changeAvatarProfileBtn');
+                    if (changeAvatarProfileBtn) {
+                        changeAvatarProfileBtn.addEventListener('click', () => {
+                            playClickSound();
+                            authModal.classList.add('hidden');
+                            const user = JSON.parse(localStorage.getItem('user'));
+                            showAvatarCreatorModal(user.avatar_config || {});
+                        });
+                    }
+                    initializeAvatarCreatorOptions();
+                });
+
+                const loginBtn = document.getElementById('loginBtn');
+                const signupBtn = document.getElementById('signupBtn');
+                const profileBtn = document.getElementById('profileBtn');
+                const logoutBtn = document.getElementById('logoutBtn');
+                const authModal = document.getElementById('authModal');
+                const authTitle = document.getElementById('authTitle');
+                const authForm = document.getElementById('authForm');
+                const usernameInput = document.getElementById('username');
+                const emailInput = document.getElementById('email');
+                const passwordInput = document.getElementById('password');
+                const submitAuthBtn = document.getElementById('submitAuth');
+                const authMessage = document.getElementById('authMessage');
+                const closeModalBtn = document.getElementById('closeModalBtn');
+                const emailGroup = document.getElementById('emailGroup');
+                const loginSignupFields = document.getElementById('loginSignupFields');
+                const forgotPasswordFields = document.getElementById('forgotPasswordFields');
+                const forgotPasswordEmailInput = document.getElementById('forgotPasswordEmail');
+                const forgotPasswordLink = document.getElementById('forgotPasswordLink');
+                const changeAvatarProfileBtn = document.getElementById('changeAvatarProfileBtn');
+
+                const avatarModal = document.getElementById('avatarModal');
+                const avatarPreview = document.getElementById('avatarPreview');
+                const generateRandomAvatarBtn = document.getElementById('generateRandomAvatarBtn');
+                const saveAvatarBtn = document.getElementById('saveAvatarBtn');
+                const closeAvatarModalBtn = document.getElementById('closeAvatarModalBtn');
+                const avatarMessage = document.getElementById('avatarMessage');
+                const avatarOptionsContainer = document.getElementById('avatarOptionsContainer');
+                const avatarStyleSelect = document.getElementById('avatarStyleSelect');
+                const topTypeSelect = document.getElementById('topTypeSelect');
+                const topColorSelect = document.getElementById('topColorSelect');
+                const hairColorSelect = document.getElementById('hairColorSelect');
+                const facialHairTypeSelect = document.getElementById('facialHairTypeSelect');
+                const facialHairColorSelect = document.getElementById('facialHairColorSelect');
+                const eyeTypeSelect = document.getElementById('eyeTypeSelect');
+                const eyebrowTypeSelect = document.getElementById('eyebrowTypeSelect');
+                const mouthTypeSelect = document.getElementById('mouthTypeSelect');
+                const skinColorSelect = document.getElementById('skinColorSelect');
+                const clotheTypeSelect = document.getElementById('clotheTypeSelect');
+                const clotheColorSelect = document.getElementById('clotheColorSelect');
+                const graphicTypeSelect = document.getElementById('graphicTypeSelect');
+                const accessoriesTypeSelect = document.getElementById('accessoriesTypeSelect');
+
+                const topColorGroup = document.getElementById('topColorGroup');
+                const facialHairColorGroup = document.getElementById('facialHairColorGroup');
+                const graphicTypeGroup = document.getElementById('graphicTypeGroup');
+                const profileAvatarDisplay = document.getElementById('profileAvatarDisplay');
+                const profileAvatarImg = document.getElementById('profileAvatarImg');
+                const headerAvatarContainer = document.getElementById('header-avatar-container');
+
+                const BACKEND_URL = 'https://smartypantsbe.onrender.com/user';
+
                 function updateAuthButtons() {
-                    console.log("updateAuthButtons called."); // Debugging log
                     const token = localStorage.getItem('token');
                     const user = JSON.parse(localStorage.getItem('user'));
-                    console.log("updateAuthButtons - token:", token, "user:", user); // Debugging log
 
                     loginBtn.classList.toggle('hidden', !!token);
                     signupBtn.classList.toggle('hidden', !!token);
@@ -992,7 +1045,6 @@
                 }
 
                 function showLoginForm() {
-                    console.log("showLoginForm called."); // Debugging log
                     authTitle.textContent = 'Login';
                     submitAuthBtn.textContent = 'Login';
                     authForm.dataset.currentAction = 'login';
@@ -1011,7 +1063,6 @@
                 }
 
                 function showSignupForm() {
-                    console.log("showSignupForm called."); // Debugging log
                     authTitle.textContent = 'Sign Up';
                     submitAuthBtn.textContent = 'Sign Up';
                     authForm.dataset.currentAction = 'signup';
@@ -1030,7 +1081,6 @@
                 }
 
                 function showForgotPasswordForm() {
-                    console.log("showForgotPasswordForm called."); // Debugging log
                     authTitle.textContent = 'Forgot Password';
                     submitAuthBtn.textContent = 'Send Reset Link';
                     authForm.dataset.currentAction = 'forgot-password';
@@ -1046,8 +1096,9 @@
                     logoutBtn.classList.add('hidden');
                 }
 
+                let currentAvatarConfig = {};
+
                 function showAvatarCreatorModal(userAvatarConfig = {}) {
-                    console.log("showAvatarCreatorModal called with config:", userAvatarConfig); // Debugging log
                     authModal.classList.add('hidden');
                     avatarModal.classList.remove('hidden');
                     avatarMessage.textContent = '';
@@ -1063,12 +1114,29 @@
                 }
 
                 function hideAvatarCreatorModal() {
-                    console.log("hideAvatarCreatorModal called."); // Debugging log
                     avatarModal.classList.add('hidden');
                 }
 
+                const avatarFeatures = {
+                    avatarStyle: ['Circle', 'Transparent'],
+                    topType: ['NoHair', 'Eyepatch', 'Hat', 'Hijab', 'Turban', 'WinterHat1', 'WinterHat2', 'WinterHat3', 'WinterHat4', 'LongHairBigHair', 'LongHairBob', 'LongHairBun', 'LongHairCurly', 'LongHairCurvy', 'LongHairDreads', 'LongHairFrida', 'LongHairFro', 'LongHairMiaWallace', 'LongHairStraight', 'LongHairStraight2', 'LongHairStraightStrand', 'ShortHairDreads01', 'ShortHairDreads02', 'ShortHairFrizzle', 'ShortHairShaggy', 'ShortHairShaggyMullet', 'ShortHairShortCurly', 'ShortHairShortFlat', 'ShortHairShortRound', 'ShortHairShortWaved', 'ShortHairSides', 'ShortHairTheCaesar', 'ShortHairTheCaesarSidePart'],
+                    hairColor: ['Auburn', 'Black', 'Blonde', 'BlondeGolden', 'Brown', 'BrownDark', 'PastelPink', 'Platinum', 'Red', 'SilverGray'],
+                    hatColor: ['Black', 'Blue01', 'Blue02', 'Blue03', 'Gray01', 'Gray02', 'Heather', 'PastelBlue', 'PastelGreen', 'PastelOrange', 'PastelRed', 'PastelYellow', 'Pink', 'Red', 'White'],
+                    facialHairType: ['Blank', 'BeardLight', 'BeardMajestic', 'MoustacheFancy', 'MoustacheMagnum'],
+                    facialHairColor: ['Auburn', 'Black', 'Blonde', 'BlondeGolden', 'Brown', 'BrownDark', 'PastelPink', 'Platinum', 'Red', 'SilverGray'],
+                    noseType: ['Default'],
+                    eyeType: ['Default', 'Close', 'Cry', 'Dizzy', 'EyeRoll', 'Happy', 'Hearts', 'Side', 'Squint', 'Surprised', 'Wink', 'WinkWacky'],
+                    eyebrowType: ['Default', 'Angry', 'AngryNatural', 'FlatNatural', 'FrownNatural', 'RaisedExcited', 'RaisedExcitedNatural', 'SadConcerned', 'SadConcernedNatural', 'UnibrowNatural', 'Updown', 'UpDownNatural'],
+                    mouthType: ['Default', 'Smile', 'Concerned', 'Disbelief', 'Eating', 'Grimace', 'Sad', 'Twinkle'],
+                    skinColor: ['Tanned', 'Yellow', 'Pale', 'Light', 'Brown', 'DarkBrown', 'Black'],
+                    clotheType: ['BlazerShirt', 'BlazerSweater', 'CollarSweater', 'GraphicShirt', 'Hoodie', 'Overall', 'ShirtCrewNeck', 'ShirtScoopNeck', 'ShirtVNeck'],
+                    clotheColor: ['Black', 'Blue01', 'Blue02', 'Blue03', 'Gray01', 'Gray02', 'Heather', 'PastelBlue', 'PastelGreen', 'PastelOrange', 'PastelRed', 'PastelYellow', 'Pink', 'Red', 'White'],
+                    graphicType: ['Bat', 'Cumbia', 'Deer', 'Diamond', 'Hola', 'Pizza', 'Resist', 'Selena', 'Bear', 'Skull', 'SkullOutline'],
+                    accessoriesType: ['Blank', 'Prescription01', 'Prescription02', 'Round', 'Sunglasses', 'Wayfarers'],
+                    topColor: ['Black', 'Blue01', 'Blue02', 'Blue03', 'Gray01', 'Gray02', 'Heather', 'PastelBlue', 'PastelGreen', 'PastelOrange', 'PastelRed', 'PastelYellow', 'Pink', 'Red', 'White'],
+                };
+
                 function generateRandomAvatarConfig() {
-                    console.log("generateRandomAvatarConfig called."); // Debugging log
                     const randomConfig = {};
                     const hatTypes = ['Hat', 'Turban', 'WinterHat1', 'WinterHat2', 'WinterHat3', 'WinterHat4'];
 
@@ -1098,8 +1166,8 @@
                     return randomConfig;
                 }
 
+
                 function updateAvatarPreview(config) {
-                    console.log("updateAvatarPreview called with config:", config); // Debugging log
                     const queryParams = new URLSearchParams(config).toString();
                     avatarPreview.src = `https://avataaars.io/?${queryParams}`;
                     avatarPreview.parentElement.style.backgroundColor = 'transparent';
@@ -1113,7 +1181,6 @@
                 }
 
                 function populateSelect(selectElement, featureArray) {
-                    console.log("populateSelect called for:", selectElement.id); // Debugging log
                     selectElement.innerHTML = '';
                     featureArray.forEach(value => {
                         let text = value.replace(/([A-Z])/g, ' $1').replace(/([0-9])/, ' $1').trim();
@@ -1127,7 +1194,6 @@
                 }
 
                 function handleConditionalAvatarFields() {
-                    console.log("handleConditionalAvatarFields called."); // Debugging log
                     const topType = currentAvatarConfig.topType;
                     const hatTypes = ['Hat', 'Turban', 'WinterHat1', 'WinterHat2', 'WinterHat3', 'WinterHat4'];
                     const hijabType = 'Hijab';
@@ -1183,7 +1249,6 @@
 
 
                 function initializeAvatarCreatorOptions() {
-                    console.log("initializeAvatarCreatorOptions called."); // Debugging log
                     populateSelect(avatarStyleSelect, avatarFeatures.avatarStyle);
                     populateSelect(topTypeSelect, avatarFeatures.topType);
                     populateSelect(topColorSelect, avatarFeatures.topColor);
@@ -1199,9 +1264,10 @@
                     populateSelect(graphicTypeSelect, avatarFeatures.graphicType);
                     populateSelect(accessoriesTypeSelect, avatarFeatures.accessoriesType);
 
-                    // Event listeners for avatar options
                     avatarStyleSelect.addEventListener('change', (event) => { currentAvatarConfig.avatarStyle = event.target.value; handleConditionalAvatarFields(); });
                     topTypeSelect.addEventListener('change', (event) => { currentAvatarConfig.topType = event.target.value; handleConditionalAvatarFields(); });
+
+                    // This listener now handles both hat and top colors
                     topColorSelect.addEventListener('change', (event) => {
                         const selectedColor = event.target.value;
                         const hatTypes = ['Hat', 'Turban', 'WinterHat1', 'WinterHat2', 'WinterHat3', 'WinterHat4'];
@@ -1212,6 +1278,7 @@
                         }
                         updateAvatarPreview(currentAvatarConfig);
                     });
+
                     hairColorSelect.addEventListener('change', (event) => { currentAvatarConfig.hairColor = event.target.value; updateAvatarPreview(currentAvatarConfig); });
                     facialHairTypeSelect.addEventListener('change', (event) => { currentAvatarConfig.facialHairType = event.target.value; handleConditionalAvatarFields(); });
                     facialHairColorSelect.addEventListener('change', (event) => { currentAvatarConfig.facialHairColor = event.target.value; updateAvatarPreview(currentAvatarConfig); });
@@ -1226,7 +1293,6 @@
                 }
 
                 function setAvatarCreatorOptions(config) {
-                    console.log("setAvatarCreatorOptions called with config:", config); // Debugging log
                     avatarStyleSelect.value = config.avatarStyle || avatarFeatures.avatarStyle[0];
                     topTypeSelect.value = config.topType || avatarFeatures.topType[0];
 
@@ -1253,372 +1319,294 @@
                     handleConditionalAvatarFields();
                 }
 
-                // --- DOMContentLoaded Event Listener ---
-                document.addEventListener('DOMContentLoaded', () => {
-                    console.log("DOMContentLoaded fired - script execution started."); // Debugging log
 
-                    // --- Element References (Moved to top of DOMContentLoaded) ---
-                    // These need to be declared *before* they are used in event listeners or other functions.
-                    // If they are only used inside DOMContentLoaded, they can stay there.
-                    // If used outside, they need to be global or passed as arguments.
-                    const loginBtn = document.getElementById('loginBtn');
-                    const signupBtn = document.getElementById('signupBtn');
-                    const profileBtn = document.getElementById('profileBtn');
-                    const logoutBtn = document.getElementById('logoutBtn');
-                    const authModal = document.getElementById('authModal');
-                    const authTitle = document.getElementById('authTitle');
-                    const authForm = document.getElementById('authForm');
-                    const usernameInput = document.getElementById('username');
-                    const emailInput = document.getElementById('email');
-                    const passwordInput = document.getElementById('password');
-                    const submitAuthBtn = document.getElementById('submitAuth');
-                    const authMessage = document.getElementById('authMessage');
-                    const closeModalBtn = document.getElementById('closeModalBtn');
-                    const emailGroup = document.getElementById('emailGroup');
-                    const loginSignupFields = document.getElementById('loginSignupFields');
-                    const forgotPasswordFields = document.getElementById('forgotPasswordFields');
-                    const forgotPasswordEmailInput = document.getElementById('forgotPasswordEmail');
-                    const forgotPasswordLink = document.getElementById('forgotPasswordLink');
-                    const changeAvatarProfileBtn = document.getElementById('changeAvatarProfileBtn');
-
-                    const avatarModal = document.getElementById('avatarModal');
-                    const avatarPreview = document.getElementById('avatarPreview');
-                    const generateRandomAvatarBtn = document.getElementById('generateRandomAvatarBtn');
-                    const saveAvatarBtn = document.getElementById('saveAvatarBtn');
-                    const closeAvatarModalBtn = document.getElementById('closeAvatarModalBtn');
-                    const avatarMessage = document.getElementById('avatarMessage');
-                    const avatarOptionsContainer = document.getElementById('avatarOptionsContainer');
-                    const avatarStyleSelect = document.getElementById('avatarStyleSelect');
-                    const topTypeSelect = document.getElementById('topTypeSelect');
-                    const topColorSelect = document.getElementById('topColorSelect');
-                    const hairColorSelect = document.getElementById('hairColorSelect');
-                    const facialHairTypeSelect = document.getElementById('facialHairTypeSelect');
-                    const facialHairColorSelect = document.getElementById('facialHairColorSelect');
-                    const eyeTypeSelect = document.getElementById('eyeTypeSelect');
-                    const eyebrowTypeSelect = document.getElementById('eyebrowTypeSelect');
-                    const mouthTypeSelect = document.getElementById('mouthTypeSelect');
-                    const skinColorSelect = document.getElementById('skinColorSelect');
-                    const clotheTypeSelect = document.getElementById('clotheTypeSelect');
-                    const clotheColorSelect = document.getElementById('clotheColorSelect');
-                    const graphicTypeSelect = document.getElementById('graphicTypeSelect');
-                    const accessoriesTypeSelect = document.getElementById('accessoriesTypeSelect');
-
-                    const topColorGroup = document.getElementById('topColorGroup');
-                    const facialHairColorGroup = document.getElementById('facialHairColorGroup');
-                    const graphicTypeGroup = document.getElementById('graphicTypeGroup');
-                    const profileAvatarDisplay = document.getElementById('profileAvatarDisplay');
-                    const profileAvatarImg = document.getElementById('profileAvatarImg');
-                    const headerAvatarContainer = document.getElementById('header-avatar-container');
-
-
-                    // Initial setup calls
-                    console.log("DOMContentLoaded - Calling showMainMenu and updateAuthButtons."); // Debugging log
-                    showMainMenu();
-                    updateAuthButtons();
-
-                    // Attach event listeners for main header buttons
-                    loginBtn.addEventListener('click', () => {
-                        playClickSound();
-                        showLoginForm();
-                        authModal.classList.remove('hidden');
-                    });
-
-                    signupBtn.addEventListener('click', () => {
-                        playClickSound();
-                        showSignupForm();
-                        authModal.classList.remove('hidden');
-                    });
-
-                    profileBtn.addEventListener('click', () => {
-                        playClickSound();
-                        const user = JSON.parse(localStorage.getItem('user'));
-                        console.log("profileBtn click - User object from localStorage:", user); // Debugging log
-
-                        authMessage.textContent = '';
-                        authMessage.style.color = 'black';
-                        submitAuthBtn.classList.add('hidden');
-                        loginSignupFields.classList.add('hidden');
-                        forgotPasswordFields.classList.add('hidden');
-                        forgotPasswordLink.classList.add('hidden');
-                        if (changeAvatarProfileBtn) changeAvatarProfileBtn.classList.add('hidden');
-                        profileAvatarDisplay.classList.add('hidden');
-                        logoutBtn.classList.add('hidden');
-
-                        if (!user) {
-                            authMessage.textContent = 'Please log in to view your profile.';
-                            authMessage.style.color = 'red';
-                            authModal.classList.remove('hidden');
-                            showLoginForm();
-                            return;
-                        }
-
-                        if (user.has_created_avatar === false || user.has_created_avatar === undefined || user.has_created_avatar === null) {
-                            showAvatarCreatorModal(user.avatar_config || {});
-                        } else {
-                            authTitle.textContent = 'User Profile';
-                            authMessage.textContent = `Welcome, ${user.username}!\nBadges: ${user.badges && user.badges.length > 0 ? user.badges.join(', ') : 'None'}`;
-                            authModal.classList.remove('hidden');
-
-                            if (changeAvatarProfileBtn) changeAvatarProfileBtn.classList.remove('hidden');
-                            logoutBtn.classList.remove('hidden');
-
-                            if (user.avatar_config && Object.keys(user.avatar_config).length > 0) {
-                                const avatarUrl = `https://avataaars.io/?${new URLSearchParams(user.avatar_config).toString()}`;
-                                profileAvatarImg.src = avatarUrl;
-                                profileAvatarDisplay.classList.remove('hidden');
-                            }
-                        }
-                    });
-
-                    // Attach event listeners for category explore buttons
-                    document.getElementById('exploreMathBtn').addEventListener('click', () => {
-                        playClickSound();
-                        showMathCategoryView();
-                    });
-                    document.getElementById('exploreScienceBtn').addEventListener('click', () => {
-                        playClickSound();
-                        showScienceCategoryView();
-                    });
-                    document.getElementById('exploreElaBtn').addEventListener('click', () => {
-                        playClickSound();
-                        showElaCategoryView();
-                    });
-                    document.getElementById('exploreSocialStudiesBtn').addEventListener('click', () => {
-                        playClickSound();
-                        showSocialStudiesCategoryView();
-                    });
-
-                    // Attach event listeners for game play buttons
-                    document.getElementById('playMathGameBtn').addEventListener('click', () => {
-                        playClickSound();
-                        showMathGame();
-                    });
-                    document.getElementById('playScienceGameBtn').addEventListener('click', () => {
-                        playClickSound();
-                        showScienceGame();
-                    });
-                    document.getElementById('playElaGameBtn').addEventListener('click', () => {
-                        playClickSound();
-                        showElaGame();
-                    });
-                    document.getElementById('playPongGameBtn').addEventListener('click', () => {
-                        playClickSound();
-                        showPongGame();
-                    });
-
-                    // Attach event listeners for "Open in New Window" buttons
-                    document.querySelectorAll('.play-game-button-new-window').forEach(button => {
-                        button.addEventListener('click', (event) => {
-                            // Extract URL from data-game-url attribute instead of onclick
-                            const gameUrl = event.target.dataset.gameUrl;
-                            playClickSound();
-                            openGameInNewWindow(gameUrl);
-                        });
-                    });
-
-                    // Attach event listeners for Back buttons
-                    document.getElementById('backFromMathBtn').addEventListener('click', () => {
-                        playClickSound();
-                        showMainMenu();
-                    });
-                    document.getElementById('backFromScienceBtn').addEventListener('click', () => {
-                        playClickSound();
-                        showMainMenu();
-                    });
-                    document.getElementById('backFromElaBtn').addEventListener('click', () => {
-                        playClickSound();
-                        showMainMenu();
-                    });
-                    document.getElementById('backFromSocialStudiesBtn').addEventListener('click', () => {
-                        playClickSound();
-                        showMainMenu();
-                    });
-                    document.getElementById('backFromMathGameBtn').addEventListener('click', () => {
-                        playClickSound();
-                        showMainMenu();
-                    });
-                    document.getElementById('backFromScienceGameBtn').addEventListener('click', () => {
-                        playClickSound();
-                        showMainMenu();
-                    });
-                    document.getElementById('backFromElaGameBtn').addEventListener('click', () => {
-                        playClickSound();
-                        showMainMenu();
-                    });
-                    document.getElementById('backFromPongGameBtn').addEventListener('click', () => {
-                        playClickSound();
-                        showMainMenu();
-                    });
-
-                    // Attach event listeners for auth modal buttons
-                    document.getElementById('changeAvatarProfileBtn').addEventListener('click', () => {
-                        playClickSound();
-                        authModal.classList.add('hidden');
-                        const user = JSON.parse(localStorage.getItem('user'));
-                        showAvatarCreatorModal(user.avatar_config || {});
-                    });
-
-                    forgotPasswordLink.addEventListener('click', (e) => {
-                        e.preventDefault();
-                        playClickSound();
-                        showForgotPasswordForm();
-                    });
-
-                    closeModalBtn.addEventListener('click', () => {
-                        playClickSound();
-                        if (changeAvatarProfileBtn) changeAvatarProfileBtn.classList.add('hidden');
-                        profileAvatarDisplay.classList.add('hidden');
-                        logoutBtn.classList.add('hidden');
-                        authModal.classList.add('hidden');
-                        authMessage.textContent = '';
-                        showLoginForm();
-                    });
-
-                    logoutBtn.addEventListener('click', () => {
-                        playClickSound();
-                        localStorage.removeItem('token');
-                        localStorage.removeItem('user');
-                        updateAuthButtons();
-                        authMessage.textContent = 'You have been logged out.';
-                        authMessage.style.color = 'blue';
-                        authModal.classList.remove('hidden');
-                        authTitle.textContent = 'Logout';
-                        submitAuthBtn.classList.add('hidden');
-                        loginSignupFields.classList.add('hidden');
-                        forgotPasswordFields.classList.add('hidden');
-                        forgotPasswordLink.classList.add('hidden');
-                        profileAvatarDisplay.classList.add('hidden');
-                        logoutBtn.classList.add('hidden');
-                        setTimeout(() => {
-                            authModal.classList.add('hidden');
-                            authMessage.textContent = '';
-                        }, 2000);
-                    });
-
-                    // Attach event listeners for avatar modal buttons
-                    closeAvatarModalBtn.addEventListener('click', () => {
-                        playClickSound();
-                        hideAvatarCreatorModal();
-                    });
-
-                    generateRandomAvatarBtn.addEventListener('click', () => {
-                        playClickSound();
-                        currentAvatarConfig = generateRandomAvatarConfig();
-                        updateAvatarPreview(currentAvatarConfig);
-                        avatarMessage.textContent = 'New random avatar generated!';
-                        avatarMessage.style.color = 'gray';
-                        setAvatarCreatorOptions(currentAvatarConfig);
-                    });
-
-                    saveAvatarBtn.addEventListener('click', async () => {
-                        playClickSound();
-                        avatarMessage.textContent = 'Saving avatar...';
-                        avatarMessage.style.color = 'gray';
-                        saveAvatarBtn.disabled = true;
-
-                        const user = JSON.parse(localStorage.getItem('user'));
-                        console.log('Save Avatar: User from localStorage before saving:', user);
-
-                        if (!user || !user._id) {
-                            avatarMessage.textContent = 'Error: User not logged in.';
-                            avatarMessage.style.color = 'red';
-                            saveAvatarBtn.disabled = false;
-                            hideAvatarCreatorModal();
-                            console.error('Save Avatar: User not found or _id missing. Hiding avatar modal.');
-                            return;
-                        }
-
-                        console.log('Save Avatar: Current avatar config being sent:', currentAvatarConfig);
-                        try {
-                            const response = await fetch(`${BACKEND_URL}/avatar/${user._id}`, {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json',
-                                },
-                                body: JSON.stringify(currentAvatarConfig)
-                            });
-
-                            console.log('Save Avatar: Fetch response received. Status:', response.status, response.statusText);
-
-                            if (!response.ok) {
-                                const errorData = await response.json().catch(() => ({ message: 'Could not parse error response.' }));
-                                avatarMessage.textContent = errorData.message || `Error saving avatar: ${response.status} ${response.statusText}`;
-                                avatarMessage.style.color = 'red';
-                                console.error('Save Avatar: Server responded with error:', response.status, errorData);
-                                return;
-                            }
-
-                            const data = await response.json();
-                            console.log('Save Avatar: Parsed response data:', data);
-
-                            if (data.status === "Success") {
-                                avatarMessage.textContent = data.message;
-                                avatarMessage.style.color = 'green';
-
-                                // Get the full user object from storage
-                                const existingUser = JSON.parse(localStorage.getItem('user'));
-
-                                // Merge the updates from the server response into the existing user object
-                                const updatedUser = {
-                                    ...existingUser, // Keeps old avatar_config if not explicitly returned
-                                    ...data.data     // Overwrites with fresh data from the avatar save response
-                                };
-
-                                // Save the complete, merged user object back to localStorage
-                                localStorage.setItem('user', JSON.stringify(updatedUser));
-                                console.log('Save Avatar: User data updated in localStorage:', updatedUser);
-
-                                // Now, reliably update the UI by calling the main function
-                                updateAuthButtons();
-
-                                setTimeout(() => {
-                                    hideAvatarCreatorModal();
-                                }, 1000);
-
-                            } else {
-                                avatarMessage.textContent = data.message || 'An application error occurred (backend status not Success).';
-                                avatarMessage.style.color = 'red';
-                            }
-                        } catch (error) {
-                            console.error('Save Avatar: Network error or JSON parse error:', error);
-                            avatarMessage.textContent = 'Network error saving avatar. Please try again.';
-                            avatarMessage.style.color = 'red';
-                        } finally {
-                            saveAvatarBtn.disabled = false;
-                            console.log('Save Avatar: Save button re-enabled.');
-                        }
-                    });
-
-                    authForm.addEventListener('submit', handleAuthSubmission);
-                    submitAuthBtn.addEventListener('click', handleAuthSubmission);
-
-                    // Attach event listeners for avatar option selects
-                    avatarStyleSelect.addEventListener('change', (event) => { currentAvatarConfig.avatarStyle = event.target.value; handleConditionalAvatarFields(); });
-                    topTypeSelect.addEventListener('change', (event) => { currentAvatarConfig.topType = event.target.value; handleConditionalAvatarFields(); });
-                    topColorSelect.addEventListener('change', (event) => {
-                        const selectedColor = event.target.value;
-                        const hatTypes = ['Hat', 'Turban', 'WinterHat1', 'WinterHat2', 'WinterHat3', 'WinterHat4'];
-                        if (hatTypes.includes(currentAvatarConfig.topType)) {
-                            currentAvatarConfig.hatColor = selectedColor;
-                        } else if (currentAvatarConfig.topType === 'Hijab') {
-                            currentAvatarConfig.topColor = selectedColor;
-                        }
-                        updateAvatarPreview(currentAvatarConfig);
-                    });
-                    hairColorSelect.addEventListener('change', (event) => { currentAvatarConfig.hairColor = event.target.value; updateAvatarPreview(currentAvatarConfig); });
-                    facialHairTypeSelect.addEventListener('change', (event) => { currentAvatarConfig.facialHairType = event.target.value; handleConditionalAvatarFields(); });
-                    facialHairColorSelect.addEventListener('change', (event) => { currentAvatarConfig.facialHairColor = event.target.value; updateAvatarPreview(currentAvatarConfig); });
-                    eyeTypeSelect.addEventListener('change', (event) => { currentAvatarConfig.eyeType = event.target.value; updateAvatarPreview(currentAvatarConfig); });
-                    eyebrowTypeSelect.addEventListener('change', (event) => { currentAvatarConfig.eyebrowType = event.target.value; updateAvatarPreview(currentAvatarConfig); });
-                    mouthTypeSelect.addEventListener('change', (event) => { currentAvatarConfig.mouthType = event.target.value; updateAvatarPreview(currentAvatarConfig); });
-                    skinColorSelect.addEventListener('change', (event) => { currentAvatarConfig.skinColor = event.target.value; updateAvatarPreview(currentAvatarConfig); });
-                    clotheTypeSelect.addEventListener('change', (event) => { currentAvatarConfig.clotheType = event.target.value; handleConditionalAvatarFields(); });
-                    clotheColorSelect.addEventListener('change', (event) => { currentAvatarConfig.clotheColor = event.target.value; updateAvatarPreview(currentAvatarConfig); });
-                    graphicTypeSelect.addEventListener('change', (event) => { currentAvatarConfig.graphicType = event.target.value; updateAvatarPreview(currentAvatarConfig); });
-                    accessoriesTypeSelect.addEventListener('change', (event) => { currentAvatarConfig.accessoriesType = event.target.value; updateAvatarPreview(currentAvatarConfig); });
-
-                    initializeAvatarCreatorOptions(); // Call this here to ensure it runs after all elements are available
+                loginBtn.addEventListener('click', () => {
+                    playClickSound();
+                    showLoginForm();
+                    authModal.classList.remove('hidden');
                 });
+
+                signupBtn.addEventListener('click', () => {
+                    playClickSound();
+                    showSignupForm();
+                    authModal.classList.remove('hidden');
+                });
+
+                profileBtn.addEventListener('click', () => {
+                    playClickSound();
+                    const user = JSON.parse(localStorage.getItem('user'));
+                    console.log("User object from localStorage on profile click:", user);
+
+                    authMessage.textContent = '';
+                    authMessage.style.color = 'black';
+                    submitAuthBtn.classList.add('hidden');
+                    loginSignupFields.classList.add('hidden');
+                    forgotPasswordFields.classList.add('hidden');
+                    forgotPasswordLink.classList.add('hidden');
+                    if (changeAvatarProfileBtn) changeAvatarProfileBtn.classList.add('hidden');
+                    profileAvatarDisplay.classList.add('hidden');
+                    logoutBtn.classList.add('hidden');
+
+                    if (!user) {
+                        authMessage.textContent = 'Please log in to view your profile.';
+                        authMessage.style.color = 'red';
+                        authModal.classList.remove('hidden');
+                        showLoginForm();
+                        return;
+                    }
+
+                    if (user.has_created_avatar === false || user.has_created_avatar === undefined || user.has_created_avatar === null) {
+                        showAvatarCreatorModal(user.avatar_config || {});
+                    } else {
+                        authTitle.textContent = 'User Profile';
+                        // Updated line to remove "Coins" and "Avatar saved", and use "Welcome (username)"
+                        authMessage.textContent = `Welcome, ${user.username}!\nBadges: ${user.badges && user.badges.length > 0 ? user.badges.join(', ') : 'None'}`;
+                        authModal.classList.remove('hidden');
+
+                        if (changeAvatarProfileBtn) changeAvatarProfileBtn.classList.remove('hidden');
+                        logoutBtn.classList.remove('hidden');
+
+                        if (user.avatar_config && Object.keys(user.avatar_config).length > 0) {
+                            const avatarUrl = `https://avataaars.io/?${new URLSearchParams(user.avatar_config).toString()}`;
+                            profileAvatarImg.src = avatarUrl;
+                            profileAvatarDisplay.classList.remove('hidden');
+                        }
+                    }
+                });
+
+
+                forgotPasswordLink.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    playClickSound();
+                    showForgotPasswordForm();
+                });
+
+                closeModalBtn.addEventListener('click', () => {
+                    playClickSound();
+                    if (changeAvatarProfileBtn) changeAvatarProfileBtn.classList.add('hidden');
+                    profileAvatarDisplay.classList.add('hidden');
+                    logoutBtn.classList.add('hidden');
+                    authModal.classList.add('hidden');
+                    authMessage.textContent = '';
+                    showLoginForm();
+                });
+
+                closeAvatarModalBtn.addEventListener('click', () => {
+                    playClickSound();
+                    hideAvatarCreatorModal();
+                });
+
+                generateRandomAvatarBtn.addEventListener('click', () => {
+                    playClickSound();
+                    currentAvatarConfig = generateRandomAvatarConfig();
+                    updateAvatarPreview(currentAvatarConfig);
+                    avatarMessage.textContent = 'New random avatar generated!';
+                    avatarMessage.style.color = 'gray';
+                    setAvatarCreatorOptions(currentAvatarConfig);
+                });
+
+                saveAvatarBtn.addEventListener('click', async () => {
+                    playClickSound();
+                    avatarMessage.textContent = 'Saving avatar...';
+                    avatarMessage.style.color = 'gray';
+                    saveAvatarBtn.disabled = true;
+
+                    const user = JSON.parse(localStorage.getItem('user'));
+                    console.log('Save Avatar: User from localStorage before saving:', user);
+
+                    if (!user || !user._id) {
+                        avatarMessage.textContent = 'Error: User not logged in.';
+                        avatarMessage.style.color = 'red';
+                        saveAvatarBtn.disabled = false;
+                        hideAvatarCreatorModal();
+                        console.error('Save Avatar: User not found or _id missing. Hiding avatar modal.');
+                        return;
+                    }
+
+                    console.log('Save Avatar: Current avatar config being sent:', currentAvatarConfig);
+                    try {
+                        const response = await fetch(`${BACKEND_URL}/avatar/${user._id}`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify(currentAvatarConfig)
+                        });
+
+                        console.log('Save Avatar: Fetch response received. Status:', response.status, response.statusText);
+
+                        if (!response.ok) {
+                            const errorData = await response.json().catch(() => ({ message: 'Could not parse error response.' }));
+                            avatarMessage.textContent = errorData.message || `Error saving avatar: ${response.status} ${response.statusText}`;
+                            avatarMessage.style.color = 'red';
+                            console.error('Save Avatar: Server responded with error:', response.status, errorData);
+                            return;
+                        }
+
+                        const data = await response.json();
+                        console.log('Save Avatar: Parsed response data:', data);
+
+                        if (data.status === "Success") {
+                            avatarMessage.textContent = data.message;
+                            avatarMessage.style.color = 'green';
+
+                            // Get the full user object from storage
+                            const existingUser = JSON.parse(localStorage.getItem('user'));
+
+                            // Merge the updates from the server response into the existing user object
+                            const updatedUser = {
+                                ...existingUser, // Keeps old avatar_config if not explicitly returned
+                                ...data.data     // Overwrites with fresh data from the avatar save response
+                            };
+
+                            // Save the complete, merged user object back to localStorage
+                            localStorage.setItem('user', JSON.stringify(updatedUser));
+                            console.log('Save Avatar: User data updated in localStorage:', updatedUser);
+
+                            // Now, reliably update the UI by calling the main function
+                            updateAuthButtons();
+
+                            setTimeout(() => {
+                                hideAvatarCreatorModal();
+                            }, 1000);
+
+                        } else {
+                            avatarMessage.textContent = data.message || 'An application error occurred (backend status not Success).';
+                            avatarMessage.style.color = 'red';
+                        }
+                    } catch (error) {
+                        console.error('Save Avatar: Network error or JSON parse error:', error);
+                        avatarMessage.textContent = 'Network error saving avatar. Please try again.';
+                        avatarMessage.style.color = 'red';
+                    } finally {
+                        saveAvatarBtn.disabled = false;
+                        console.log('Save Avatar: Save button re-enabled.');
+                    }
+                });
+
+
+                logoutBtn.addEventListener('click', () => {
+                    playClickSound();
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('user');
+                    updateAuthButtons();
+                    authMessage.textContent = 'You have been logged out.';
+                    authMessage.style.color = 'blue';
+                    authModal.classList.remove('hidden');
+                    authTitle.textContent = 'Logout';
+                    submitAuthBtn.classList.add('hidden');
+                    loginSignupFields.classList.add('hidden');
+                    forgotPasswordFields.classList.add('hidden');
+                    forgotPasswordLink.classList.add('hidden');
+                    profileAvatarDisplay.classList.add('hidden');
+                    logoutBtn.classList.add('hidden');
+                    setTimeout(() => {
+                        authModal.classList.add('hidden');
+                        authMessage.textContent = '';
+                    }, 2000);
+                });
+
+                async function handleAuthSubmission(e) {
+                    if (e && e.preventDefault) {
+                        e.preventDefault();
+                    }
+                    playClickSound();
+
+                    const action = authForm.dataset.currentAction;
+
+                    authMessage.textContent = 'Processing...';
+                    authMessage.style.color = 'gray';
+                    submitAuthBtn.disabled = true;
+
+                    let requestBody = {};
+                    let endpoint = '';
+
+                    if (action === 'login') {
+                        requestBody = { username: usernameInput.value, password: passwordInput.value };
+                        endpoint = `${BACKEND_URL}/login`;
+                    } else if (action === 'signup') {
+                        requestBody = { username: usernameInput.value, email: emailInput.value, password: passwordInput.value };
+                        endpoint = `${BACKEND_URL}/signup`;
+                        if (!requestBody.email || !/^[\w-\.]+@([\w-]+\.)+[\w-\.]{2,4}$/.test(requestBody.email)) {
+                            authMessage.textContent = 'Please enter a valid email address.';
+                            authMessage.style.color = 'red';
+                            submitAuthBtn.disabled = false;
+                            return;
+                        }
+                        if (requestBody.password.length < 8) {
+                            authMessage.textContent = 'Password must be at least 8 characters long.';
+                            authMessage.style.color = 'red';
+                            submitAuthBtn.disabled = false;
+                            return;
+                        }
+                        if (!/^[a-zA-Z0-9]+$/.test(requestBody.username)) {
+                            authMessage.textContent = 'Invalid username. Only alphanumeric characters are allowed.';
+                            authMessage.style.color = 'red';
+                            submitAuthBtn.disabled = false;
+                            return;
+                        }
+                    } else if (action === 'forgot-password') {
+                        requestBody = { email: forgotPasswordEmailInput.value };
+                        endpoint = `${BACKEND_URL}/reset-password-request`;
+                        if (!requestBody.email) {
+                            authMessage.textContent = 'Please enter your email address.';
+                            authMessage.style.color = 'red';
+                            submitAuthBtn.disabled = false;
+                            return;
+                        }
+                    }
+
+                    try {
+                        const response = await fetch(endpoint, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(requestBody)
+                        });
+
+                        const data = await response.json();
+                        console.log('Auth Backend Response Status:', response.status);
+                        console.log('Auth Backend Response Data:', data);
+
+
+                        if (response.ok) {
+                            if (data.status === "Success") {
+                                // Crucial change: Always set the 'user' object from the backend response.
+                                // This 'data.data' should contain the username and other user details.
+                                localStorage.setItem('user', JSON.stringify(data.data));
+
+                                localStorage.setItem('token', data.token);
+
+                                authMessage.textContent = data.message;
+                                authMessage.style.color = 'green';
+                                setTimeout(() => {
+                                    authModal.classList.add('hidden');
+                                    updateAuthButtons();
+                                    const user = JSON.parse(localStorage.getItem('user'));
+                                    if (user && !user.has_created_avatar) { // Check if user exists before checking has_created_avatar
+                                        showAvatarCreatorModal(user.avatar_config || {});
+                                    }
+                                }, 1000);
+                            } else {
+                                authMessage.textContent = data.message || 'An application error occurred.';
+                                authMessage.style.color = 'red';
+                            }
+                        } else {
+                            authMessage.textContent = data.message || `An HTTP error occurred: ${response.status}`;
+                            authMessage.style.color = 'red';
+                        }
+                    } catch (error) {
+                        console.error('Fetch error (network or JSON parse):', error);
+                        authMessage.textContent = 'Network error or invalid response. Please check backend server and console for details.';
+                        authMessage.style.color = 'red';
+                    } finally {
+                        submitAuthBtn.disabled = false;
+                    }
+                }
+
+                authForm.addEventListener('submit', handleAuthSubmission);
+                submitAuthBtn.addEventListener('click', handleAuthSubmission);
             </script>
         </body>
         </html>
