@@ -576,12 +576,14 @@
 </head>
 <body>
 
-    <header class="fixed top-0 left-0 right-0 p-4 flex justify-end items-center z-60"> 
-        <nav class="flex space-x-2">
+    <header class="fixed top-0 left-0 right-0 p-4 flex justify-between items-center z-60"> 
+        <div id="header-avatar-container" class="w-12 h-12"></div>
+        <nav class="flex space-x-2 items-center">
             <button id="loginBtn" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-full font-semibold shadow-md">Login</button>
             <button id="signupBtn" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-full font-semibold shadow-md">Sign Up</button>
-            <button id="profileBtn" class="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded-full font-semibold shadow-md">
-                Profile </button>
+            <button id="profileBtn" class="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded-full font-semibold shadow-md hidden">
+                Profile
+            </button>
         </nav>
     </header>
 
@@ -1017,33 +1019,28 @@
         const graphicTypeGroup = document.getElementById('graphicTypeGroup');
         const profileAvatarDisplay = document.getElementById('profileAvatarDisplay');
         const profileAvatarImg = document.getElementById('profileAvatarImg');
+        const headerAvatarContainer = document.getElementById('header-avatar-container');
 
-        const BACKEND_URL = 'https://smartypantsbe.onrender.com/user'; 
+        const BACKEND_URL = '[https://smartypantsbe.onrender.com/user](https://smartypantsbe.onrender.com/user)'; 
 
         function updateAuthButtons() {
             const token = localStorage.getItem('token');
             const user = JSON.parse(localStorage.getItem('user'));
-            profileBtn.classList.remove('hidden');
+            
+            loginBtn.classList.toggle('hidden', !!token);
+            signupBtn.classList.toggle('hidden', !!token);
+            profileBtn.classList.toggle('hidden', !token);
+            headerAvatarContainer.innerHTML = ''; // Clear previous avatar
 
             if (token && user) {
-                loginBtn.classList.add('hidden');
-                signupBtn.classList.add('hidden');
                 if (user.has_created_avatar && user.avatar_config && Object.keys(user.avatar_config).length > 0) {
                     const avatarUrl = `https://avataaars.io/?${new URLSearchParams(user.avatar_config).toString()}`;
-                    profileBtn.innerHTML = `<img src="${avatarUrl}" alt="Avatar" class="h-8 w-8 rounded-full object-cover">`;
-                    profileBtn.classList.remove('px-4', 'py-2');
-                    profileBtn.classList.add('w-12', 'h-12', 'flex', 'items-center', 'justify-center');
+                    headerAvatarContainer.innerHTML = `<img src="${avatarUrl}" alt="Avatar" class="h-12 w-12 rounded-full object-cover cursor-pointer border-2 border-purple-400">`;
+                    headerAvatarContainer.addEventListener('click', () => profileBtn.click());
+                    profileBtn.classList.add('hidden'); // Hide the text button if avatar is shown
                 } else {
-                    profileBtn.innerHTML = `Profile`;
-                    profileBtn.classList.add('px-4', 'py-2');
-                    profileBtn.classList.remove('w-12', 'h-12', 'flex', 'items-center', 'justify-center');
+                    profileBtn.classList.remove('hidden'); // Show text button if no avatar
                 }
-            } else {
-                loginBtn.classList.remove('hidden');
-                signupBtn.classList.remove('hidden');
-                profileBtn.innerHTML = `Profile`;
-                profileBtn.classList.add('px-4', 'py-2');
-                profileBtn.classList.remove('w-12', 'h-12', 'flex', 'items-center', 'justify-center');
             }
         }
 
@@ -1452,26 +1449,26 @@
                     avatarMessage.textContent = data.message;
                     avatarMessage.style.color = 'green';
                     
-                    localStorage.setItem('user', JSON.stringify(data.data));
-                    console.log('Save Avatar: User data updated in localStorage:', data.data);
+                    // Get the full user object from storage
+                    const existingUser = JSON.parse(localStorage.getItem('user'));
 
-                    const updatedUser = data.data;
-                    if (updatedUser.has_created_avatar && updatedUser.avatar_config && Object.keys(updatedUser.avatar_config).length > 0) {
-                        const avatarUrl = `https://avataaars.io/?${new URLSearchParams(updatedUser.avatar_config).toString()}`;
-                        profileBtn.innerHTML = `<img src="${avatarUrl}" alt="Avatar" class="h-8 w-8 rounded-full object-cover">`;
-                        profileBtn.classList.remove('px-4', 'py-2');
-                        profileBtn.classList.add('w-12', 'h-12', 'flex', 'items-center', 'justify-center');
-                    } else {
-                        profileBtn.innerHTML = `Profile`;
-                        profileBtn.classList.add('px-4', 'py-2');
-                        profileBtn.classList.remove('w-12', 'h-12', 'flex', 'items-center', 'justify-center');
-                    }
+                    // Merge the updates from the server response into the existing user object
+                    const updatedUser = {
+                        ...existingUser,
+                        avatar_config: data.data.avatar_config,
+                        has_created_avatar: data.data.has_created_avatar,
+                        avatar_url: data.data.avatar_url
+                    };
 
-                    profileAvatarImg.src = `https://avataaars.io/?${new URLSearchParams(currentAvatarConfig).toString()}`;
+                    // Save the complete, merged user object back to localStorage
+                    localStorage.setItem('user', JSON.stringify(updatedUser));
+                    console.log('Save Avatar: User data updated in localStorage:', updatedUser);
+                    
+                    // Now, reliably update the UI by calling the main function
+                    updateAuthButtons();
 
                     setTimeout(() => {
                         hideAvatarCreatorModal(); 
-                        console.log('Save Avatar: Avatar modal hidden and auth buttons updated (directly).');
                     }, 1000);
 
                 } else {
@@ -1575,35 +1572,42 @@
 
 
                 if (response.ok) {
-                    if (action === 'login' || action === 'signup') {
-                        if (data.status === "Success") {
-                            localStorage.setItem('token', data.token); 
-                            localStorage.setItem('user', JSON.stringify(data.data));
+                    if (data.status === "Success") {
+                        if (action === 'login') {
+                            // --- CORRECTED LOGIN LOGIC ---
+                            // Get existing user data to preserve avatar config if it exists
+                            const existingUser = JSON.parse(localStorage.getItem('user')) || {};
                             
-                            authMessage.textContent = data.message;
-                            authMessage.style.color = 'green';
-                            setTimeout(() => {
-                                authModal.classList.add('hidden');
-                                updateAuthButtons();
-                                if (!data.data.has_created_avatar) {
-                                    showAvatarCreatorModal(data.data.avatar_config || {});
-                                }
-                            }, 1000);
+                            // Merge new login data with existing data
+                            const mergedUser = {
+                                ...existingUser, // Keeps old avatar_config
+                                ...data.data      // Overwrites with fresh data from login (_id, username, etc.)
+                            };
+
+                            localStorage.setItem('user', JSON.stringify(mergedUser));
                         } else {
-                            authMessage.textContent = data.message || 'An application error occurred (backend status not Success).';
-                            authMessage.style.color = 'red';
+                            // For signup, the response is the full user object, so we can set it directly
+                            localStorage.setItem('user', JSON.stringify(data.data));
                         }
-                    } else if (action === 'forgot-password') {
-                        authMessage.textContent = 'If an account with that email exists, a password reset link has been sent!';
+                        
+                        localStorage.setItem('token', data.token); 
+                        
+                        authMessage.textContent = data.message;
                         authMessage.style.color = 'green';
-                        forgotPasswordEmailInput.value = '';
                         setTimeout(() => {
                             authModal.classList.add('hidden');
-                            showLoginForm(); 
-                        }, 3000);
+                            updateAuthButtons();
+                            const user = JSON.parse(localStorage.getItem('user'));
+                            if (!user.has_created_avatar) {
+                                showAvatarCreatorModal(user.avatar_config || {});
+                            }
+                        }, 1000);
+                    } else {
+                        authMessage.textContent = data.message || 'An application error occurred.';
+                        authMessage.style.color = 'red';
                     }
                 } else {
-                    authMessage.textContent = data.message || `An HTTP error occurred: ${response.status} ${response.statusText}. Please try again.`;
+                    authMessage.textContent = data.message || `An HTTP error occurred: ${response.status}`;
                     authMessage.style.color = 'red';
                 }
             } catch (error) {
