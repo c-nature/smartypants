@@ -1,0 +1,18 @@
+# render.yaml for SmartyPants frontend
+services:
+  - type: static_site
+    name: smartypants # <--- IMPORTANT: Replace with your actual Render service name
+    # If you have a build command (e.g., 'npm run build'), include it here.
+    # buildCommand: npm run build
+    # The path where your built static files are located relative to this render.yaml
+    # This is usually 'build', 'dist', or '.' if your repo root is the publish path.
+    # If your frontend is just HTML/CSS/JS directly in 'frontend', then 'publishPath: .' might be correct.
+    # If you have a build step that outputs to 'dist' inside 'frontend', it would be 'publishPath: dist'
+    publishPath: . # Assuming your index.html and webgames folder are directly in the frontend folder
+
+    headers:
+      # Apply these headers specifically to your Godot game assets
+      - path: /webgames/pong/*
+        headers:
+          - Cross-Origin-Opener-Policy: same-origin
+          - Cross-Origin-Embedder-Policy: require-corp
