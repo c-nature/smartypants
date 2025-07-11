@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SMARTY PANTS Online</title>
-    <script src="[https://cdn.tailwindcss.com](https://cdn.tailwindcss.com)"></script>
-    <link href="[https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap](https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap)" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap" rel="stylesheet">
     <style>
         body {
             margin: 0;
@@ -595,7 +595,7 @@
 
         <div class="grid-layout">
             <div class="category-card math">
-                <img src="math.png" alt="Math Icon" class="category-icon" onerror="this.onerror=null; this.src='[https://placehold.co/80x80/FFD700/000000?text=Math](https://placehold.co/80x80/FFD700/000000?text=Math)';" />
+                <img src="math.png" alt="Math Icon" class="category-icon" onerror="this.onerror=null; this.src='https://placehold.co/80x80/FFD700/000000?text=Math';" />
                 <h2 class="category-title">Math Games</h2>
                 <p class="category-description">Fun with numbers & logic!</p>
                 <button class="explore-button" onclick="playClickSound(); showMathCategoryView();">
@@ -603,7 +603,7 @@
             </div>
 
             <div class="category-card science">
-                <img src="science.png" alt="Science Icon" class="category-icon" onerror="this.onerror=null; this.src='[https://placehold.co/80x80/81C784/000000?text=Science](https://placehold.co/80x80/81C784/000000?text=Science)';" />
+                <img src="science.png" alt="Science Icon" class="category-icon" onerror="this.onerror=null; this.src='https://placehold.co/80x80/81C784/000000?text=Science';" />
                 <h2 class="category-title">Science Games</h2>
                 <p class="category-description">Discover the world around you!</p>
                 <button class="explore-button" onclick="playClickSound(); showScienceCategoryView();">
@@ -611,14 +611,14 @@
             </div>
 
             <div class="category-card ela">
-                <img src="abc.png" alt="ELA Icon" class="category-icon" onerror="this.onerror=null; this.src='[https://placehold.co/80x80/EF9A9A/000000?text=ABC](https://placehold.co/80x80/EF9A9A/000000?text=ABC)';" />
+                <img src="abc.png" alt="ELA Icon" class="category-icon" onerror="this.onerror=null; this.src='https://placehold.co/80x80/EF9A9A/000000?text=ABC';" />
                 <h2 class="category-title">ELA Games</h2>
                 <p class="category-description">Read, write, and communicate!</p>
                 <button class="explore-button" onclick="playClickSound(); showElaCategoryView();"> Explore <span style="margin-left: 0.5rem;">&#x276F;</span> </button>
             </div>
 
             <div class="category-card social-studies">
-                <img src="socialstudies.png" alt="Social Studies Icon" class="category-icon" onerror="this.onerror=null; this.src='[https://placehold.co/80x80/FFA500/000000?text=History](https://placehold.co/80x80/FFA500/000000?text=History)';" />
+                <img src="socialstudies.png" alt="Social Studies Icon" class="category-icon" onerror="this.onerror=null; this.src='https://placehold.co/80x80/FFA500/000000?text=History';" />
                 <h2 class="category-title">Social Studies</h2>
                 <p class="category-description">Explore history and cultures!</p>
                 <button class="explore-button" onclick="playClickSound(); showSocialStudiesCategoryView();"> Explore <span style="margin-left: 0.5rem;">&#x276F;</span> </button>
@@ -768,7 +768,7 @@
         <div class="avatar-modal-content">
             <h2 class="avatar-modal-title">Create Your Avatar</h2>
             <div class="flex flex-col items-center justify-center">
-                <img id="avatarPreview" class="avatar-preview" src="[https://avataaars.io/?avatarStyle=Circle&topType=ShortHairDreads02&hairColor=Black&facialHairType=MoustacheMagnum&facialHairColor=Black&noseType=Default&eyeType=Squint&eyebrowType=FrownNatural&mouthType=Concerned&skinColor=DarkBrown&clotheType=Hoodie&clotheColor=Blue01&graphicType=Skull&accessoriesType=Prescription02](https://avataaars.io/?avatarStyle=Circle&topType=ShortHairDreads02&hairColor=Black&facialHairType=MoustacheMagnum&facialHairColor=Black&noseType=Default&eyeType=Squint&eyebrowType=FrownNatural&mouthType=Concerned&skinColor=DarkBrown&clotheType=Hoodie&clotheColor=Blue01&graphicType=Skull&accessoriesType=Prescription02)" alt="Avatar Preview">
+                <img id="avatarPreview" class="avatar-preview" src="https://avataaars.io/?avatarStyle=Circle&topType=ShortHairDreads02&hairColor=Black&facialHairType=MoustacheMagnum&facialHairColor=Black&noseType=Default&eyeType=Squint&eyebrowType=FrownNatural&mouthType=Concerned&skinColor=DarkBrown&clotheType=Hoodie&clotheColor=Blue01&graphicType=Skull&accessoriesType=Prescription02" alt="Avatar Preview">
                 <p id="avatarMessage" class="auth-message"></p>
             </div>
             <div id="avatarOptionsContainer" class="avatar-options">
@@ -1018,7 +1018,7 @@
         const profileAvatarDisplay = document.getElementById('profileAvatarDisplay');
         const profileAvatarImg = document.getElementById('profileAvatarImg');
 
-        const BACKEND_URL = '[https://smartypantsbe.onrender.com/user](https://smartypantsbe.onrender.com/user)'; 
+        const BACKEND_URL = 'https://smartypantsbe.onrender.com/user'; 
 
         function updateAuthButtons() {
             const token = localStorage.getItem('token');
@@ -1452,26 +1452,26 @@
                     avatarMessage.textContent = data.message;
                     avatarMessage.style.color = 'green';
                     
-                    // Get the full user object from storage
-                    const existingUser = JSON.parse(localStorage.getItem('user'));
+                    localStorage.setItem('user', JSON.stringify(data.data));
+                    console.log('Save Avatar: User data updated in localStorage:', data.data);
 
-                    // Merge the updates from the server response into the existing user object
-                    const updatedUser = {
-                        ...existingUser,
-                        avatar_config: data.data.avatar_config,
-                        has_created_avatar: data.data.has_created_avatar,
-                        avatar_url: data.data.avatar_url
-                    };
+                    const updatedUser = data.data;
+                    if (updatedUser.has_created_avatar && updatedUser.avatar_config && Object.keys(updatedUser.avatar_config).length > 0) {
+                        const avatarUrl = `https://avataaars.io/?${new URLSearchParams(updatedUser.avatar_config).toString()}`;
+                        profileBtn.innerHTML = `<img src="${avatarUrl}" alt="Avatar" class="h-8 w-8 rounded-full object-cover">`;
+                        profileBtn.classList.remove('px-4', 'py-2');
+                        profileBtn.classList.add('w-12', 'h-12', 'flex', 'items-center', 'justify-center');
+                    } else {
+                        profileBtn.innerHTML = `Profile`;
+                        profileBtn.classList.add('px-4', 'py-2');
+                        profileBtn.classList.remove('w-12', 'h-12', 'flex', 'items-center', 'justify-center');
+                    }
 
-                    // Save the complete, merged user object back to localStorage
-                    localStorage.setItem('user', JSON.stringify(updatedUser));
-                    console.log('Save Avatar: User data updated in localStorage:', updatedUser);
-                    
-                    // Now, reliably update the UI by calling the main function
-                    updateAuthButtons();
+                    profileAvatarImg.src = `https://avataaars.io/?${new URLSearchParams(currentAvatarConfig).toString()}`;
 
                     setTimeout(() => {
                         hideAvatarCreatorModal(); 
+                        console.log('Save Avatar: Avatar modal hidden and auth buttons updated (directly).');
                     }, 1000);
 
                 } else {
@@ -1575,42 +1575,35 @@
 
 
                 if (response.ok) {
-                    if (data.status === "Success") {
-                        if (action === 'login') {
-                            // --- CORRECTED LOGIN LOGIC ---
-                            // Get existing user data to preserve avatar config if it exists
-                            const existingUser = JSON.parse(localStorage.getItem('user')) || {};
-                            
-                            // Merge new login data with existing data
-                            const mergedUser = {
-                                ...existingUser, // Keeps old avatar_config
-                                ...data.data      // Overwrites with fresh data from login (_id, username, etc.)
-                            };
-
-                            localStorage.setItem('user', JSON.stringify(mergedUser));
-                        } else {
-                            // For signup, the response is the full user object, so we can set it directly
+                    if (action === 'login' || action === 'signup') {
+                        if (data.status === "Success") {
+                            localStorage.setItem('token', data.token); 
                             localStorage.setItem('user', JSON.stringify(data.data));
+                            
+                            authMessage.textContent = data.message;
+                            authMessage.style.color = 'green';
+                            setTimeout(() => {
+                                authModal.classList.add('hidden');
+                                updateAuthButtons();
+                                if (!data.data.has_created_avatar) {
+                                    showAvatarCreatorModal(data.data.avatar_config || {});
+                                }
+                            }, 1000);
+                        } else {
+                            authMessage.textContent = data.message || 'An application error occurred (backend status not Success).';
+                            authMessage.style.color = 'red';
                         }
-                        
-                        localStorage.setItem('token', data.token); 
-                        
-                        authMessage.textContent = data.message;
+                    } else if (action === 'forgot-password') {
+                        authMessage.textContent = 'If an account with that email exists, a password reset link has been sent!';
                         authMessage.style.color = 'green';
+                        forgotPasswordEmailInput.value = '';
                         setTimeout(() => {
                             authModal.classList.add('hidden');
-                            updateAuthButtons();
-                            const user = JSON.parse(localStorage.getItem('user'));
-                            if (!user.has_created_avatar) {
-                                showAvatarCreatorModal(user.avatar_config || {});
-                            }
-                        }, 1000);
-                    } else {
-                        authMessage.textContent = data.message || 'An application error occurred.';
-                        authMessage.style.color = 'red';
+                            showLoginForm(); 
+                        }, 3000);
                     }
                 } else {
-                    authMessage.textContent = data.message || `An HTTP error occurred: ${response.status}`;
+                    authMessage.textContent = data.message || `An HTTP error occurred: ${response.status} ${response.statusText}. Please try again.`;
                     authMessage.style.color = 'red';
                 }
             } catch (error) {
