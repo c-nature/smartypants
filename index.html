@@ -626,7 +626,7 @@
         </div>
 
         <p class="footer-text">
-            (Account features and AI assistance coming soon!)
+            (More games and apps comings soon!!!)
         </p>
     </div>
 
@@ -818,8 +818,8 @@
                     <label for="clotheColorSelect" class="avatar-option-label">Clothes Color:</label>
                     <select id="clotheColorSelect" class="avatar-option-select"></select>
                 </div>
-                <div id="clotheGraphicTypeGroup" class="avatar-option-group hidden"> <label for="clotheGraphicTypeSelect" class="avatar-option-label">Graphic:</label>
-                    <select id="clotheGraphicTypeSelect" class="avatar-option-select"></select>
+                <div id="graphicTypeGroup" class="avatar-option-group hidden"> <label for="graphicTypeSelect" class="avatar-option-label">Graphic:</label>
+                    <select id="graphicTypeSelect" class="avatar-option-select"></select>
                 </div>
                 <div class="avatar-option-group">
                     <label for="accessoriesTypeSelect" class="avatar-option-label">Accessories:</label>
@@ -1009,12 +1009,12 @@
         const skinColorSelect = document.getElementById('skinColorSelect');
         const clotheTypeSelect = document.getElementById('clotheTypeSelect');
         const clotheColorSelect = document.getElementById('clotheColorSelect');
-        const clotheGraphicTypeSelect = document.getElementById('clotheGraphicTypeSelect');
+        const graphicTypeSelect = document.getElementById('graphicTypeSelect');
         const accessoriesTypeSelect = document.getElementById('accessoriesTypeSelect');
 
         const topColorGroup = document.getElementById('topColorGroup');
         const facialHairColorGroup = document.getElementById('facialHairColorGroup');
-        const clotheGraphicTypeGroup = document.getElementById('clotheGraphicTypeGroup');
+        const graphicTypeGroup = document.getElementById('graphicTypeGroup');
         const profileAvatarDisplay = document.getElementById('profileAvatarDisplay');
         const profileAvatarImg = document.getElementById('profileAvatarImg');
 
@@ -1124,6 +1124,7 @@
             avatarStyle: ['Circle', 'Transparent'],
             topType: ['NoHair', 'Eyepatch', 'Hat', 'Hijab', 'Turban', 'WinterHat1', 'WinterHat2', 'WinterHat3', 'WinterHat4', 'LongHairBigHair', 'LongHairBob', 'LongHairBun', 'LongHairCurly', 'LongHairCurvy', 'LongHairDreads', 'LongHairFrida', 'LongHairFro', 'LongHairMiaWallace', 'LongHairStraight', 'LongHairStraight2', 'LongHairStraightStrand', 'ShortHairDreads01', 'ShortHairDreads02', 'ShortHairFrizzle', 'ShortHairShaggy', 'ShortHairShaggyMullet', 'ShortHairShortCurly', 'ShortHairShortFlat', 'ShortHairShortRound', 'ShortHairShortWaved', 'ShortHairSides', 'ShortHairTheCaesar', 'ShortHairTheCaesarSidePart'],
             hairColor: ['Auburn', 'Black', 'Blonde', 'BlondeGolden', 'Brown', 'BrownDark', 'PastelPink', 'Platinum', 'Red', 'SilverGray'],
+            hatColor: ['Black', 'Blue01', 'Blue02', 'Blue03', 'Gray01', 'Gray02', 'Heather', 'PastelBlue', 'PastelGreen', 'PastelOrange', 'PastelRed', 'PastelYellow', 'Pink', 'Red', 'White'],
             facialHairType: ['Blank', 'BeardLight', 'BeardMajestic', 'MoustacheFancy', 'MoustacheMagnum'],
             facialHairColor: ['Auburn', 'Black', 'Blonde', 'BlondeGolden', 'Brown', 'BrownDark', 'PastelPink', 'Platinum', 'Red', 'SilverGray'],
             noseType: ['Default'],
@@ -1140,21 +1141,29 @@
 
         function generateRandomAvatarConfig() {
             const randomConfig = {};
+            const hatTypes = ['Hat', 'Turban', 'WinterHat1', 'WinterHat2', 'WinterHat3', 'WinterHat4'];
+
             for (const feature in avatarFeatures) {
                 const possibleValues = avatarFeatures[feature];
                 randomConfig[feature] = possibleValues[Math.floor(Math.random() * possibleValues.length)];
             }
-            if (!['Hat', 'WinterHat1', 'WinterHat2', 'WinterHat3', 'WinterHat4', 'Turban', 'Hijab'].includes(randomConfig.topType)) {
+            
+            // Clean up conditional properties
+            if (hatTypes.includes(randomConfig.topType)) {
+                delete randomConfig.topColor; // Use hatColor instead
+            } else if (randomConfig.topType === 'Hijab') {
+                delete randomConfig.hatColor; // Use topColor instead
+            } else {
+                // It's regular hair, so delete both hat and top colors
+                delete randomConfig.hatColor;
                 delete randomConfig.topColor;
             }
+
             if (randomConfig.facialHairType === 'Blank') {
                 delete randomConfig.facialHairColor;
             }
-            if (randomConfig.clotheType === 'GraphicShirt') {
-                if (!randomConfig.graphicType) {
-                    randomConfig.graphicType = avatarFeatures.graphicType[Math.floor(Math.random() * avatarFeatures.graphicType.length)];
-                }
-            } else {
+
+            if (randomConfig.clotheType !== 'GraphicShirt') {
                 delete randomConfig.graphicType;
             }
             return randomConfig;
@@ -1189,16 +1198,35 @@
 
         function handleConditionalAvatarFields() {
             const topType = currentAvatarConfig.topType;
-            if (['Hat', 'WinterHat1', 'WinterHat2', 'WinterHat3', 'WinterHat4', 'Turban', 'Hijab'].includes(topType)) {
+            const hatTypes = ['Hat', 'Turban', 'WinterHat1', 'WinterHat2', 'WinterHat3', 'WinterHat4'];
+            const hijabType = 'Hijab';
+
+            // Show/Hide Top Color dropdown for Hats and Hijab
+            if (hatTypes.includes(topType) || topType === hijabType) {
                 topColorGroup.classList.remove('hidden');
+            } else {
+                topColorGroup.classList.add('hidden');
+            }
+
+            // Clean up config object based on topType
+            if (hatTypes.includes(topType)) {
+                delete currentAvatarConfig.topColor; // Remove incorrect property
+                if (!currentAvatarConfig.hatColor) {
+                    currentAvatarConfig.hatColor = topColorSelect.value;
+                }
+            } else if (topType === hijabType) {
+                delete currentAvatarConfig.hatColor; // Remove incorrect property
                 if (!currentAvatarConfig.topColor) {
                     currentAvatarConfig.topColor = topColorSelect.value;
                 }
             } else {
-                topColorGroup.classList.add('hidden');
+                // It's regular hair, so delete both
+                delete currentAvatarConfig.hatColor;
                 delete currentAvatarConfig.topColor;
             }
 
+
+            // Show/Hide Facial Hair Color
             if (currentAvatarConfig.facialHairType !== 'Blank') {
                 facialHairColorGroup.classList.remove('hidden');
                 if (!currentAvatarConfig.facialHairColor) {
@@ -1209,13 +1237,14 @@
                 delete currentAvatarConfig.facialHairColor;
             }
 
+            // Show/Hide Graphic Type
             if (currentAvatarConfig.clotheType === 'GraphicShirt') {
-                clotheGraphicTypeGroup.classList.remove('hidden');
+                graphicTypeGroup.classList.remove('hidden');
                 if (!currentAvatarConfig.graphicType) {
-                    currentAvatarConfig.graphicType = clotheGraphicTypeSelect.value;
+                    currentAvatarConfig.graphicType = graphicTypeSelect.value;
                 }
             } else {
-                clotheGraphicTypeGroup.classList.add('hidden');
+                graphicTypeGroup.classList.add('hidden');
                 delete currentAvatarConfig.graphicType;
             }
             updateAvatarPreview(currentAvatarConfig);
@@ -1235,29 +1264,49 @@
             populateSelect(skinColorSelect, avatarFeatures.skinColor);
             populateSelect(clotheTypeSelect, avatarFeatures.clotheType);
             populateSelect(clotheColorSelect, avatarFeatures.clotheColor);
-            populateSelect(clotheGraphicTypeSelect, avatarFeatures.graphicType);
+            populateSelect(graphicTypeSelect, avatarFeatures.graphicType);
             populateSelect(accessoriesTypeSelect, avatarFeatures.accessoriesType);
             
-            avatarStyleSelect.addEventListener('change', (event) => { currentAvatarConfig.avatarStyle = event.target.value; handleConditionalAvatarFields(); updateAvatarPreview(currentAvatarConfig); });
-            topTypeSelect.addEventListener('change', (event) => { currentAvatarConfig.topType = event.target.value; handleConditionalAvatarFields(); updateAvatarPreview(currentAvatarConfig); });
-            topColorSelect.addEventListener('change', (event) => { currentAvatarConfig.topColor = event.target.value; updateAvatarPreview(currentAvatarConfig); });
+            avatarStyleSelect.addEventListener('change', (event) => { currentAvatarConfig.avatarStyle = event.target.value; handleConditionalAvatarFields(); });
+            topTypeSelect.addEventListener('change', (event) => { currentAvatarConfig.topType = event.target.value; handleConditionalAvatarFields(); });
+            
+            // This listener now handles both hat and top colors
+            topColorSelect.addEventListener('change', (event) => { 
+                const selectedColor = event.target.value;
+                const hatTypes = ['Hat', 'Turban', 'WinterHat1', 'WinterHat2', 'WinterHat3', 'WinterHat4'];
+                if (hatTypes.includes(currentAvatarConfig.topType)) {
+                    currentAvatarConfig.hatColor = selectedColor;
+                } else if (currentAvatarConfig.topType === 'Hijab') {
+                    currentAvatarConfig.topColor = selectedColor;
+                }
+                updateAvatarPreview(currentAvatarConfig); 
+            });
+
             hairColorSelect.addEventListener('change', (event) => { currentAvatarConfig.hairColor = event.target.value; updateAvatarPreview(currentAvatarConfig); });
-            facialHairTypeSelect.addEventListener('change', (event) => { currentAvatarConfig.facialHairType = event.target.value; handleConditionalAvatarFields(); updateAvatarPreview(currentAvatarConfig); });
+            facialHairTypeSelect.addEventListener('change', (event) => { currentAvatarConfig.facialHairType = event.target.value; handleConditionalAvatarFields(); });
             facialHairColorSelect.addEventListener('change', (event) => { currentAvatarConfig.facialHairColor = event.target.value; updateAvatarPreview(currentAvatarConfig); });
             eyeTypeSelect.addEventListener('change', (event) => { currentAvatarConfig.eyeType = event.target.value; updateAvatarPreview(currentAvatarConfig); });
             eyebrowTypeSelect.addEventListener('change', (event) => { currentAvatarConfig.eyebrowType = event.target.value; updateAvatarPreview(currentAvatarConfig); });
             mouthTypeSelect.addEventListener('change', (event) => { currentAvatarConfig.mouthType = event.target.value; updateAvatarPreview(currentAvatarConfig); });
             skinColorSelect.addEventListener('change', (event) => { currentAvatarConfig.skinColor = event.target.value; updateAvatarPreview(currentAvatarConfig); });
-            clotheTypeSelect.addEventListener('change', (event) => { currentAvatarConfig.clotheType = event.target.value; handleConditionalAvatarFields(); updateAvatarPreview(currentAvatarConfig); });
+            clotheTypeSelect.addEventListener('change', (event) => { currentAvatarConfig.clotheType = event.target.value; handleConditionalAvatarFields(); });
             clotheColorSelect.addEventListener('change', (event) => { currentAvatarConfig.clotheColor = event.target.value; updateAvatarPreview(currentAvatarConfig); });
-            clotheGraphicTypeSelect.addEventListener('change', (event) => { currentAvatarConfig.graphicType = event.target.value; updateAvatarPreview(currentAvatarConfig); });
+            graphicTypeSelect.addEventListener('change', (event) => { currentAvatarConfig.graphicType = event.target.value; updateAvatarPreview(currentAvatarConfig); });
             accessoriesTypeSelect.addEventListener('change', (event) => { currentAvatarConfig.accessoriesType = event.target.value; updateAvatarPreview(currentAvatarConfig); });
         }
 
         function setAvatarCreatorOptions(config) {
             avatarStyleSelect.value = config.avatarStyle || avatarFeatures.avatarStyle[0];
             topTypeSelect.value = config.topType || avatarFeatures.topType[0];
-            topColorSelect.value = config.topColor || avatarFeatures.topColor[0];
+            
+            // Set the top color dropdown based on hatColor or topColor
+            const hatTypes = ['Hat', 'Turban', 'WinterHat1', 'WinterHat2', 'WinterHat3', 'WinterHat4'];
+            if(hatTypes.includes(config.topType)) {
+                topColorSelect.value = config.hatColor || avatarFeatures.hatColor[0];
+            } else if (config.topType === 'Hijab') {
+                topColorSelect.value = config.topColor || avatarFeatures.topColor[0];
+            }
+
             hairColorSelect.value = config.hairColor || avatarFeatures.hairColor[0];
             facialHairTypeSelect.value = config.facialHairType || avatarFeatures.facialHairType[0];
             facialHairColorSelect.value = config.facialHairColor || avatarFeatures.facialHairColor[0];
@@ -1267,7 +1316,7 @@
             skinColorSelect.value = config.skinColor || avatarFeatures.skinColor[0];
             clotheTypeSelect.value = config.clotheType || avatarFeatures.clotheType[0];
             clotheColorSelect.value = config.clotheColor || avatarFeatures.clotheColor[0];
-            clotheGraphicTypeSelect.value = config.graphicType || avatarFeatures.graphicType[0];
+            graphicTypeSelect.value = config.graphicType || avatarFeatures.graphicType[0];
             accessoriesTypeSelect.value = config.accessoriesType || avatarFeatures.accessoriesType[0];
             
             handleConditionalAvatarFields();
