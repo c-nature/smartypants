@@ -4,7 +4,9 @@
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <title>SMARTY PANTS Online</title>
-            <script src="https://cdn.tailwindcss.com"></script>
+            <!-- REMOVED: <script src="https://cdn.tailwindcss.com"></script> -->
+            <!-- ADDED: Self-hosted Tailwind CSS. Make sure to download the content from https://cdn.tailwindcss.com/ and save it to ./styles/tailwind.min.css -->
+            <link href="./styles/tailwind.min.css" rel="stylesheet">
             <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap" rel="stylesheet">
             <style>
                 body {
@@ -1477,128 +1479,6 @@
                     } catch (error) {
                         console.error('Save Avatar: Network error or JSON parse error:', error);
                         avatarMessage.textContent = 'Network error saving avatar. Please try again.';
-                        avatarMessage.style.color = 'red';
-                    } finally {
-                        saveAvatarBtn.disabled = false;
-                        console.log('Save Avatar: Save button re-enabled.');
-                    }
-                });
-
-
-                logoutBtn.addEventListener('click', () => {
-                    playClickSound();
-                    localStorage.removeItem('token');
-                    localStorage.removeItem('user');
-                    updateAuthButtons();
-                    authMessage.textContent = 'You have been logged out.';
-                    authMessage.style.color = 'blue';
-                    authModal.classList.remove('hidden');
-                    authTitle.textContent = 'Logout';
-                    submitAuthBtn.classList.add('hidden');
-                    loginSignupFields.classList.add('hidden');
-                    forgotPasswordFields.classList.add('hidden');
-                    forgotPasswordLink.classList.add('hidden');
-                    profileAvatarDisplay.classList.add('hidden');
-                    logoutBtn.classList.add('hidden');
-                    setTimeout(() => {
-                        authModal.classList.add('hidden');
-                        authMessage.textContent = '';
-                    }, 2000);
-                });
-
-                async function handleAuthSubmission(e) {
-                    if (e && e.preventDefault) {
-                        e.preventDefault();
-                    }
-                    playClickSound();
-
-                    const action = authForm.dataset.currentAction;
-
-                    authMessage.textContent = 'Processing...';
-                    authMessage.style.color = 'gray';
-                    submitAuthBtn.disabled = true;
-
-                    let requestBody = {};
-                    let endpoint = '';
-
-                    if (action === 'login') {
-                        requestBody = { username: usernameInput.value, password: passwordInput.value };
-                        endpoint = `${BACKEND_URL}/login`;
-                    } else if (action === 'signup') {
-                        requestBody = { username: usernameInput.value, email: emailInput.value, password: passwordInput.value };
-                        endpoint = `${BACKEND_URL}/signup`;
-                        if (!requestBody.email || !/^[\w-\.]+@([\w-]+\.)+[\w-\.]{2,4}$/.test(requestBody.email)) {
-                            authMessage.textContent = 'Please enter a valid email address.';
-                            authMessage.style.color = 'red';
-                            submitAuthBtn.disabled = false;
-                            return;
-                        }
-                        if (requestBody.password.length < 8) {
-                            authMessage.textContent = 'Password must be at least 8 characters long.';
-                            authMessage.style.color = 'red';
-                            submitAuthBtn.disabled = false;
-                            return;
-                        }
-                        if (!/^[a-zA-Z0-9]+$/.test(requestBody.username)) {
-                            authMessage.textContent = 'Invalid username. Only alphanumeric characters are allowed.';
-                            authMessage.style.color = 'red';
-                            submitAuthBtn.disabled = false;
-                            return;
-                        }
-                    } else if (action === 'forgot-password') {
-                        requestBody = { email: forgotPasswordEmailInput.value };
-                        endpoint = `${BACKEND_URL}/reset-password-request`;
-                        if (!requestBody.email) {
-                            authMessage.textContent = 'Please enter your email address.';
-                            authMessage.style.color = 'red';
-                            submitAuthBtn.disabled = false;
-                            return;
-                        }
-                    }
-
-                    try {
-                        const response = await fetch(endpoint, {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            },
-                            body: JSON.stringify(requestBody)
-                        });
-
-                        const data = await response.json();
-                        console.log('Auth Backend Response Status:', response.status);
-                        console.log('Auth Backend Response Data:', data);
-
-
-                        if (response.ok) {
-                            if (data.status === "Success") {
-                                // Crucial change: Always set the 'user' object from the backend response.
-                                // This 'data.data' should contain the username and other user details.
-                                localStorage.setItem('user', JSON.stringify(data.data));
-
-                                localStorage.setItem('token', data.token);
-
-                                authMessage.textContent = data.message;
-                                authMessage.style.color = 'green';
-                                setTimeout(() => {
-                                    authModal.classList.add('hidden');
-                                    updateAuthButtons();
-                                    const user = JSON.parse(localStorage.getItem('user'));
-                                    if (user && !user.has_created_avatar) { // Check if user exists before checking has_created_avatar
-                                        showAvatarCreatorModal(user.avatar_config || {});
-                                    }
-                                }, 1000);
-                            } else {
-                                authMessage.textContent = data.message || 'An application error occurred.';
-                                authMessage.style.color = 'red';
-                            }
-                        } else {
-                            authMessage.textContent = data.message || `An HTTP error occurred: ${response.status}`;
-                            authMessage.style.color = 'red';
-                        }
-                    } catch (error) {
-                        console.error('Fetch error (network or JSON parse):', error);
-                        authMessage.textContent = 'Network error or invalid response. Please check backend server and console for details.';
                         authMessage.style.color = 'red';
                     } finally {
                         submitAuthBtn.disabled = false;
