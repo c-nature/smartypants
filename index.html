@@ -1359,7 +1359,8 @@
                 showAvatarCreatorModal(user.avatar_config || {});
             } else {
                 authTitle.textContent = 'User Profile';
-                authMessage.textContent = `Welcome, ${user.username}!\nCoins: ${user.coins || 'N/A'}\nBadges: ${user.badges && user.badges.length > 0 ? user.badges.join(', ') : 'None'}\nAvatar saved: ${user.avatar_url ? 'Yes' : 'No'}`;
+                // Updated line to remove "Coins" and "Avatar saved", and use "Welcome (username)"
+                authMessage.textContent = `Welcome, ${user.username}!\nBadges: ${user.badges && user.badges.length > 0 ? user.badges.join(', ') : 'None'}`;
                 authModal.classList.remove('hidden');
                 
                 if (changeAvatarProfileBtn) changeAvatarProfileBtn.classList.remove('hidden');
@@ -1454,10 +1455,8 @@
 
                     // Merge the updates from the server response into the existing user object
                     const updatedUser = {
-                        ...existingUser,
-                        avatar_config: data.data.avatar_config,
-                        has_created_avatar: data.data.has_created_avatar,
-                        avatar_url: data.data.avatar_url
+                        ...existingUser, // Keeps old avatar_config
+                        ...data.data     // Overwrites with fresh data from login (_id, username, etc.)
                     };
 
                     // Save the complete, merged user object back to localStorage
@@ -1581,7 +1580,7 @@
                             // Merge new login data with existing data
                             const mergedUser = {
                                 ...existingUser, // Keeps old avatar_config
-                                ...data.data      // Overwrites with fresh data from login (_id, username, etc.)
+                                ...data.data     // Overwrites with fresh data from login (_id, username, etc.)
                             };
 
                             localStorage.setItem('user', JSON.stringify(mergedUser));
