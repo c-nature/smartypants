@@ -177,7 +177,7 @@
         </div>
     </div>
 
-    <!-- NEW: Image Modal -->
+    <!-- Image Modal -->
     <div id="image-modal" class="fixed inset-0 bg-black bg-opacity-90 z-[100] hidden items-center justify-center p-4 transition-opacity duration-300">
         <div class="container-glow rounded-lg p-4 max-w-5xl max-h-[95vh] w-full flex flex-col relative">
             <button onclick="closeImageModal()" class="absolute -top-4 -right-4 text-white bg-red-500 rounded-full h-10 w-10 text-2xl flex items-center justify-center z-10 hover:bg-red-700 transition-colors">&times;</button>
@@ -200,7 +200,6 @@
         const messageDiv = document.getElementById('message');
         const imageGrid = document.getElementById('image-grid');
         
-        // NEW: Modal elements
         const imageModal = document.getElementById('image-modal');
         const modalImage = document.getElementById('modal-image');
         const modalTitle = document.getElementById('modal-title');
@@ -215,7 +214,12 @@
             document.getElementById(`${tabName}-content`).classList.remove('hidden');
             document.getElementById(`${tabName}-tab`).classList.add('active');
             clearResults();
-            showMessage('Awaiting your command...');
+
+            if (tabName === 'search') {
+                fetchRecentImages();
+            } else {
+                showMessage('Awaiting your command...');
+            }
         }
 
         function showLoader() { loader.classList.remove('hidden'); loader.classList.add('flex'); }
@@ -223,11 +227,10 @@
         function showMessage(msg) { messageDiv.textContent = msg; }
         function clearResults() { imageGrid.innerHTML = ''; messageDiv.textContent = ''; }
 
-        // --- NEW: Modal Functions ---
         function showImageModal(imageUrl, title, description) {
             modalImage.src = imageUrl;
             modalTitle.textContent = title;
-            modalDescription.innerHTML = description; // Use innerHTML to render <br> tags
+            modalDescription.innerHTML = description;
             imageModal.classList.remove('hidden');
             imageModal.classList.add('flex');
         }
@@ -235,7 +238,7 @@
         function closeImageModal() {
             imageModal.classList.add('hidden');
             imageModal.classList.remove('flex');
-            modalImage.src = ''; // Stop image loading
+            modalImage.src = '';
         }
 
         async function fetchAPOD() {
@@ -284,6 +287,21 @@
             } catch (error) { showMessage('EONET FEED COMPROMISED.'); }
             finally { hideLoader(); }
         }
+        
+        async function fetchRecentImages() {
+            showMessage('Loading recent uploads from the archive...');
+            showLoader();
+            try {
+                const response = await fetch(`${APP_API_BASE_URL}/recent`);
+                if (!response.ok) throw new Error(`SYSTEM ERROR: ${response.status}`);
+                const data = await response.json();
+                displaySearchResults(data.collection.items);
+            } catch (error) {
+                showMessage('ARCHIVE CONNECTION FAILED.');
+            } finally {
+                hideLoader();
+            }
+        }
 
         async function searchImages() {
             const query = document.getElementById('search-query').value.trim();
@@ -301,14 +319,10 @@
         function createImageCard(data) {
             const card = document.createElement('div');
             card.className = 'card-glow rounded-lg overflow-hidden';
-            
             const imageUrl = data.url || (data.links && data.links[0].href);
             const title = data.title;
             const description = data.explanation || (data.data && data.data[0].description) || 'No data available.';
-            
-            // Add onclick to show the modal
             card.setAttribute('onclick', `showImageModal('${imageUrl}', '${title.replace(/'/g, "\\'")}', '${description.replace(/'/g, "\\'").replace(/\n/g, '<br>')}')`);
-
             card.innerHTML = `<div class="h-56 bg-black"><img src="${imageUrl}" alt="${title}" class="w-full h-full object-cover" onerror="this.onerror=null;this.src='https://placehold.co/600x400/020813/00f6ff?text=SIGNAL+LOST';"></div><div class="p-4"><h3 class="font-bold text-lg text-cyan-300 mb-2 truncate">${title}</h3><p class="text-gray-400 text-sm h-20 overflow-hidden">${description.substring(0, 120)}...</p></div>`;
             imageGrid.appendChild(card);
         }
@@ -316,15 +330,12 @@
         function createMarsImageCard(photo) {
             const card = document.createElement('div');
             card.className = 'card-glow rounded-lg overflow-hidden';
-            
             const imageUrl = photo.img_src;
             const title = `ROVER: ${photo.rover.name}`;
             const camera = photo.camera.full_name;
             const date = photo.earth_date;
             const description = `Camera: ${camera}<br>Date: ${date}`;
-
             card.setAttribute('onclick', `showImageModal('${imageUrl}', '${title.replace(/'/g, "\\'")}', '${description}')`);
-
             card.innerHTML = `<div class="h-56 bg-black"><img src="${imageUrl}" alt="${title}" class="w-full h-full object-cover" onerror="this.onerror=null;this.src='https://placehold.co/600x400/020813/00f6ff?text=SIGNAL+LOST';"></div><div class="p-4"><h3 class="font-bold text-lg text-cyan-300 mb-2">${title}</h3><p class="text-gray-400 text-sm">CAMERA: ${camera}</p><p class="text-gray-400 text-sm">DATE: ${date}</p></div>`;
             imageGrid.appendChild(card);
         }
@@ -364,7 +375,7 @@
             const today = new Date();
             today.setDate(today.getDate() - 5);
             marsDateInput.value = today.toISOString().split('T')[0];
-            showMessage('Holo-Deck Ready. Awaiting your command...');
+            fetchAPOD();
         };
     </script>
 </body>
