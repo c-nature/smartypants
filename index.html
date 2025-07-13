@@ -582,7 +582,6 @@
         <div id="header-avatar-container" class="w-12 h-12"></div>
         <nav class="flex space-x-2 items-center">
             <button id="contactBtn" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-full font-semibold shadow-md">Contact</button>
-            <!-- NEW: Donate Button -->
             <button id="donateBtn" class="bg-pink-500 hover:bg-pink-600 text-white px-4 py-2 rounded-full font-semibold shadow-md">Donate</button>
             <button id="loginBtn" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-full font-semibold shadow-md">Login</button>
             <button id="signupBtn" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-full font-semibold shadow-md">Sign Up</button>
@@ -664,13 +663,22 @@
                     <button class="play-game-button-new-window" onclick="playClickSound(); openGameInNewWindow('animalapp.html');">Open in New Window</button>
                 </div>
             </div>
-            <!-- NEW: NASA Explorer Game Card -->
+            <!-- NASA Explorer Game Card -->
             <div class="game-list-card" style="background-image: url('space.png'); background-size: cover; background-position: center;">
                 <h3 style="color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);">Space Explorer</h3>
                 <p style="color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);">Explore photos from space!</p>
                 <div class="game-card-buttons">
                     <button class="play-game-button" onclick="playClickSound(); showNasaGame();">Open Here</button>
                     <button class="play-game-button-new-window" onclick="playClickSound(); openGameInNewWindow('nasaexplorer.html');">Open in New Window</button>
+                </div>
+            </div>
+            <!-- NEW: Plant Explorer Game Card -->
+            <div class="game-list-card" style="background-image: url('https://placehold.co/400x200/4A6B5B/FFFFFF?text=Plant+Explorer'); background-size: cover; background-position: center;">
+                <h3 style="color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);">Plant Explorer</h3>
+                <p style="color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);">Discover the world of plants!</p>
+                <div class="game-card-buttons">
+                    <button class="play-game-button" onclick="playClickSound(); openGameInNewWindow('plantexplorer.html');">Open Here</button>
+                    <button class="play-game-button-new-window" onclick="playClickSound(); openGameInNewWindow('plantexplorer.html');">Open in New Window</button>
                 </div>
             </div>
         </div>
@@ -1700,7 +1708,7 @@
         donateBtn.addEventListener('click', () => {
             playClickSound();
             // IMPORTANT: Replace 'YOUR_PAYPAL_DONATION_LINK_HERE' with your actual PayPal donation URL
-            const donationUrl = 'https://www.paypal.com/donate/?hosted_button_id=RSG7WDB322VBC'; 
+            const donationUrl = 'https://www.paypal.com/donate/?hosted_button_id=RSG7WDB322VBC';
             window.open(donationUrl, '_blank'); // Open in a new tab
         });
     </script>
