@@ -297,6 +297,7 @@
                 const data = await response.json();
                 displaySearchResults(data.collection.items);
             } catch (error) {
+                console.error("Error in fetchRecentImages:", error);
                 showMessage('ARCHIVE CONNECTION FAILED.');
             } finally {
                 hideLoader();
@@ -319,11 +320,15 @@
         function createImageCard(data) {
             const card = document.createElement('div');
             card.className = 'card-glow rounded-lg overflow-hidden';
-            const imageUrl = data.url || (data.links && data.links[0].href);
-            const title = data.title;
+            const imageUrl = data.url || (data.links && data.links[0].href) || '';
+            const title = data.title || 'Untitled Image';
             const description = data.explanation || (data.data && data.data[0].description) || 'No data available.';
-            card.setAttribute('onclick', `showImageModal('${imageUrl}', '${title.replace(/'/g, "\\'")}', '${description.replace(/'/g, "\\'").replace(/\n/g, '<br>')}')`);
-            card.innerHTML = `<div class="h-56 bg-black"><img src="${imageUrl}" alt="${title}" class="w-full h-full object-cover" onerror="this.onerror=null;this.src='https://placehold.co/600x400/020813/00f6ff?text=SIGNAL+LOST';"></div><div class="p-4"><h3 class="font-bold text-lg text-cyan-300 mb-2 truncate">${title}</h3><p class="text-gray-400 text-sm h-20 overflow-hidden">${description.substring(0, 120)}...</p></div>`;
+            
+            const escapedTitle = title.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+            const escapedDescription = description.replace(/'/g, "\\'").replace(/"/g, '&quot;').replace(/\n/g, '<br>');
+
+            card.setAttribute('onclick', `showImageModal('${imageUrl}', '${escapedTitle}', '${escapedDescription}')`);
+            card.innerHTML = `<div class="h-56 bg-black"><img src="${imageUrl}" alt="${escapedTitle}" class="w-full h-full object-cover" onerror="this.onerror=null;this.src='https://placehold.co/600x400/020813/00f6ff?text=SIGNAL+LOST';"></div><div class="p-4"><h3 class="font-bold text-lg text-cyan-300 mb-2 truncate">${escapedTitle}</h3><p class="text-gray-400 text-sm h-20 overflow-hidden">${description.substring(0, 120)}...</p></div>`;
             imageGrid.appendChild(card);
         }
         
@@ -342,7 +347,29 @@
 
         function displayAPOD(data) { if (data.media_type === 'image') { createImageCard(data); } else { showMessage("APOD is a video. This terminal displays static images only."); } }
         function displayMarsPhotos(photos) { if (!photos || photos.length === 0) { showMessage('No image data found for this rover on the selected date.'); return; } photos.slice(0, 24).forEach(photo => createMarsImageCard(photo)); }
-        function displaySearchResults(items) { if (!items || items.length === 0) { showMessage('Query returned no results from the image database.'); return; } items.slice(0, 24).forEach(item => { if(item.links && item.links[0].href) { createImageCard({ url: item.links[0].href, title: item.data[0].title, explanation: item.data[0].description }); } }); }
+        
+        // FIX: This function now filters for images to prevent errors
+        function displaySearchResults(items) {
+            if (!items || items.length === 0) {
+                showMessage('Query returned no results from the image database.');
+                return;
+            }
+            const imageItems = items.filter(item => item.data && item.data[0] && item.data[0].media_type === 'image' && item.links && item.links[0]);
+
+            if (imageItems.length === 0) {
+                showMessage('No images found in the results.');
+                return;
+            }
+            
+            showMessage(''); // Clear loading message
+            imageItems.slice(0, 24).forEach(item => {
+                createImageCard({
+                    url: item.links[0].href,
+                    title: item.data[0].title,
+                    explanation: item.data[0].description
+                });
+            });
+        }
 
         function displayEPICImages(images) {
             if (!images || images.length === 0) { showMessage('No Earth images found in the latest transmission.'); return; }
