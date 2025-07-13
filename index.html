@@ -1556,11 +1556,10 @@
 
                 if (response.ok) {
                     if (data.status === "Success") {
-                        // Crucial change: Always set the 'user' object from the backend response.
-                        // This 'data.data' should contain the username and other user details.
                         localStorage.setItem('user', JSON.stringify(data.data));
-
-                        localStorage.setItem('token', data.token);
+                        if (data.token) { // Only set token if it exists (on login)
+                            localStorage.setItem('token', data.token);
+                        }
 
                         authMessage.textContent = data.message;
                         authMessage.style.color = 'green';
@@ -1568,7 +1567,7 @@
                             authModal.classList.add('hidden');
                             updateAuthButtons();
                             const user = JSON.parse(localStorage.getItem('user'));
-                            if (user && !user.has_created_avatar) { // Check if user exists before checking has_created_avatar
+                            if (action === 'signup' || (user && !user.has_created_avatar)) {
                                 showAvatarCreatorModal(user.avatar_config || {});
                             }
                         }, 1000);
