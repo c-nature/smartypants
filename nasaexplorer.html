@@ -218,6 +218,10 @@
         const modalTitle = document.getElementById('modal-title');
         const modalDescription = document.getElementById('modal-description');
 
+        /**
+         * Changes the active tab and clears previous results.
+         * @param {string} tabName - The name of the tab to activate ('apod', 'mars', 'epic', 'search').
+         */
         function changeTab(tabName) {
             const tabs = ['apod', 'mars', 'epic', 'search'];
             tabs.forEach(tab => {
@@ -228,6 +232,7 @@
             document.getElementById(`${tabName}-tab`).classList.add('active');
             clearResults();
 
+            // Special handling for the search tab to pre-fill and search
             if (tabName === 'search') {
                 document.getElementById('search-query').value = 'Orion Nebula';
                 searchImages();
@@ -236,11 +241,26 @@
             }
         }
 
+        /** Shows the loading spinner. */
         function showLoader() { loader.classList.remove('hidden'); loader.classList.add('flex'); }
+        /** Hides the loading spinner. */
         function hideLoader() { loader.classList.add('hidden'); loader.classList.remove('flex'); }
+        /**
+         * Displays a message in the results area.
+         * @param {string} msg - The message to display.
+         */
         function showMessage(msg) { messageDiv.textContent = msg; }
+        /** Clears all results and messages from the display. */
         function clearResults() { imageGrid.innerHTML = ''; messageDiv.textContent = ''; }
 
+        /**
+         * Displays the media modal with the given content.
+         * If the media type is 'video', it opens the URL in a new window instead.
+         * @param {string} mediaType - The type of media ('image' or 'video').
+         * @param {string} url - The URL of the media.
+         * @param {string} title - The title of the media.
+         * @param {string} description - The description of the media.
+         */
         function showMediaModal(mediaType, url, title, description) {
             if (mediaType === 'video') {
                 window.open(url, '_blank');
@@ -250,16 +270,20 @@
             modalTitle.textContent = title;
             modalDescription.innerHTML = description;
             modalImage.src = url;
+            modalImage.style.display = 'block'; // Ensure image is visible
             mediaModal.classList.remove('hidden');
             mediaModal.classList.add('flex');
         }
 
+        /** Closes the media modal and clears its content. */
         function closeMediaModal() {
             mediaModal.classList.add('hidden');
             mediaModal.classList.remove('flex');
             modalImage.src = '';
+            modalImage.style.display = 'none'; // Hide the image when closing
         }
 
+        /** Fetches the Astronomy Picture of the Day (APOD). */
         async function fetchAPOD() {
             clearResults(); showLoader();
             try {
@@ -271,6 +295,7 @@
             finally { hideLoader(); }
         }
 
+        /** Fetches Mars Rover photos for a selected rover and date. */
         async function fetchMarsPhotos() {
             const rover = document.getElementById('rover-select').value;
             const date = document.getElementById('mars-date').value;
@@ -285,6 +310,7 @@
             finally { hideLoader(); }
         }
         
+        /** Fetches Earth Polychromatic Imaging Camera (EPIC) images. */
         async function fetchEPIC() {
             clearResults(); showLoader();
             try {
@@ -296,6 +322,7 @@
             finally { hideLoader(); }
         }
 
+        /** Searches the NASA image and video library based on a query. */
         async function searchImages() {
             const query = document.getElementById('search-query').value.trim();
             if (!query) { showMessage('ERROR: Search query cannot be empty.'); return; }
@@ -309,81 +336,157 @@
             finally { hideLoader(); }
         }
 
-        function createMediaCard(data) {
+        /**
+         * Creates and appends a media card to the image grid.
+         * This function now intelligently extracts data based on the sourceType.
+         * @param {object} rawData - The raw data object from the API response (APOD, Mars photo, EPIC image, or Search item).
+         * @param {string} sourceType - A string indicating the source of the data ('apod', 'mars', 'epic', 'search').
+         */
+        function createMediaCard(rawData, sourceType) {
             const card = document.createElement('div');
             card.className = 'card-glow rounded-lg overflow-hidden';
-            
-            const mediaType = data.media_type || 'image';
-            const imageUrl = mediaType === 'image' ? (data.url || (data.links && data.links[0].href)) : data.thumbnail_url || 'https://placehold.co/600x400/020813/00f6ff?text=VIDEO';
-            const title = data.title || 'Untitled';
-            const description = data.explanation || (data.data && data.data[0].description) || 'No data available.';
-            
+
+            let mediaType, cardThumbnailUrl, modalContentUrl, title, description;
+
+            if (sourceType === 'apod') {
+                mediaType = rawData.media_type || 'image';
+                cardThumbnailUrl = rawData.url || 'https://placehold.co/600x400/020813/00f6ff?text=SIGNAL+LOST';
+                modalContentUrl = rawData.url; // APOD URL is usually direct for image/video
+                title = rawData.title || 'APOD Image';
+                description = rawData.explanation || 'No description available.';
+            } else if (sourceType === 'mars') {
+                mediaType = 'image'; // Mars photos are always images
+                cardThumbnailUrl = rawData.img_src;
+                modalContentUrl = rawData.img_src; // Mars image URL is direct
+                title = `ROVER: ${rawData.rover.name}`;
+                description = `Camera: ${rawData.camera.full_name}<br>Date: ${rawData.earth_date}`;
+            } else if (sourceType === 'epic') {
+                mediaType = 'image'; // EPIC images are always images
+                const date = new Date(rawData.date);
+                const datePath = `${date.getFullYear()}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getDate().toString().padStart(2, '0')}`;
+                cardThumbnailUrl = `https://epic.gsfc.nasa.gov/archive/natural/${datePath}/png/${rawData.image}.png`;
+                modalContentUrl = cardThumbnailUrl; // EPIC URL is direct
+                title = `Earth: ${rawData.caption}`;
+                description = `Image taken on ${date.toISOString().slice(0, 10)}.`;
+            } else if (sourceType === 'search') {
+                mediaType = rawData.data[0].media_type || 'image';
+                cardThumbnailUrl = rawData.links[0] ? rawData.links[0].href : 'https://placehold.co/600x400/020813/00f6ff?text=SIGNAL+LOST';
+                title = rawData.data[0].title || 'Search Result';
+                description = rawData.data[0].description || 'No description available.';
+
+                if (mediaType === 'image') {
+                    // For search images, try to find a larger image link for the modal
+                    // Look for 'orig' or 'asset' relations, or direct image file extensions
+                    const originalLink = rawData.links.find(link => 
+                        link.rel === 'orig' || 
+                        link.rel === 'asset' || 
+                        link.href.toLowerCase().endsWith('.jpg') || 
+                        link.href.toLowerCase().endsWith('.png') ||
+                        link.href.toLowerCase().endsWith('.gif')
+                    );
+                    modalContentUrl = originalLink ? originalLink.href : cardThumbnailUrl; // Fallback to thumbnail if no better link
+                } else if (mediaType === 'video') {
+                    // For videos from search, link to the NASA details page
+                    modalContentUrl = `https://images.nasa.gov/details-${rawData.data[0].nasa_id}`; 
+                }
+            }
+
+            // Escape single quotes and double quotes for HTML attributes
             const escapedTitle = title.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+            // Replace newlines with <br> for HTML display in description
             const escapedDescription = description.replace(/'/g, "\\'").replace(/"/g, '&quot;').replace(/\n/g, '<br>');
 
-            card.setAttribute('onclick', `showMediaModal('${mediaType}', '${data.url}', '${escapedTitle}', '${escapedDescription}')`);
+            // Set the onclick attribute to open the media modal
+            card.setAttribute('onclick', `showMediaModal('${mediaType}', '${modalContentUrl}', '${escapedTitle}', '${escapedDescription}')`);
 
             let playIcon = '';
+            // Add a play icon overlay for video thumbnails
             if (mediaType === 'video') {
                 playIcon = `<div class="play-icon-overlay"><svg class="w-12 h-12 text-white" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"></path></svg></div>`;
             }
 
-            card.innerHTML = `<div class="h-56 bg-black relative"><img src="${imageUrl}" alt="${escapedTitle}" class="w-full h-full object-cover" onerror="this.onerror=null;this.src='https://placehold.co/600x400/020813/00f6ff?text=SIGNAL+LOST';">${playIcon}</div><div class="p-4"><h3 class="font-bold text-lg text-cyan-300 mb-2 truncate">${escapedTitle}</h3><p class="text-gray-400 text-sm h-20 overflow-hidden">${description.substring(0, 120)}...</p></div>`;
+            // Construct the inner HTML of the card
+            card.innerHTML = `
+                <div class="h-56 bg-black relative">
+                    <img src="${cardThumbnailUrl}" alt="${escapedTitle}" class="w-full h-full object-cover" 
+                         onerror="this.onerror=null;this.src='https://placehold.co/600x400/020813/00f6ff?text=SIGNAL+LOST';">
+                    ${playIcon}
+                </div>
+                <div class="p-4">
+                    <h3 class="font-bold text-lg text-cyan-300 mb-2 truncate">${escapedTitle}</h3>
+                    <p class="text-gray-400 text-sm h-20 overflow-hidden">${description.substring(0, 120)}...</p>
+                </div>
+            `;
             imageGrid.appendChild(card);
         }
         
-        function createMarsImageCard(photo) {
-            const card = document.createElement('div');
-            card.className = 'card-glow rounded-lg overflow-hidden';
-            const imageUrl = photo.img_src;
-            const title = `ROVER: ${photo.rover.name}`;
-            const camera = photo.camera.full_name;
-            const date = photo.earth_date;
-            const description = `Camera: ${camera}<br>Date: ${date}`;
-            card.setAttribute('onclick', `showMediaModal('image', '${imageUrl}', '${title.replace(/'/g, "\\'")}', '${description}')`);
-            card.innerHTML = `<div class="h-56 bg-black"><img src="${imageUrl}" alt="${title}" class="w-full h-full object-cover" onerror="this.onerror=null;this.src='https://placehold.co/600x400/020813/00f6ff?text=SIGNAL+LOST';"></div><div class="p-4"><h3 class="font-bold text-lg text-cyan-300 mb-2">${title}</h3><p class="text-gray-400 text-sm">CAMERA: ${camera}</p><p class="text-gray-400 text-sm">DATE: ${date}</p></div>`;
-            imageGrid.appendChild(card);
+        /**
+         * Displays the APOD data.
+         * @param {object} data - The APOD data object.
+         */
+        function displayAPOD(data) { 
+            createMediaCard(data, 'apod'); 
         }
 
-        function displayAPOD(data) { createMediaCard(data); }
-        function displayMarsPhotos(photos) { if (!photos || photos.length === 0) { showMessage('No image data found for this rover on the selected date.'); return; } photos.slice(0, 24).forEach(photo => createMarsImageCard(photo)); }
+        /**
+         * Displays Mars Rover photos.
+         * @param {Array<object>} photos - An array of Mars Rover photo objects.
+         */
+        function displayMarsPhotos(photos) { 
+            if (!photos || photos.length === 0) { 
+                showMessage('No image data found for this rover on the selected date.'); 
+                return; 
+            } 
+            photos.slice(0, 24).forEach(photo => createMediaCard(photo, 'mars')); 
+        }
         
+        /**
+         * Displays search results.
+         * @param {Array<object>} items - An array of search result items.
+         */
         function displaySearchResults(items) {
-            if (!items || items.length === 0) { showMessage('Query returned no results from the image database.'); return; }
-            const mediaItems = items.filter(item => item.data && item.data[0] && (item.data[0].media_type === 'image' || item.data[0].media_type === 'video') && item.links && item.links[0]);
-            if (mediaItems.length === 0) { showMessage('No images or videos found in the results.'); return; }
-            showMessage('');
+            if (!items || items.length === 0) { 
+                showMessage('Query returned no results from the image database.'); 
+                return; 
+            }
+            // Filter for items that have data, media_type (image/video), and at least one link
+            const mediaItems = items.filter(item => 
+                item.data && item.data[0] && 
+                (item.data[0].media_type === 'image' || item.data[0].media_type === 'video') && 
+                item.links && item.links[0]
+            );
+            if (mediaItems.length === 0) { 
+                showMessage('No images or videos found in the results.'); 
+                return; 
+            }
+            showMessage(''); // Clear any previous messages
             mediaItems.slice(0, 24).forEach(item => {
-                let mediaUrl = item.links[0].href;
-                if (item.data[0].media_type === 'video') {
-                    mediaUrl = `https://images.nasa.gov/details-${item.data[0].nasa_id}`;
-                }
-                createMediaCard({
-                    media_type: item.data[0].media_type,
-                    url: mediaUrl, 
-                    thumbnail_url: item.links[0].href,
-                    title: item.data[0].title,
-                    explanation: item.data[0].description
-                });
+                createMediaCard(item, 'search');
             });
         }
 
+        /**
+         * Displays EPIC (Earth) images.
+         * @param {Array<object>} images - An array of EPIC image objects.
+         */
         function displayEPICImages(images) {
-            if (!images || images.length === 0) { showMessage('No Earth images found in the latest transmission.'); return; }
+            if (!images || images.length === 0) { 
+                showMessage('No Earth images found in the latest transmission.'); 
+                return; 
+            }
             images.forEach(image => {
-                const date = new Date(image.date);
-                const dateString = date.toISOString().slice(0, 10);
-                const archiveUrl = `https://epic.gsfc.nasa.gov/archive/natural/${date.getFullYear()}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getDate().toString().padStart(2, '0')}/png/${image.image}.png`;
-                createMediaCard({ media_type: 'image', url: archiveUrl, title: `Earth: ${image.caption}`, explanation: `Image taken on ${dateString}.` });
+                createMediaCard(image, 'epic');
             });
         }
 
+        // Initialize the app when the window loads
         window.onload = () => {
             const marsDateInput = document.getElementById('mars-date');
             const today = new Date();
-            today.setDate(today.getDate() - 5);
+            // Set Mars date to 5 days ago as a default, since recent dates might not have photos
+            today.setDate(today.getDate() - 5); 
             marsDateInput.value = today.toISOString().split('T')[0];
-            fetchAPOD();
+            fetchAPOD(); // Load APOD by default on startup
         };
     </script>
 </body>
