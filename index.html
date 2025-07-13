@@ -1507,14 +1507,18 @@
             } else if (action === 'signup') {
                 requestBody = { username: usernameInput.value, email: emailInput.value, password: passwordInput.value };
                 endpoint = `${BACKEND_URL}/signup`;
+                
+                // --- NEW: Updated password validation ---
+                const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+
                 if (!requestBody.email || !/^[\w-\.]+@([\w-]+\.)+[\w-\.]{2,4}$/.test(requestBody.email)) {
                     authMessage.textContent = 'Please enter a valid email address.';
                     authMessage.style.color = 'red';
                     submitAuthBtn.disabled = false;
                     return;
                 }
-                if (requestBody.password.length < 8) {
-                    authMessage.textContent = 'Password must be at least 8 characters long.';
+                if (!passwordRegex.test(requestBody.password)) {
+                    authMessage.textContent = 'Password must be at least 8 characters long and contain one uppercase letter, one lowercase letter, one number, and one special character.';
                     authMessage.style.color = 'red';
                     submitAuthBtn.disabled = false;
                     return;
@@ -1589,4 +1593,4 @@
         submitAuthBtn.addEventListener('click', handleAuthSubmission);
     </script>
 </body>
-</html>
+</ht
