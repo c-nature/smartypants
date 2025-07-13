@@ -1012,7 +1012,8 @@
         const profileAvatarImg = document.getElementById('profileAvatarImg');
         const headerAvatarContainer = document.getElementById('header-avatar-container');
 
-        const BACKEND_URL = 'https://smartypantsbe.onrender.com/user';
+        // FIX: The backend URL now correctly includes /api
+        const BACKEND_URL = 'https://smartypantsbe.onrender.com/api/user';
 
         function updateAuthButtons() {
             const token = localStorage.getItem('token');
