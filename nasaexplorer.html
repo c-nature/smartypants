@@ -117,7 +117,7 @@
         .card-glow:hover::before {
             left: 100%;
         }
-        
+
         .play-icon-overlay {
             position: absolute;
             top: 50%;
@@ -132,7 +132,7 @@
             justify-content: center;
             pointer-events: none; /* Allows clicks to pass through to the card */
         }
-
+        
         @keyframes flicker {
             0%, 18%, 22%, 25%, 53%, 57%, 100% {
                 text-shadow: 0 0 4px #fff, 0 0 11px #fff, 0 0 19px #fff, 0 0 40px var(--glow-color), 0 0 80px var(--glow-color), 0 0 90px var(--glow-color), 0 0 100px var(--glow-color), 0 0 150px var(--glow-color);
@@ -199,7 +199,6 @@
             <div class="flex-grow overflow-y-auto flex flex-col md:flex-row gap-4">
                 <div class="md:w-2/3 flex-shrink-0 flex items-center justify-center bg-black rounded-md">
                      <img id="modal-image" src="" alt="Enlarged view" class="w-full h-auto max-h-[80vh] object-contain hidden">
-                     <iframe id="modal-video" class="w-full h-full aspect-video hidden" src="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
                 </div>
                 <div class="md:w-1/3 text-gray-300 overflow-y-auto p-2">
                     <h2 id="modal-title" class="text-2xl text-cyan-300 font-bold mb-4 font-['Orbitron']"></h2>
@@ -218,7 +217,6 @@
         
         const mediaModal = document.getElementById('media-modal');
         const modalImage = document.getElementById('modal-image');
-        const modalVideo = document.getElementById('modal-video');
         const modalTitle = document.getElementById('modal-title');
         const modalDescription = document.getElementById('modal-description');
 
@@ -233,7 +231,9 @@
             clearResults();
 
             if (tabName === 'search') {
-                fetchRecentImages();
+                document.getElementById('search-query').value = 'Orion Nebula';
+                searchImages();
+                showMessage('Displaying popular images. Use the search bar for more.');
             } else {
                 showMessage('Awaiting your command...');
             }
@@ -245,25 +245,15 @@
         function clearResults() { imageGrid.innerHTML = ''; messageDiv.textContent = ''; }
 
         function showMediaModal(mediaType, url, title, description) {
-            modalTitle.textContent = title;
-            modalDescription.innerHTML = description;
-            
-            if (mediaType === 'image') {
-                modalImage.src = url;
-                modalImage.classList.remove('hidden');
-                modalVideo.classList.add('hidden');
-            } else if (mediaType === 'video') {
-                // Convert YouTube watch URLs to embed URLs
-                let videoUrl = url;
-                if (url.includes("youtube.com/watch?v=")) {
-                    const videoId = url.split('v=')[1].split('&')[0];
-                    videoUrl = `https://www.youtube.com/embed/${videoId}`;
-                }
-                modalVideo.src = videoUrl;
-                modalVideo.classList.remove('hidden');
-                modalImage.classList.add('hidden');
+            // FIX: If it's a video, open it in a new tab instead of the modal
+            if (mediaType === 'video') {
+                window.open(url, '_blank');
+                return;
             }
             
+            modalTitle.textContent = title;
+            modalDescription.innerHTML = description;
+            modalImage.src = url;
             mediaModal.classList.remove('hidden');
             mediaModal.classList.add('flex');
         }
@@ -272,7 +262,6 @@
             mediaModal.classList.add('hidden');
             mediaModal.classList.remove('flex');
             modalImage.src = '';
-            modalVideo.src = '';
         }
 
         async function fetchAPOD() {
@@ -320,22 +309,6 @@
                 displayEONETEvents(data.events);
             } catch (error) { showMessage('EONET FEED COMPROMISED.'); }
             finally { hideLoader(); }
-        }
-        
-        async function fetchRecentImages() {
-            showMessage('Loading recent uploads from the archive...');
-            showLoader();
-            try {
-                const response = await fetch(`${APP_API_BASE_URL}/recent`);
-                if (!response.ok) throw new Error(`SYSTEM ERROR: ${response.status}`);
-                const data = await response.json();
-                displaySearchResults(data.collection.items);
-            } catch (error) {
-                console.error("Error in fetchRecentImages:", error);
-                showMessage('ARCHIVE CONNECTION FAILED.');
-            } finally {
-                hideLoader();
-            }
         }
 
         async function searchImages() {
@@ -396,10 +369,15 @@
             if (mediaItems.length === 0) { showMessage('No images or videos found in the results.'); return; }
             showMessage('');
             mediaItems.slice(0, 24).forEach(item => {
+                let mediaUrl = item.links[0].href;
+                // The search API doesn't provide a direct video file, so we find a link to the asset page
+                if (item.data[0].media_type === 'video') {
+                    mediaUrl = `https://images.nasa.gov/details-${item.data[0].nasa_id}`;
+                }
                 createMediaCard({
                     media_type: item.data[0].media_type,
-                    url: item.data[0].media_type === 'video' ? item.links[0].href : item.links[0].href, // Placeholder for video URL logic
-                    thumbnail_url: item.links[0].href, // Use image link as thumbnail
+                    url: mediaUrl, 
+                    thumbnail_url: item.links[0].href,
                     title: item.data[0].title,
                     explanation: item.data[0].description
                 });
