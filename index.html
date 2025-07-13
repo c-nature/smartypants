@@ -639,7 +639,16 @@
                     <button class="play-game-button-new-window" onclick="playClickSound(); openGameInNewWindow('animalapp.html');">Open in New Window</button>
                 </div>
             </div>
+            <!-- NEW: NASA Explorer Game Card -->
+            <div class="game-list-card" style="background-image: url('https://placehold.co/600x400/020813/00f6ff?text=NASA'); background-size: cover; background-position: center;">
+                <h3 style="color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);">NASA Explorer</h3>
+                <p style="color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);">Explore photos from space!</p>
+                <div class="game-card-buttons">
+                    <button class="play-game-button" onclick="playClickSound(); showNasaGame();">Play Here</button>
+                    <button class="play-game-button-new-window" onclick="playClickSound(); openGameInNewWindow('nasaexplorer.html');">Open in New Window</button>
+                </div>
             </div>
+        </div>
     </div>
 
     <div id="ela-category-view" class="category-view hidden">
@@ -692,6 +701,15 @@
         </button>
         <iframe id="ela-game-iframe" src="" title="Word Weaver Game" class="game-iframe"></iframe>
     </div>
+    
+    <!-- NEW: NASA Game Iframe Container -->
+    <div id="nasa-game-view" class="game-iframe-container">
+        <button onclick="playClickSound(); showScienceCategoryView();" class="back-button">
+            &larr; Back to Science Menu
+        </button>
+        <iframe id="nasa-game-iframe" src="" title="NASA Explorer" class="game-iframe"></iframe>
+    </div>
+
 
     <audio id="mainClickSoundElement" preload="auto">
         <source src="click.mp3" type="audio/mpeg">
@@ -823,11 +841,13 @@
         const mathGameView = document.getElementById('math-game-view');
         const scienceGameView = document.getElementById('science-game-view');
         const elaGameView = document.getElementById('ela-game-view');
+        const nasaGameView = document.getElementById('nasa-game-view'); // NEW
 
         // Game Iframes
         const mathGameIframe = document.getElementById('math-game-iframe');
         const scienceGameIframe = document.getElementById('science-game-iframe');
         const elaGameIframe = document.getElementById('ela-game-iframe');
+        const nasaGameIframe = document.getElementById('nasa-game-iframe'); // NEW
 
         const mainClickSoundElement = document.getElementById('mainClickSoundElement');
 
@@ -853,6 +873,7 @@
             mathGameView.style.display = 'none';
             scienceGameView.style.display = 'none';
             elaGameView.style.display = 'none';
+            nasaGameView.style.display = 'none'; // NEW
         }
 
         function showMainMenu() {
@@ -861,6 +882,7 @@
             mathGameIframe.src = '';
             scienceGameIframe.src = '';
             elaGameIframe.src = '';
+            nasaGameIframe.src = ''; // NEW
             document.body.style.overflow = 'auto';
         }
 
@@ -908,6 +930,14 @@
             hideAllViews();
             elaGameView.style.display = 'flex';
             elaGameIframe.src = 'WordWarrior.html';
+            document.body.style.overflow = 'hidden';
+        }
+        
+        // NEW: Function to show NASA game
+        function showNasaGame() {
+            hideAllViews();
+            nasaGameView.style.display = 'flex';
+            nasaGameIframe.src = 'nasaexplorer.html';
             document.body.style.overflow = 'hidden';
         }
 
@@ -982,8 +1012,7 @@
         const profileAvatarImg = document.getElementById('profileAvatarImg');
         const headerAvatarContainer = document.getElementById('header-avatar-container');
 
-        // FIX: Updated the backend URL to match the new server.js route structure.
-        const BACKEND_URL = 'https://smartypantsbe.onrender.com/api/user';
+        const BACKEND_URL = 'https://smartypantsbe.onrender.com/user';
 
         function updateAuthButtons() {
             const token = localStorage.getItem('token');
