@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plant Explorer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Updated Google Fonts for an earthy/exotic feel -->
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;700&family=Lora:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            /* New earthy background gradient */
+            font-family: 'Lora', serif; /* Body text font */
+            background: linear-gradient(to bottom right, #8B5E3C, #4A6B5B, #D4E7C5); /* Earthy tones */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            min-height: 100vh;
+            padding: 2rem;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        .container {
+            /* Muted, natural background for the main container */
+            background-color: rgba(255, 255, 255, 0.85); /* Slightly transparent white for a softer look */
+            border-radius: 1.5rem;
+            padding: 2rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            width: 100%;
+            max-width: 900px;
+            text-align: center;
+            margin-top: 2rem;
+            margin-bottom: 2rem;
+            border: 2px solid #6B8E23; /* Earthy green border */
+        }
+
+        .header-title {
+            /* New font and color for the title */
+            font-family: 'Cormorant Garamond', serif; /* Heading font */
+            font-size: 3.5rem;
+            font-weight: 700; /* Adjusted weight for Cormorant Garamond */
+            color: #4A6B5B; /* Forest green title */
+            margin-bottom: 1.5rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .search-container {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .search-input {
+            flex-grow: 1;
+            padding: 0.75rem 1.25rem;
+            border-radius: 9999px;
+            border: 2px solid #A7D9B2; /* Muted green border */
+            outline: none;
+            font-size: 1.1rem;
+            font-family: 'Lora', serif; /* Match body font */
+            max-width: 400px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: border-color 0.3s ease;
+            color: #333;
+            background-color: #F5F5DC; /* Beige input background */
+        }
+
+        .search-input:focus {
+            border-color: #8B5E3C; /* Earthy brown focus */
+        }
+
+        .search-button {
+            /* New button colors */
+            background-color: #6B8E23; /* Olive green button */
+            color: white;
+            padding: 0.75rem 1.75rem;
+            border-radius: 9999px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out;
+        }
+
+        .search-button:hover {
+            background-color: #4A6B5B; /* Darker forest green on hover */
+            transform: translateY(-2px);
+        }
+        .search-button:active {
+            transform: translateY(0);
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .plant-card {
+            /* Muted background for plant cards */
+            background-color: #F5F5DC; /* Beige card background */
+            border-radius: 1rem;
+            padding: 1.5rem;
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+            text-align: left;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: transform 0.2s ease-in-out;
+            border: 2px solid #8B5E3C; /* Earthy brown border */
+        }
+
+        .plant-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
+        }
+
+        .plant-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 0.75rem;
+            margin-bottom: 1rem;
+            border: 1px solid #ccc;
+        }
+
+        .plant-name {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #4A6B5B; /* Forest green for plant names */
+            margin-bottom: 0.5rem;
+        }
+
+        .plant-scientific {
+            font-style: italic;
+            color: #5A4F4A; /* Darker muted brown for scientific names */
+            margin-bottom: 0.5rem;
+        }
+
+        .plant-detail {
+            font-size: 0.95rem;
+            color: #5A4F4A; /* Darker muted brown for details */
+            margin-bottom: 0.25rem;
+        }
+
+        .message-box {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 0.5rem;
+            z-index: 1001;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+            pointer-events: none;
+            font-family: 'Lora', serif; /* Match new body font */
+            text-align: center;
+        }
+        .message-box.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+            .header-title {
+                font-size: 2.2rem;
+            }
+            .search-container {
+                flex-direction: column;
+                align-items: center;
+            }
+            .search-input {
+                width: 100%;
+                max-width: none;
+            }
+            .search-button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1 class="header-title">Plant Explorer</h1>
+        <div class="search-container">
+            <input type="text" id="plantSearchInput" class="search-input" placeholder="Search for a plant (e.g., 'rose', 'oak')">
+            <button id="searchPlantBtn" class="search-button">Search Plants</button>
+        </div>
+        <div id="plantResults" class="results-grid">
+            <!-- Plant cards will be inserted here -->
+        </div>
+        <p id="statusMessage" class="text-gray-600 mt-4"></p>
+    </div>
+
+    <!-- Message Box for general messages -->
+    <div id="messageBox" class="message-box"></div>
+
+    <audio id="mainClickSoundElement" preload="auto">
+        <source src="click.mp3" type="audio/mpeg">
+        <source src="click.ogg" type="audio/ogg">
+        <source src="click.wav" type="audio/wav"> Your browser does not support the audio element.
+    </audio>
+
+    <script>
+        const plantSearchInput = document.getElementById('plantSearchInput');
+        const searchPlantBtn = document.getElementById('searchPlantBtn');
+        const plantResults = document.getElementById('plantResults');
+        const statusMessage = document.getElementById('statusMessage');
+        const messageBox = document.getElementById('messageBox');
+        const mainClickSoundElement = document.getElementById('mainClickSoundElement');
+
+        // IMPORTANT: Replace with your actual backend URL where the /api/user/plant/search endpoint is hosted
+        const BACKEND_API_BASE_URL = 'https://smartypantsbe.onrender.com/api/user'; 
+
+        function playClickSound() {
+            if (mainClickSoundElement) {
+                mainClickSoundElement.currentTime = 0;
+                mainClickSoundElement.play().catch(e => {
+                    console.warn("Error playing click sound:", e);
+                });
+            } else {
+                console.warn("mainClickSoundElement not found. Click sound may not work.");
+            }
+        }
+
+        /**
+         * Displays a temporary message box with the given text.
+         * @param {string} message The message to display.
+         * @param {number} duration The duration in milliseconds for which the message should be displayed.
+         */
+        function showMessageBox(message, duration = 3000) {
+            messageBox.textContent = message;
+            messageBox.classList.add('show');
+            setTimeout(() => {
+                messageBox.classList.remove('show');
+            }, duration);
+        }
+
+        async function searchPlants() {
+            playClickSound();
+            const query = plantSearchInput.value.trim();
+            if (!query) {
+                showMessageBox('Please enter a plant name to search.');
+                return;
+            }
+
+            plantResults.innerHTML = ''; // Clear previous results
+            statusMessage.textContent = 'Searching for plants...';
+            searchPlantBtn.disabled = true;
+
+            try {
+                // Call your backend endpoint for Trefle.io search
+                const response = await fetch(`${BACKEND_API_BASE_URL}/plant/search?q=${encodeURIComponent(query)}`);
+                const data = await response.json();
+
+                if (!response.ok || data.status !== 'Success') {
+                    const errorMessage = data.message || `Error: ${response.status} ${response.statusText}`;
+                    statusMessage.textContent = `Error: ${errorMessage}`;
+                    showMessageBox(`Search failed: ${errorMessage}`);
+                    return;
+                }
+
+                if (data.data && data.data.length > 0) {
+                    statusMessage.textContent = `Found ${data.data.length} plants for "${query}"`;
+                    data.data.forEach(plant => {
+                        const plantCard = document.createElement('div');
+                        plantCard.className = 'plant-card';
+                        plantCard.innerHTML = `
+                            <img src="${plant.imageUrl || 'https://placehold.co/200x200/cccccc/000000?text=No+Image'}" alt="${plant.commonName || plant.scientificName}" class="plant-image" onerror="this.onerror=null;this.src='https://placehold.co/200x200/cccccc/000000?text=No+Image';">
+                            <h3 class="plant-name">${plant.commonName || 'N/A'}</h3>
+                            <p class="plant-scientific">${plant.scientificName || 'N/A'}</p>
+                            <p class="plant-detail">Family: ${plant.family || 'N/A'}</p>
+                            <p class="plant-detail">Genus: ${plant.genus || 'N/A'}</p>
+                        `;
+                        plantResults.appendChild(plantCard);
+                    });
+                } else {
+                    statusMessage.textContent = `No plants found for "${query}". Try a different name.`;
+                    showMessageBox(`No results for "${query}".`);
+                }
+
+            } catch (error) {
+                console.error('Frontend search error:', error);
+                statusMessage.textContent = 'An error occurred during search. Please try again.';
+                showMessageBox('Network error during search.');
+            } finally {
+                searchPlantBtn.disabled = false;
+            }
+        }
+
+        searchPlantBtn.addEventListener('click', searchPlants);
+        plantSearchInput.addEventListener('keypress', (event) => {
+            if (event.key === 'Enter') {
+                searchPlants();
+            }
+        });
+
+        // Initial message
+        document.addEventListener('DOMContentLoaded', () => {
+            statusMessage.textContent = 'Enter a plant name to explore!';
+        });
+    </script>
+</body>
+</html>
