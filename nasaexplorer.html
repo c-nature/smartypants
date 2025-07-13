@@ -7,29 +7,6 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <!-- FIX: Added Roboto font for better readability in UI elements -->
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --glow-color: #00f6ff;
-            --bg-color: #020813;
-            --surface-color: rgba(10, 30, 50, 0.6);
-            --border-color: rgba(0, 246, 255, 0.3);
-        }
-
-        body {
-            /* FIX: Default font for body is now Roboto for readability */
-            font-family: 'Roboto', sans-serif;
-            background-color: var(--bg-color);
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NASA Holo-Deck | Photo Explorer</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -173,13 +150,12 @@
 
         <!-- Navigation Tabs -->
         <div class="mb-8 container-glow rounded-lg p-2">
-            <nav class="grid grid-cols-2 md:flex md:flex-row justify-center gap-2" aria-label="Tabs">
+            <nav class="grid grid-cols-2 md:grid-cols-5 justify-center gap-2" aria-label="Tabs">
                 <button onclick="changeTab('apod')" id="apod-tab" class="tab-button w-full sm:w-auto text-base md:text-lg font-bold active">APOD</button>
                 <button onclick="changeTab('mars')" id="mars-tab" class="tab-button w-full sm:w-auto text-base md:text-lg font-bold">MARS ROVERS</button>
                 <button onclick="changeTab('epic')" id="epic-tab" class="tab-button w-full sm:w-auto text-base md:text-lg font-bold">EARTH</button>
                 <button onclick="changeTab('eonet')" id="eonet-tab" class="tab-button w-full sm:w-auto text-base md:text-lg font-bold">NATURAL EVENTS</button>
-                <button onclick="changeTab('astronaut')" id="astronaut-tab" class="tab-button w-full sm:w-auto text-base md:text-lg font-bold">ASTRONAUT PHOTOS</button>
-                <button onclick="changeTab('search')" id="search-tab" class="tab-button w-full sm:w-auto text-base md:text-lg font-bold">IMAGE SEARCH</button>
+                <button onclick="changeTab('search')" id="search-tab" class="tab-button w-full sm:w-auto text-base md:text-lg font-bold col-span-2 md:col-span-1">IMAGE SEARCH</button>
             </nav>
         </div>
 
@@ -189,7 +165,6 @@
             <div id="mars-content" class="tab-content hidden"><div class="text-center mb-4 flex flex-col sm:flex-row justify-center items-center gap-4"><select id="rover-select" class="futuristic-select rounded-md px-4 py-3 text-lg"><option value="curiosity">Curiosity</option><option value="opportunity">Opportunity</option><option value="spirit">Spirit</option></select><input type="date" id="mars-date" class="futuristic-input rounded-md px-4 py-2.5 text-lg"><button onclick="fetchMarsPhotos()" class="futuristic-btn font-bold py-3 px-8 rounded-md text-lg">QUERY ROVER</button></div></div>
             <div id="epic-content" class="tab-content hidden"><div class="text-center mb-4"><button onclick="fetchEPIC()" class="futuristic-btn font-bold py-3 px-8 rounded-md text-lg">LOAD LATEST EARTH IMAGES</button></div></div>
             <div id="eonet-content" class="tab-content hidden"><div class="text-center mb-4"><button onclick="fetchEONET()" class="futuristic-btn font-bold py-3 px-8 rounded-md text-lg">SCAN FOR NATURAL EVENTS</button></div></div>
-            <div id="astronaut-content" class="tab-content hidden"><div class="text-center mb-4 flex flex-col sm:flex-row justify-center items-center gap-4"><input type="text" id="astronaut-query" class="w-full max-w-sm futuristic-input rounded-md px-4 py-3 text-lg" placeholder="QUERY: e.g., STS-135"><button onclick="fetchAstronautPhotos()" class="futuristic-btn font-bold py-3 px-8 rounded-md text-lg">SEARCH ARCHIVE</button></div></div>
             <div id="search-content" class="tab-content hidden"><div class="text-center mb-4 flex flex-col sm:flex-row justify-center items-center gap-4"><input type="text" id="search-query" class="w-full max-w-sm futuristic-input rounded-md px-4 py-3 text-lg" placeholder="QUERY: e.g., Orion Nebula"><button onclick="searchImages()" class="futuristic-btn font-bold py-3 px-8 rounded-md text-lg">SEARCH DATABASE</button></div></div>
         </main>
 
@@ -208,7 +183,7 @@
         const imageGrid = document.getElementById('image-grid');
 
         function changeTab(tabName) {
-            const tabs = ['apod', 'mars', 'epic', 'eonet', 'astronaut', 'search'];
+            const tabs = ['apod', 'mars', 'epic', 'eonet', 'search'];
             tabs.forEach(tab => {
                 document.getElementById(`${tab}-content`).classList.add('hidden');
                 document.getElementById(`${tab}-tab`).classList.remove('active');
@@ -271,19 +246,6 @@
             finally { hideLoader(); }
         }
 
-        async function fetchAstronautPhotos() {
-            const query = document.getElementById('astronaut-query').value.trim();
-            if (!query) { showMessage('ERROR: Search query required for archive.'); return; }
-            clearResults(); showLoader();
-            try {
-                const response = await fetch(`${APP_API_BASE_URL}/astronaut/${encodeURIComponent(query)}`);
-                if (!response.ok) throw new Error(`SYSTEM ERROR: ${response.status}`);
-                const data = await response.json();
-                displayAstronautPhotos(data.collection.items);
-            } catch (error) { showMessage('ASTRONAUT PHOTO ARCHIVE UNREACHABLE.'); }
-            finally { hideLoader(); }
-        }
-
         async function searchImages() {
             const query = document.getElementById('search-query').value.trim();
             if (!query) { showMessage('ERROR: Search query cannot be empty.'); return; }
@@ -307,10 +269,20 @@
             imageGrid.appendChild(card);
         }
         
-        function createMarsImageCard(photo) { /* ... existing code ... */ }
-        function displayAPOD(data) { /* ... existing code ... */ }
-        function displayMarsPhotos(photos) { /* ... existing code ... */ }
-        function displaySearchResults(items) { /* ... existing code ... */ }
+        function createMarsImageCard(photo) {
+            const card = document.createElement('div');
+            card.className = 'card-glow rounded-lg overflow-hidden';
+            const imageUrl = photo.img_src;
+            const title = `ROVER: ${photo.rover.name}`;
+            const camera = photo.camera.full_name;
+            const date = photo.earth_date;
+            card.innerHTML = `<div class="h-56 bg-black"><img src="${imageUrl}" alt="${title}" class="w-full h-full object-cover" onerror="this.onerror=null;this.src='https://placehold.co/600x400/020813/00f6ff?text=SIGNAL+LOST';"></div><div class="p-4"><h3 class="font-bold text-lg text-cyan-300 mb-2">${title}</h3><p class="text-gray-400 text-sm">CAMERA: ${camera}</p><p class="text-gray-400 text-sm">DATE: ${date}</p></div>`;
+            imageGrid.appendChild(card);
+        }
+
+        function displayAPOD(data) { if (data.media_type === 'image') { createImageCard(data); } else { showMessage("APOD is a video. This terminal displays static images only."); } }
+        function displayMarsPhotos(photos) { if (!photos || photos.length === 0) { showMessage('No image data found for this rover on the selected date.'); return; } photos.slice(0, 24).forEach(photo => createMarsImageCard(photo)); }
+        function displaySearchResults(items) { if (!items || items.length === 0) { showMessage('Query returned no results from the image database.'); return; } items.slice(0, 24).forEach(item => { if(item.links && item.links[0].href) { createImageCard({ url: item.links[0].href, title: item.data[0].title, explanation: item.data[0].description }); } }); }
 
         function displayEPICImages(images) {
             if (!images || images.length === 0) { showMessage('No Earth images found in the latest transmission.'); return; }
@@ -324,19 +296,17 @@
 
         function displayEONETEvents(events) {
             if (!events || events.length === 0) { showMessage('No recent natural events detected.'); return; }
-            const eventsWithImages = events.filter(event => event.geometry && event.geometry.length > 0);
-             if (eventsWithImages.length === 0) { showMessage('Detected events have no associated imagery.'); return; }
+            const eventsWithImages = events.filter(event => event.sources && event.sources.length > 0);
+            if (eventsWithImages.length === 0) { showMessage('Detected events have no associated imagery.'); return; }
             eventsWithImages.slice(0, 12).forEach(event => {
-                createImageCard({ url: event.geometry[0].url, title: event.title, explanation: `Category: ${event.categories[0].title}` });
-            });
-        }
-
-        function displayAstronautPhotos(items) {
-            if (!items || items.length === 0) { showMessage('No astronaut photos found for that query.'); return; }
-            items.slice(0, 24).forEach(item => {
-                if (item.links && item.links[0].render === 'image') {
-                    createImageCard({ url: item.links[0].href, title: item.data[0].nasa_id, explanation: item.data[0].description });
-                }
+                const card = document.createElement('a');
+                card.href = event.sources[0].url;
+                card.target = '_blank';
+                card.className = 'card-glow rounded-lg overflow-hidden block';
+                const title = event.title;
+                const category = event.categories[0].title;
+                card.innerHTML = `<div class="h-56 bg-black flex items-center justify-center text-center p-4"><div class="text-cyan-300"><h3 class="font-bold text-xl mb-2">${title}</h3><p class="text-gray-400">Category: ${category}</p><p class="mt-4 text-sm underline">Click to view event details</p></div></div>`;
+                imageGrid.appendChild(card);
             });
         }
 
