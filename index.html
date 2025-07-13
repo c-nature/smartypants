@@ -640,6 +640,7 @@
                     <button class="play-game-button-new-window" onclick="playClickSound(); openGameInNewWindow('animalapp.html');">Open in New Window</button>
                 </div>
             </div>
+            <!-- NEW: NASA Explorer Game Card -->
             <div class="game-list-card" style="background-image: url('space.png'); background-size: cover; background-position: center;">
                 <h3 style="color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);">Space Explorer</h3>
                 <p style="color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);">Explore photos from space!</p>
@@ -1141,7 +1142,7 @@
             if (hatTypes.includes(randomConfig.topType)) {
                 delete randomConfig.topColor; // Use hatColor instead
             } else if (randomConfig.topType === 'Hijab') {
-                delete randomConfig.hatColor; // Use topColor instead
+                delete randomConfig.topColor; // Use topColor instead
             } else {
                 // It's regular hair, so delete both hat and top colors
                 delete randomConfig.hatColor;
