@@ -51,7 +51,7 @@
             text-shadow: 0 0 2px var(--glow-color);
             transition: all 0.3s ease;
             clip-path: polygon(10% 0, 100% 0, 90% 100%, 0 100%);
-            padding: 0.75rem 1rem; /* Adjusted padding for more tabs */
+            padding: 0.75rem 1rem;
         }
 
         .tab-button:hover, .tab-button.active {
@@ -130,7 +130,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            pointer-events: none; /* Allows clicks to pass through to the card */
+            pointer-events: none;
         }
         
         @keyframes flicker {
@@ -166,12 +166,11 @@
 
         <!-- Navigation Tabs -->
         <div class="mb-8 container-glow rounded-lg p-2">
-            <nav class="grid grid-cols-2 md:grid-cols-5 justify-center gap-2" aria-label="Tabs">
+            <nav class="grid grid-cols-2 md:grid-cols-4 justify-center gap-2" aria-label="Tabs">
                 <button onclick="changeTab('apod')" id="apod-tab" class="tab-button w-full sm:w-auto text-base md:text-lg font-bold active">APOD</button>
-                <button onclick="changeTab('mars')" id="mars-tab" class="tab-button w-full sm:w-auto text-base md:text-lg font-bold">MARS ROVERS</button>
+                <button onclick="changeTab('mars')" id="mars-tab" class="tab-button w-full sm:w-auto text-base md:text-lg font-bold">MARS</button>
                 <button onclick="changeTab('epic')" id="epic-tab" class="tab-button w-full sm:w-auto text-base md:text-lg font-bold">EARTH</button>
-                <button onclick="changeTab('eonet')" id="eonet-tab" class="tab-button w-full sm:w-auto text-base md:text-lg font-bold">NATURAL EVENTS</button>
-                <button onclick="changeTab('search')" id="search-tab" class="tab-button w-full sm:w-auto text-base md:text-lg font-bold col-span-2 md:col-span-1">IMAGE SEARCH</button>
+                <button onclick="changeTab('search')" id="search-tab" class="tab-button w-full sm:w-auto text-base md:text-lg font-bold col-span-2 md:col-span-1">SEARCH</button>
             </nav>
         </div>
 
@@ -180,7 +179,6 @@
             <div id="apod-content" class="tab-content"><div class="text-center mb-4"><button onclick="fetchAPOD()" class="futuristic-btn font-bold py-3 px-8 rounded-md text-lg">INITIALIZE APOD STREAM</button></div></div>
             <div id="mars-content" class="tab-content hidden"><div class="text-center mb-4 flex flex-col sm:flex-row justify-center items-center gap-4"><select id="rover-select" class="futuristic-select rounded-md px-4 py-3 text-lg"><option value="curiosity">Curiosity</option><option value="opportunity">Opportunity</option><option value="spirit">Spirit</option></select><input type="date" id="mars-date" class="futuristic-input rounded-md px-4 py-2.5 text-lg"><button onclick="fetchMarsPhotos()" class="futuristic-btn font-bold py-3 px-8 rounded-md text-lg">QUERY ROVER</button></div></div>
             <div id="epic-content" class="tab-content hidden"><div class="text-center mb-4"><button onclick="fetchEPIC()" class="futuristic-btn font-bold py-3 px-8 rounded-md text-lg">LOAD LATEST EARTH IMAGES</button></div></div>
-            <div id="eonet-content" class="tab-content hidden"><div class="text-center mb-4"><button onclick="fetchEONET()" class="futuristic-btn font-bold py-3 px-8 rounded-md text-lg">SCAN FOR NATURAL EVENTS</button></div></div>
             <div id="search-content" class="tab-content hidden"><div class="text-center mb-4 flex flex-col sm:flex-row justify-center items-center gap-4"><input type="text" id="search-query" class="w-full max-w-sm futuristic-input rounded-md px-4 py-3 text-lg" placeholder="QUERY: e.g., Orion Nebula"><button onclick="searchImages()" class="futuristic-btn font-bold py-3 px-8 rounded-md text-lg">SEARCH DATABASE</button></div></div>
         </main>
 
@@ -221,7 +219,7 @@
         const modalDescription = document.getElementById('modal-description');
 
         function changeTab(tabName) {
-            const tabs = ['apod', 'mars', 'epic', 'eonet', 'search'];
+            const tabs = ['apod', 'mars', 'epic', 'search'];
             tabs.forEach(tab => {
                 document.getElementById(`${tab}-content`).classList.add('hidden');
                 document.getElementById(`${tab}-tab`).classList.remove('active');
@@ -245,7 +243,6 @@
         function clearResults() { imageGrid.innerHTML = ''; messageDiv.textContent = ''; }
 
         function showMediaModal(mediaType, url, title, description) {
-            // FIX: If it's a video, open it in a new tab instead of the modal
             if (mediaType === 'video') {
                 window.open(url, '_blank');
                 return;
@@ -297,17 +294,6 @@
                 const data = await response.json();
                 displayEPICImages(data);
             } catch (error) { showMessage('EPIC DATASTREAM CORRUPTED.'); }
-            finally { hideLoader(); }
-        }
-
-        async function fetchEONET() {
-            clearResults(); showLoader();
-            try {
-                const response = await fetch(`${APP_API_BASE_URL}/eonet`);
-                if (!response.ok) throw new Error(`SYSTEM ERROR: ${response.status}`);
-                const data = await response.json();
-                displayEONETEvents(data.events);
-            } catch (error) { showMessage('EONET FEED COMPROMISED.'); }
             finally { hideLoader(); }
         }
 
@@ -370,7 +356,6 @@
             showMessage('');
             mediaItems.slice(0, 24).forEach(item => {
                 let mediaUrl = item.links[0].href;
-                // The search API doesn't provide a direct video file, so we find a link to the asset page
                 if (item.data[0].media_type === 'video') {
                     mediaUrl = `https://images.nasa.gov/details-${item.data[0].nasa_id}`;
                 }
@@ -391,22 +376,6 @@
                 const dateString = date.toISOString().slice(0, 10);
                 const archiveUrl = `https://epic.gsfc.nasa.gov/archive/natural/${date.getFullYear()}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getDate().toString().padStart(2, '0')}/png/${image.image}.png`;
                 createMediaCard({ media_type: 'image', url: archiveUrl, title: `Earth: ${image.caption}`, explanation: `Image taken on ${dateString}.` });
-            });
-        }
-
-        function displayEONETEvents(events) {
-            if (!events || events.length === 0) { showMessage('No recent natural events detected.'); return; }
-            const eventsWithImages = events.filter(event => event.sources && event.sources.length > 0);
-            if (eventsWithImages.length === 0) { showMessage('Detected events have no associated imagery.'); return; }
-            eventsWithImages.slice(0, 12).forEach(event => {
-                const card = document.createElement('a');
-                card.href = event.sources[0].url;
-                card.target = '_blank';
-                card.className = 'card-glow rounded-lg overflow-hidden block';
-                const title = event.title;
-                const category = event.categories[0].title;
-                card.innerHTML = `<div class="h-56 bg-black flex items-center justify-center text-center p-4"><div class="text-cyan-300"><h3 class="font-bold text-xl mb-2">${title}</h3><p class="text-gray-400">Category: ${category}</p><p class="mt-4 text-sm underline">Click to view event details</p></div></div>`;
-                imageGrid.appendChild(card);
             });
         }
 
