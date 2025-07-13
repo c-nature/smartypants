@@ -1650,10 +1650,15 @@
         contactBtn.addEventListener('click', () => {
             playClickSound();
             const emailAddress = 'sbloom@cnature.net';
-            const mailtoLink = `mailto:${emailAddress}`;
 
+            // 1. Always copy to clipboard immediately on click for reliability.
+            copyEmailToClipboard(emailAddress);
+            showMessageBox("Email copied to clipboard. Attempting to open email client...");
+
+            // 2. Then, attempt to open the mailto link.
+            const mailtoLink = `mailto:${emailAddress}`;
             try {
-                // Attempt to open mailto link by creating a temporary anchor
+                // Creating a temporary anchor and clicking it is often more reliable than window.open for mailto.
                 const tempLink = document.createElement('a');
                 tempLink.href = mailtoLink;
                 tempLink.style.display = 'none'; // Hide it
@@ -1661,19 +1666,10 @@
                 tempLink.click(); // Programmatically click the link
                 document.body.removeChild(tempLink); // Clean up
 
-                // Show a message indicating the email client is being attempted and email is copied
-                showMessageBox("Attempting to open email client. Email copied to clipboard.");
-
             } catch (e) {
                 console.error("Error attempting to open mailto link:", e);
-                // If an error occurs during the mailto attempt, it definitely failed.
-                showMessageBox("Could not open email client. Email copied to clipboard.");
-            } finally {
-                // Always copy to clipboard after a very short delay, regardless of mailto success,
-                // to ensure the user has the email address.
-                setTimeout(() => {
-                    copyEmailToClipboard(emailAddress);
-                }, 100); // Small delay to allow mailto attempt first
+                // If an error occurs during the mailto attempt, update message.
+                showMessageBox("Email copied to clipboard. Could not open email client.");
             }
         });
 
@@ -1689,9 +1685,6 @@
             tempInput.setSelectionRange(0, 99999); // For mobile devices
             try {
                 document.execCommand('copy');
-                // The message is now handled by the main click handler, but this is a fallback for direct calls
-                // or if the initial message needs refinement.
-                // showMessageBox(`Email copied to clipboard: ${text}`); // Removed duplicate message here
             } catch (err) {
                 console.error('Failed to copy email:', err);
                 showMessageBox('Failed to copy email. Please copy it manually: ' + text);
