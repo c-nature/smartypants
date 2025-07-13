@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NASA Holo-Deck | Photo Explorer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- FIX: Added Roboto font for better readability in UI elements -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --glow-color: #00f6ff;
+            --bg-color: #020813;
+            --surface-color: rgba(10, 30, 50, 0.6);
+            --border-color: rgba(0, 246, 255, 0.3);
+        }
+
+        body {
+            /* FIX: Default font for body is now Roboto for readability */
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--bg-color);
+            color: #e0e0e0;
+            background-image: 
+                radial-gradient(circle at 25% 25%, rgba(0, 246, 255, 0.1), transparent 30%),
+                radial-gradient(circle at 75% 75%, rgba(0, 246, 255, 0.05), transparent 25%);
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        
+        /* FIX: Apply Orbitron font specifically to titles and tabs for the futuristic look */
+        .header-title, .tab-button, .futuristic-btn {
+             font-family: 'Orbitron', sans-serif;
+        }
+
+        .text-glow {
+            text-shadow: 0 0 5px var(--glow-color), 0 0 10px var(--glow-color);
+        }
+
+        .container-glow {
+            border: 1px solid var(--border-color);
+            background-color: var(--surface-color);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 0 15px rgba(0, 246, 255, 0.1), inset 0 0 10px rgba(0, 246, 255, 0.1);
+        }
+
+        .tab-button {
+            position: relative;
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--glow-color);
+            text-shadow: 0 0 2px var(--glow-color);
+            transition: all 0.3s ease;
+            clip-path: polygon(10% 0, 100% 0, 90% 100%, 0 100%);
+        }
+
+        .tab-button:hover, .tab-button.active {
+            background: var(--border-color);
+            box-shadow: 0 0 10px var(--glow-color), 0 0 20px var(--glow-color);
+            color: #fff;
+        }
+        
+        .futuristic-btn {
+            background: var(--border-color);
+            border: 1px solid var(--glow-color);
+            color: #fff;
+            transition: all 0.3s ease;
+            letter-spacing: 0.1em; /* Add letter spacing for robotic feel */
+        }
+        .futuristic-btn:hover {
+            background: var(--glow-color);
+            color: var(--bg-color);
+            box-shadow: 0 0 15px var(--glow-color);
+        }
+
+        .futuristic-input, .futuristic-select {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border-color);
+            color: #e0e0e0;
+            transition: all 0.3s ease;
+            font-family: 'Roboto', sans-serif; /* Ensure readable font */
+        }
+        .futuristic-input:focus, .futuristic-select:focus {
+            outline: none;
+            border-color: var(--glow-color);
+            box-shadow: 0 0 10px var(--glow-color);
+        }
+
+        .futuristic-input::-webkit-calendar-picker-indicator {
+            filter: invert(1) brightness(0.8) sepia(1) hue-rotate(140deg);
+        }
+
+        .card-glow {
+            border: 1px solid transparent;
+            background-color: var(--surface-color);
+            backdrop-filter: blur(5px);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .card-glow:hover {
+            transform: translateY(-5px);
+            border-color: var(--glow-color);
+            box-shadow: 0 5px 25px rgba(0, 246, 255, 0.3);
+        }
+        .card-glow::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 246, 255, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+        .card-glow:hover::before {
+            left: 100%;
+        }
+
+        @keyframes flicker {
+            0%, 18%, 22%, 25%, 53%, 57%, 100% {
+                text-shadow: 0 0 4px #fff, 0 0 11px #fff, 0 0 19px #fff, 0 0 40px var(--glow-color), 0 0 80px var(--glow-color), 0 0 90px var(--glow-color), 0 0 100px var(--glow-color), 0 0 150px var(--glow-color);
+            }
+            20%, 24%, 55% {
+                text-shadow: none;
+            }
+        }
+        .header-title {
+            animation: flicker 3s infinite alternate;
+        }
+
+        .loader {
+            width: 50px;
+            aspect-ratio: 1;
+            border-radius: 50%;
+            border: 8px solid var(--border-color);
+            border-right-color: var(--glow-color);
+            animation: l2 1s infinite linear;
+        }
+        @keyframes l2 {to{transform: rotate(1turn)}}
+    </style>
+</head>
+<body class="min-h-screen p-4 sm:p-6 lg:p-8">
+
+    <div class="container mx-auto max-w-7xl">
+        <header class="text-center mb-8">
+            <h1 class="text-4xl md:text-6xl font-black text-white header-title">NASA HOLO-DECK</h1>
+            <p class="text-cyan-300 mt-2 tracking-widest font-['Orbitron']">PHOTON STREAM EXPLORER</p>
+        </header>
+
+        <!-- Navigation Tabs -->
+        <div class="mb-8 container-glow rounded-lg p-2">
+            <nav class="flex flex-col sm:flex-row justify-center gap-2" aria-label="Tabs">
+                <button onclick="changeTab('apod')" id="apod-tab" class="tab-button w-full sm:w-auto py-3 px-6 text-lg font-bold active">
+                    APOD
+                </button>
+                <button onclick="changeTab('mars')" id="mars-tab" class="tab-button w-full sm:w-auto py-3 px-6 text-lg font-bold">
+                    MARS ROVERS
+                </button>
+                <button onclick="changeTab('search')" id="search-tab" class="tab-button w-full sm:w-auto py-3 px-6 text-lg font-bold">
+                    IMAGE SEARCH
+                </button>
+            </nav>
+        </div>
+
+        <!-- Content Sections -->
+        <main id="content-area" class="container-glow rounded-lg p-4 md:p-6 min-h-[200px]">
+            <!-- APOD Section -->
+            <div id="apod-content" class="tab-content">
+                <div class="text-center mb-4">
+                    <button onclick="fetchAPOD()" class="futuristic-btn font-bold py-3 px-8 rounded-md text-lg">INITIALIZE APOD STREAM</button>
+                </div>
+            </div>
+
+            <!-- Mars Rover Section -->
+            <div id="mars-content" class="tab-content hidden">
+                 <div class="text-center mb-4 flex flex-col sm:flex-row justify-center items-center gap-4">
+                    <select id="rover-select" class="futuristic-select rounded-md px-4 py-3 text-lg">
+                        <option value="curiosity">Curiosity</option>
+                        <option value="opportunity">Opportunity</option>
+                        <option value="spirit">Spirit</option>
+                    </select>
+                    <input type="date" id="mars-date" class="futuristic-input rounded-md px-4 py-2.5 text-lg">
+                    <button onclick="fetchMarsPhotos()" class="futuristic-btn font-bold py-3 px-8 rounded-md text-lg">QUERY ROVER</button>
+                </div>
+            </div>
+
+            <!-- Search Section -->
+            <div id="search-content" class="tab-content hidden">
+                <div class="text-center mb-4 flex flex-col sm:flex-row justify-center items-center gap-4">
+                    <input type="text" id="search-query" class="w-full max-w-sm futuristic-input rounded-md px-4 py-3 text-lg" placeholder="QUERY: e.g., Orion Nebula">
+                    <button onclick="searchImages()" class="futuristic-btn font-bold py-3 px-8 rounded-md text-lg">SEARCH DATABASE</button>
+                </div>
+            </div>
+        </main>
+
+        <!-- Results Area -->
+        <div id="results" class="mt-8">
+            <!-- Loader -->
+            <div id="loader" class="hidden justify-center items-center py-16">
+                <div class="loader"></div>
+            </div>
+            <!-- Message Display -->
+            <div id="message" class="text-center text-cyan-300 text-2xl py-16"></div>
+            <!-- Image Grid -->
+            <div id="image-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"></div>
+        </div>
+    </div>
+
+    <script>
+        // --- Globals ---
+        const APP_API_BASE_URL = 'https://smartypantsbe.onrender.com/api/user/nasa';
+        const loader = document.getElementById('loader');
+        const messageDiv = document.getElementById('message');
+        const imageGrid = document.getElementById('image-grid');
+
+        // --- Tab Management ---
+        function changeTab(tabName) {
+            const tabs = ['apod', 'mars', 'search'];
+            tabs.forEach(tab => {
+                document.getElementById(`${tab}-content`).classList.add('hidden');
+                document.getElementById(`${tab}-tab`).classList.remove('active');
+            });
+            document.getElementById(`${tabName}-content`).classList.remove('hidden');
+            document.getElementById(`${tabName}-tab`).classList.add('active');
+            clearResults();
+            showMessage('Awaiting your command...');
+        }
+
+        // --- API Fetching ---
+        async function fetchAPOD() {
+            clearResults();
+            showLoader();
+            try {
+                const response = await fetch(`${APP_API_BASE_URL}/apod`);
+                if (!response.ok) throw new Error(`SYSTEM ERROR: ${response.status}`);
+                const data = await response.json();
+                displayAPOD(data);
+            } catch (error) {
+                console.error("Error fetching APOD:", error);
+                showMessage('APOD STREAM FAILED. Check connection to backend matrix.');
+            } finally {
+                hideLoader();
+            }
+        }
+
+        async function fetchMarsPhotos() {
+            const rover = document.getElementById('rover-select').value;
+            const date = document.getElementById('mars-date').value;
+            if (!date) {
+                showMessage('ERROR: Temporal coordinates required. Please select a date.');
+                return;
+            }
+
+            clearResults();
+            showLoader();
+            try {
+                const response = await fetch(`${APP_API_BASE_URL}/mars/${rover}/${date}`);
+                if (!response.ok) throw new Error(`SYSTEM ERROR: ${response.status}`);
+                const data = await response.json();
+                displayMarsPhotos(data.photos);
+            } catch (error) {
+                console.error("Error fetching Mars photos:", error);
+                showMessage('MARS ROVER LINK FAILED. Try different temporal coordinates.');
+            } finally {
+                hideLoader();
+            }
+        }
+        
+        async function searchImages() {
+            const query = document.getElementById('search-query').value.trim();
+            if (!query) {
+                showMessage('ERROR: Search query cannot be empty.');
+                return;
+            }
+
+            clearResults();
+            showLoader();
+            try {
+                const response = await fetch(`${APP_API_BASE_URL}/search/${encodeURIComponent(query)}`);
+                if (!response.ok) throw new Error(`SYSTEM ERROR: ${response.status}`);
+                const data = await response.json();
+                displaySearchResults(data.collection.items);
+            } catch (error) {
+                console.error("Error searching images:", error);
+                showMessage('DATABASE SEARCH FAILED. Please refine your query.');
+            } finally {
+                hideLoader();
+            }
+        }
+
+        // --- UI Display ---
+        function showLoader() {
+            loader.classList.remove('hidden');
+            loader.classList.add('flex');
+        }
+
+        function hideLoader() {
+            loader.classList.add('hidden');
+            loader.classList.remove('flex');
+        }
+
+        function showMessage(msg) {
+            messageDiv.textContent = msg;
+        }
+
+        function clearResults() {
+            imageGrid.innerHTML = '';
+            messageDiv.textContent = '';
+        }
+
+        function createImageCard(data) {
+            const card = document.createElement('div');
+            card.className = 'card-glow rounded-lg overflow-hidden';
+            
+            const imageUrl = data.url || (data.links && data.links[0].href);
+            const title = data.title;
+            const description = data.explanation || (data.data && data.data[0].description) || 'No data available.';
+
+            card.innerHTML = `
+                <div class="h-56 bg-black">
+                    <img src="${imageUrl}" alt="${title}" class="w-full h-full object-cover" onerror="this.onerror=null;this.src='https://placehold.co/600x400/020813/00f6ff?text=SIGNAL+LOST';">
+                </div>
+                <div class="p-4">
+                    <h3 class="font-bold text-lg text-cyan-300 mb-2 truncate">${title}</h3>
+                    <p class="text-gray-400 text-sm h-20 overflow-hidden">${description.substring(0, 120)}...</p>
+                </div>
+            `;
+            imageGrid.appendChild(card);
+        }
+        
+        function createMarsImageCard(photo) {
+            const card = document.createElement('div');
+            card.className = 'card-glow rounded-lg overflow-hidden';
+            
+            const imageUrl = photo.img_src;
+            const title = `ROVER: ${photo.rover.name}`;
+            const camera = photo.camera.full_name;
+            const date = photo.earth_date;
+
+            card.innerHTML = `
+                <div class="h-56 bg-black">
+                    <img src="${imageUrl}" alt="${title}" class="w-full h-full object-cover" onerror="this.onerror=null;this.src='https://placehold.co/600x400/020813/00f6ff?text=SIGNAL+LOST';">
+                </div>
+                <div class="p-4">
+                    <h3 class="font-bold text-lg text-cyan-300 mb-2">${title}</h3>
+                    <p class="text-gray-400 text-sm">CAMERA: ${camera}</p>
+                    <p class="text-gray-400 text-sm">DATE: ${date}</p>
+                </div>
+            `;
+            imageGrid.appendChild(card);
+        }
+
+        function displayAPOD(data) {
+            if (data.media_type === 'image') {
+                createImageCard(data);
+            } else if (data.media_type === 'video') {
+                showMessage("Today's APOD is a video transmission. This terminal displays static images only.");
+            } else {
+                 showMessage("APOD data corrupted or unreadable.");
+            }
+        }
+        
+        function displayMarsPhotos(photos) {
+            if (!photos || photos.length === 0) {
+                showMessage('No image data found for this rover on the selected date.');
+                return;
+            }
+            photos.slice(0, 24).forEach(photo => createMarsImageCard(photo)); // Limit to 24 images
+        }
+        
+        function displaySearchResults(items) {
+            if (!items || items.length === 0) {
+                showMessage('Query returned no results from the image database.');
+                return;
+            }
+            items.slice(0, 24).forEach(item => { // Limit to 24 images
+                if(item.links && item.links[0].href) {
+                     createImageCard({
+                        url: item.links[0].href,
+                        title: item.data[0].title,
+                        explanation: item.data[0].description
+                    });
+                }
+            });
+        }
+        
+        // --- Initial Setup ---
+        window.onload = () => {
+            const marsDateInput = document.getElementById('mars-date');
+            const today = new Date();
+            today.setDate(today.getDate() - 5); // Set default to a few days ago
+            marsDateInput.value = today.toISOString().split('T')[0];
+            showMessage('Holo-Deck Ready. Awaiting your command...');
+        };
+    </script>
+</body>
+</html>

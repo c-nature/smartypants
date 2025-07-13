@@ -982,7 +982,8 @@
         const profileAvatarImg = document.getElementById('profileAvatarImg');
         const headerAvatarContainer = document.getElementById('header-avatar-container');
 
-        const BACKEND_URL = 'https://smartypantsbe.onrender.com/user';
+        // FIX: Updated the backend URL to match the new server.js route structure.
+        const BACKEND_URL = 'https://smartypantsbe.onrender.com/api/user';
 
         function updateAuthButtons() {
             const token = localStorage.getItem('token');
@@ -1417,7 +1418,7 @@
                     // Merge the updates from the server response into the existing user object
                     const updatedUser = {
                         ...existingUser, // Keeps old avatar_config if not explicitly returned
-                        ...data.data     // Overwrites with fresh data from the avatar save response
+                        ...data.data      // Overwrites with fresh data from the avatar save response
                     };
 
                     // Save the complete, merged user object back to localStorage
