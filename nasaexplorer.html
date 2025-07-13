@@ -51,7 +51,7 @@
             text-shadow: 0 0 2px var(--glow-color);
             transition: all 0.3s ease;
             clip-path: polygon(10% 0, 100% 0, 90% 100%, 0 100%);
-            padding: 0.75rem 1rem; /* Adjusted padding for more tabs */
+            padding: 0.75rem 1rem;
         }
 
         .tab-button:hover, .tab-button.active {
@@ -130,7 +130,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            pointer-events: none; /* Allows clicks to pass through to the card */
+            pointer-events: none;
         }
         
         @keyframes flicker {
@@ -166,12 +166,13 @@
 
         <!-- Navigation Tabs -->
         <div class="mb-8 container-glow rounded-lg p-2">
-            <nav class="grid grid-cols-2 md:grid-cols-5 justify-center gap-2" aria-label="Tabs">
+            <nav class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 justify-center gap-2" aria-label="Tabs">
                 <button onclick="changeTab('apod')" id="apod-tab" class="tab-button w-full sm:w-auto text-base md:text-lg font-bold active">APOD</button>
-                <button onclick="changeTab('mars')" id="mars-tab" class="tab-button w-full sm:w-auto text-base md:text-lg font-bold">MARS ROVERS</button>
+                <button onclick="changeTab('mars')" id="mars-tab" class="tab-button w-full sm:w-auto text-base md:text-lg font-bold">MARS</button>
                 <button onclick="changeTab('epic')" id="epic-tab" class="tab-button w-full sm:w-auto text-base md:text-lg font-bold">EARTH</button>
-                <button onclick="changeTab('eonet')" id="eonet-tab" class="tab-button w-full sm:w-auto text-base md:text-lg font-bold">NATURAL EVENTS</button>
-                <button onclick="changeTab('search')" id="search-tab" class="tab-button w-full sm:w-auto text-base md:text-lg font-bold col-span-2 md:col-span-1">IMAGE SEARCH</button>
+                <button onclick="changeTab('eonet')" id="eonet-tab" class="tab-button w-full sm:w-auto text-base md:text-lg font-bold">EVENTS</button>
+                <button onclick="changeTab('exoplanet')" id="exoplanet-tab" class="tab-button w-full sm:w-auto text-base md:text-lg font-bold">EXOPLANETS</button>
+                <button onclick="changeTab('search')" id="search-tab" class="tab-button w-full sm:w-auto text-base md:text-lg font-bold">SEARCH</button>
             </nav>
         </div>
 
@@ -181,6 +182,7 @@
             <div id="mars-content" class="tab-content hidden"><div class="text-center mb-4 flex flex-col sm:flex-row justify-center items-center gap-4"><select id="rover-select" class="futuristic-select rounded-md px-4 py-3 text-lg"><option value="curiosity">Curiosity</option><option value="opportunity">Opportunity</option><option value="spirit">Spirit</option></select><input type="date" id="mars-date" class="futuristic-input rounded-md px-4 py-2.5 text-lg"><button onclick="fetchMarsPhotos()" class="futuristic-btn font-bold py-3 px-8 rounded-md text-lg">QUERY ROVER</button></div></div>
             <div id="epic-content" class="tab-content hidden"><div class="text-center mb-4"><button onclick="fetchEPIC()" class="futuristic-btn font-bold py-3 px-8 rounded-md text-lg">LOAD LATEST EARTH IMAGES</button></div></div>
             <div id="eonet-content" class="tab-content hidden"><div class="text-center mb-4"><button onclick="fetchEONET()" class="futuristic-btn font-bold py-3 px-8 rounded-md text-lg">SCAN FOR NATURAL EVENTS</button></div></div>
+            <div id="exoplanet-content" class="tab-content hidden"><div class="text-center mb-4"><button onclick="fetchExoplanets()" class="futuristic-btn font-bold py-3 px-8 rounded-md text-lg">LOAD EXOPLANET DATA</button></div></div>
             <div id="search-content" class="tab-content hidden"><div class="text-center mb-4 flex flex-col sm:flex-row justify-center items-center gap-4"><input type="text" id="search-query" class="w-full max-w-sm futuristic-input rounded-md px-4 py-3 text-lg" placeholder="QUERY: e.g., Orion Nebula"><button onclick="searchImages()" class="futuristic-btn font-bold py-3 px-8 rounded-md text-lg">SEARCH DATABASE</button></div></div>
         </main>
 
@@ -221,7 +223,7 @@
         const modalDescription = document.getElementById('modal-description');
 
         function changeTab(tabName) {
-            const tabs = ['apod', 'mars', 'epic', 'eonet', 'search'];
+            const tabs = ['apod', 'mars', 'epic', 'eonet', 'exoplanet', 'search'];
             tabs.forEach(tab => {
                 document.getElementById(`${tab}-content`).classList.add('hidden');
                 document.getElementById(`${tab}-tab`).classList.remove('active');
@@ -245,7 +247,6 @@
         function clearResults() { imageGrid.innerHTML = ''; messageDiv.textContent = ''; }
 
         function showMediaModal(mediaType, url, title, description) {
-            // FIX: If it's a video, open it in a new tab instead of the modal
             if (mediaType === 'video') {
                 window.open(url, '_blank');
                 return;
@@ -311,6 +312,17 @@
             finally { hideLoader(); }
         }
 
+        async function fetchExoplanets() {
+            clearResults(); showLoader();
+            try {
+                const response = await fetch(`${APP_API_BASE_URL}/exoplanets`);
+                if (!response.ok) throw new Error(`SYSTEM ERROR: ${response.status}`);
+                const data = await response.json();
+                displayExoplanets(data);
+            } catch (error) { showMessage('EXOPLANET ARCHIVE LINK FAILED.'); } 
+            finally { hideLoader(); }
+        }
+
         async function searchImages() {
             const query = document.getElementById('search-query').value.trim();
             if (!query) { showMessage('ERROR: Search query cannot be empty.'); return; }
@@ -370,7 +382,6 @@
             showMessage('');
             mediaItems.slice(0, 24).forEach(item => {
                 let mediaUrl = item.links[0].href;
-                // The search API doesn't provide a direct video file, so we find a link to the asset page
                 if (item.data[0].media_type === 'video') {
                     mediaUrl = `https://images.nasa.gov/details-${item.data[0].nasa_id}`;
                 }
@@ -406,6 +417,36 @@
                 const title = event.title;
                 const category = event.categories[0].title;
                 card.innerHTML = `<div class="h-56 bg-black flex items-center justify-center text-center p-4"><div class="text-cyan-300"><h3 class="font-bold text-xl mb-2">${title}</h3><p class="text-gray-400">Category: ${category}</p><p class="mt-4 text-sm underline">Click to view event details</p></div></div>`;
+                imageGrid.appendChild(card);
+            });
+        }
+        
+        function displayExoplanets(planets) {
+            if (!planets || planets.length === 0) { showMessage('No exoplanet data found.'); return; }
+            showMessage(''); // Clear loading message
+            planets.slice(0, 24).forEach(planet => {
+                const card = document.createElement('div');
+                card.className = 'card-glow rounded-lg overflow-hidden p-4 flex flex-col justify-between text-left';
+                
+                const name = planet.pl_name || 'Unknown';
+                const year = planet.discoveryyear || 'N/A';
+                const orbitalPeriod = planet.pl_orbper ? `${planet.pl_orbper.toFixed(2)} days` : 'N/A';
+                const mass = planet.pl_masse ? `${planet.pl_masse.toFixed(2)} Earth Masses` : 'N/A';
+
+                card.innerHTML = `
+                    <div>
+                        <h3 class="font-bold text-xl text-cyan-300 mb-2 truncate">${name}</h3>
+                        <p class="text-gray-400 text-sm">Discovered: ${year}</p>
+                        <p class="text-gray-400 text-sm">Orbital Period: ${orbitalPeriod}</p>
+                        <p class="text-gray-400 text-sm">Mass: ${mass}</p>
+                    </div>
+                    <div class="mt-4 text-center">
+                        <span class="text-xs text-gray-500">ARTIST'S CONCEPT</span>
+                        <div class="h-32 bg-black flex items-center justify-center rounded-md mt-1" style="background-image: radial-gradient(circle, #334455, #020813);">
+                             <svg class="w-16 h-16 text-cyan-400 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        </div>
+                    </div>
+                `;
                 imageGrid.appendChild(card);
             });
         }
