@@ -47,15 +47,9 @@
             text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
         }
 
-        .search-container {
-            display: flex;
-            gap: 1rem;
-            margin-bottom: 2rem;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
+        /* Removed .search-container styles as it's no longer needed for text search */
 
-        .search-input {
+        .search-input { /* Kept for image upload input styling */
             flex-grow: 1;
             padding: 0.75rem 1.25rem;
             border-radius: 9999px;
@@ -143,6 +137,12 @@
             color: #5A4F4A; /* Darker muted brown for scientific names */
             margin-bottom: 0.5rem;
         }
+        .plant-score {
+            font-size: 1rem;
+            color: #5A4F4A;
+            margin-bottom: 0.25rem;
+            font-weight: bold;
+        }
 
         .plant-detail {
             font-size: 0.95rem;
@@ -171,6 +171,42 @@
             pointer-events: auto;
         }
 
+        /* Styles for the image upload section */
+        .image-upload-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px dashed #ccc;
+        }
+
+        .image-upload-input {
+            border: 2px dashed #A7D9B2;
+            border-radius: 0.75rem;
+            padding: 1rem;
+            text-align: center;
+            cursor: pointer;
+            width: 100%;
+            max-width: 400px;
+            font-family: 'Lora', serif;
+            color: #4A6B5B;
+            transition: border-color 0.3s ease;
+        }
+        .image-upload-input:hover {
+            border-color: #6B8E23;
+        }
+
+        .image-preview {
+            max-width: 250px;
+            max-height: 250px;
+            border-radius: 0.75rem;
+            border: 2px solid #8B5E3C;
+            object-fit: contain;
+            margin-top: 1rem;
+        }
+
         @media (max-width: 768px) {
             body {
                 padding: 1rem;
@@ -178,10 +214,7 @@
             .header-title {
                 font-size: 2.2rem;
             }
-            .search-container {
-                flex-direction: column;
-                align-items: center;
-            }
+            /* Removed .search-container media query as it's no longer needed */
             .search-input {
                 width: 100%;
                 max-width: none;
@@ -196,10 +229,17 @@
 
     <div class="container">
         <h1 class="header-title">Plant Explorer</h1>
-        <div class="search-container">
-            <input type="text" id="plantSearchInput" class="search-input" placeholder="Search for a plant (e.g., 'rose', 'oak')">
-            <button id="searchPlantBtn" class="search-button">Search Plants</button>
+
+        <!-- Removed Text Search Section (Trefle.io) -->
+
+        <!-- Image Upload Section -->
+        <div class="image-upload-section">
+            <h2 class="text-2xl font-bold text-[#4A6B5B]">Identify from Image</h2>
+            <input type="file" id="imageUploadInput" accept="image/*" class="image-upload-input">
+            <button id="identifyImageBtn" class="search-button">Identify Plant from Image</button>
+            <img id="uploadedImagePreview" class="image-preview hidden" src="#" alt="Image Preview">
         </div>
+
         <div id="plantResults" class="results-grid">
             <!-- Plant cards will be inserted here -->
         </div>
@@ -216,14 +256,16 @@
     </audio>
 
     <script>
-        const plantSearchInput = document.getElementById('plantSearchInput');
-        const searchPlantBtn = document.getElementById('searchPlantBtn');
+        // Removed plantSearchInput and searchPlantBtn constants
+        const imageUploadInput = document.getElementById('imageUploadInput');
+        const identifyImageBtn = document.getElementById('identifyImageBtn');
+        const uploadedImagePreview = document.getElementById('uploadedImagePreview');
         const plantResults = document.getElementById('plantResults');
         const statusMessage = document.getElementById('statusMessage');
         const messageBox = document.getElementById('messageBox');
         const mainClickSoundElement = document.getElementById('mainClickSoundElement');
 
-        // IMPORTANT: Replace with your actual backend URL where the /api/user/plant/search endpoint is hosted
+        // IMPORTANT: Replace with your actual backend URL where the /api/user/plant/identify endpoint is hosted
         const BACKEND_API_BASE_URL = 'https://smartypantsbe.onrender.com/api/user'; 
 
         function playClickSound() {
@@ -250,68 +292,121 @@
             }, duration);
         }
 
-        async function searchPlants() {
+        /**
+         * Renders plant cards in the results grid.
+         * @param {Array} plants An array of plant objects.
+         * @param {boolean} isIdentificationResult True if results are from image identification (show score).
+         */
+        function renderPlantCards(plants, isIdentificationResult = false) {
+            plantResults.innerHTML = ''; // Clear previous results
+            if (plants.length > 0) {
+                statusMessage.textContent = `Found ${plants.length} results.`;
+                plants.forEach(plant => {
+                    const plantCard = document.createElement('div');
+                    plantCard.className = 'plant-card';
+                    let scoreHtml = '';
+                    if (isIdentificationResult && plant.score !== 'N/A') {
+                        scoreHtml = `<p class="plant-score">Confidence: ${plant.score}%</p>`;
+                    }
+                    plantCard.innerHTML = `
+                        <img src="${plant.imageUrl || 'https://placehold.co/200x200/cccccc/000000?text=No+Image'}" alt="${plant.commonName || plant.scientificName}" class="plant-image" onerror="this.onerror=null;this.src='https://placehold.co/200x200/cccccc/000000?text=No+Image';">
+                        <h3 class="plant-name">${plant.commonName || 'N/A'}</h3>
+                        <p class="plant-scientific">${plant.scientificName || 'N/A'}</p>
+                        ${scoreHtml}
+                        <p class="plant-detail">Family: ${plant.family || 'N/A'}</p>
+                        <p class="plant-detail">Genus: ${plant.genus || 'N/A'}</p>
+                    `;
+                    plantResults.appendChild(plantCard);
+                });
+            } else {
+                statusMessage.textContent = `No plants found. Try uploading a different image.`;
+                showMessageBox(`No identification found.`);
+            }
+        }
+
+
+        // Removed Text Search Function (searchPlants)
+
+        // --- Image Identification Function (using PlantNet via backend) ---
+        async function identifyPlantFromImage() {
             playClickSound();
-            const query = plantSearchInput.value.trim();
-            if (!query) {
-                showMessageBox('Please enter a plant name to search.');
+            if (!imageUploadInput.files || imageUploadInput.files.length === 0) {
+                showMessageBox('Please select an image file first.');
                 return;
             }
 
+            const imageFile = imageUploadInput.files[0];
+            const formData = new FormData();
+            formData.append('image', imageFile); // 'image' is the field name expected by multer on backend
+
             plantResults.innerHTML = ''; // Clear previous results
-            statusMessage.textContent = 'Searching for plants...';
-            searchPlantBtn.disabled = true;
+            statusMessage.textContent = 'Identifying plant from image...';
+            // searchPlantBtn.disabled = true; // No longer needed
+            identifyImageBtn.disabled = true;
+
+            // Show image preview
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                uploadedImagePreview.src = e.target.result;
+                uploadedImagePreview.classList.remove('hidden');
+            };
+            reader.readAsDataURL(imageFile);
 
             try {
-                // Call your backend endpoint for Trefle.io search
-                const response = await fetch(`${BACKEND_API_BASE_URL}/plant/search?q=${encodeURIComponent(query)}`);
+                const response = await fetch(`${BACKEND_API_BASE_URL}/plant/identify`, {
+                    method: 'POST',
+                    body: formData,
+                });
                 const data = await response.json();
 
                 if (!response.ok || data.status !== 'Success') {
                     const errorMessage = data.message || `Error: ${response.status} ${response.statusText}`;
-                    statusMessage.textContent = `Error: ${errorMessage}`;
-                    showMessageBox(`Search failed: ${errorMessage}`);
+                    statusMessage.textContent = `Identification failed: ${errorMessage}`;
+                    showMessageBox(`Identification failed: ${errorMessage}`);
                     return;
                 }
 
                 if (data.data && data.data.length > 0) {
-                    statusMessage.textContent = `Found ${data.data.length} plants for "${query}"`;
-                    data.data.forEach(plant => {
-                        const plantCard = document.createElement('div');
-                        plantCard.className = 'plant-card';
-                        plantCard.innerHTML = `
-                            <img src="${plant.imageUrl || 'https://placehold.co/200x200/cccccc/000000?text=No+Image'}" alt="${plant.commonName || plant.scientificName}" class="plant-image" onerror="this.onerror=null;this.src='https://placehold.co/200x200/cccccc/000000?text=No+Image';">
-                            <h3 class="plant-name">${plant.commonName || 'N/A'}</h3>
-                            <p class="plant-scientific">${plant.scientificName || 'N/A'}</p>
-                            <p class="plant-detail">Family: ${plant.family || 'N/A'}</p>
-                            <p class="plant-detail">Genus: ${plant.genus || 'N/A'}</p>
-                        `;
-                        plantResults.appendChild(plantCard);
-                    });
+                    statusMessage.textContent = `Identified potential matches:`;
+                    renderPlantCards(data.data, true); // Render identification results (with score)
                 } else {
-                    statusMessage.textContent = `No plants found for "${query}". Try a different name.`;
-                    showMessageBox(`No results for "${query}".`);
+                    statusMessage.textContent = `No confident identification found for the image.`;
+                    showMessageBox(`No identification found.`);
                 }
 
             } catch (error) {
-                console.error('Frontend search error:', error);
-                statusMessage.textContent = 'An error occurred during search. Please try again.';
-                showMessageBox('Network error during search.');
+                console.error('Frontend image identification error:', error);
+                statusMessage.textContent = 'An error occurred during image identification. Please try again.';
+                showMessageBox('Network error during image identification.');
             } finally {
-                searchPlantBtn.disabled = false;
+                // searchPlantBtn.disabled = false; // No longer needed
+                identifyImageBtn.disabled = false;
             }
         }
 
-        searchPlantBtn.addEventListener('click', searchPlants);
-        plantSearchInput.addEventListener('keypress', (event) => {
-            if (event.key === 'Enter') {
-                searchPlants();
+
+        // --- Event Listeners ---
+        // Removed searchPlantBtn and plantSearchInput event listeners
+
+        identifyImageBtn.addEventListener('click', identifyPlantFromImage);
+        imageUploadInput.addEventListener('change', () => {
+            if (imageUploadInput.files && imageUploadInput.files[0]) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    uploadedImagePreview.src = e.target.result;
+                    uploadedImagePreview.classList.remove('hidden');
+                };
+                reader.readAsDataURL(imageUploadInput.files[0]);
+            } else {
+                uploadedImagePreview.classList.add('hidden');
+                uploadedImagePreview.src = '#';
             }
         });
 
+
         // Initial message
         document.addEventListener('DOMContentLoaded', () => {
-            statusMessage.textContent = 'Enter a plant name to explore!';
+            statusMessage.textContent = 'Upload an image to identify plants!';
         });
     </script>
 </body>
