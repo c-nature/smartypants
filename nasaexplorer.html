@@ -166,12 +166,11 @@
 
         <!-- Navigation Tabs -->
         <div class="mb-8 container-glow rounded-lg p-2">
-            <nav class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 justify-center gap-2" aria-label="Tabs">
+            <nav class="grid grid-cols-2 md:grid-cols-4 justify-center gap-2" aria-label="Tabs">
                 <button onclick="changeTab('apod')" id="apod-tab" class="tab-button w-full sm:w-auto text-base md:text-lg font-bold active">APOD</button>
                 <button onclick="changeTab('mars')" id="mars-tab" class="tab-button w-full sm:w-auto text-base md:text-lg font-bold">MARS</button>
                 <button onclick="changeTab('epic')" id="epic-tab" class="tab-button w-full sm:w-auto text-base md:text-lg font-bold">EARTH</button>
-                <button onclick="changeTab('exoplanet')" id="exoplanet-tab" class="tab-button w-full sm:w-auto text-base md:text-lg font-bold">EXOPLANETS</button>
-                <button onclick="changeTab('search')" id="search-tab" class="tab-button w-full sm:w-auto text-base md:text-lg font-bold">SEARCH</button>
+                <button onclick="changeTab('search')" id="search-tab" class="tab-button w-full sm:w-auto text-base md:text-lg font-bold col-span-2 md:col-span-1">SEARCH</button>
             </nav>
         </div>
 
@@ -180,7 +179,6 @@
             <div id="apod-content" class="tab-content"><div class="text-center mb-4"><button onclick="fetchAPOD()" class="futuristic-btn font-bold py-3 px-8 rounded-md text-lg">INITIALIZE APOD STREAM</button></div></div>
             <div id="mars-content" class="tab-content hidden"><div class="text-center mb-4 flex flex-col sm:flex-row justify-center items-center gap-4"><select id="rover-select" class="futuristic-select rounded-md px-4 py-3 text-lg"><option value="curiosity">Curiosity</option><option value="opportunity">Opportunity</option><option value="spirit">Spirit</option></select><input type="date" id="mars-date" class="futuristic-input rounded-md px-4 py-2.5 text-lg"><button onclick="fetchMarsPhotos()" class="futuristic-btn font-bold py-3 px-8 rounded-md text-lg">QUERY ROVER</button></div></div>
             <div id="epic-content" class="tab-content hidden"><div class="text-center mb-4"><button onclick="fetchEPIC()" class="futuristic-btn font-bold py-3 px-8 rounded-md text-lg">LOAD LATEST EARTH IMAGES</button></div></div>
-            <div id="exoplanet-content" class="tab-content hidden"><div class="text-center mb-4 flex flex-col sm:flex-row justify-center items-center gap-4"><input type="text" id="exoplanet-query" class="w-full max-w-sm futuristic-input rounded-md px-4 py-3 text-lg" placeholder="PLANET NAME: e.g., Kepler-186 f"><button onclick="fetchExoplanets()" class="futuristic-btn font-bold py-3 px-8 rounded-md text-lg">SEARCH ARCHIVE</button></div></div>
             <div id="search-content" class="tab-content hidden"><div class="text-center mb-4 flex flex-col sm:flex-row justify-center items-center gap-4"><input type="text" id="search-query" class="w-full max-w-sm futuristic-input rounded-md px-4 py-3 text-lg" placeholder="QUERY: e.g., Orion Nebula"><button onclick="searchImages()" class="futuristic-btn font-bold py-3 px-8 rounded-md text-lg">SEARCH DATABASE</button></div></div>
         </main>
 
@@ -221,7 +219,7 @@
         const modalDescription = document.getElementById('modal-description');
 
         function changeTab(tabName) {
-            const tabs = ['apod', 'mars', 'epic', 'exoplanet', 'search'];
+            const tabs = ['apod', 'mars', 'epic', 'search'];
             tabs.forEach(tab => {
                 document.getElementById(`${tab}-content`).classList.add('hidden');
                 document.getElementById(`${tab}-tab`).classList.remove('active');
@@ -233,11 +231,7 @@
             if (tabName === 'search') {
                 document.getElementById('search-query').value = 'Orion Nebula';
                 searchImages();
-            } else if (tabName === 'exoplanet') {
-                document.getElementById('exoplanet-query').value = 'Kepler-186 f';
-                fetchExoplanets();
-            }
-            else {
+            } else {
                 showMessage('Awaiting your command...');
             }
         }
@@ -299,19 +293,6 @@
                 const data = await response.json();
                 displayEPICImages(data);
             } catch (error) { showMessage('EPIC DATASTREAM CORRUPTED.'); }
-            finally { hideLoader(); }
-        }
-
-        async function fetchExoplanets() {
-            const query = document.getElementById('exoplanet-query').value.trim();
-            if (!query) { showMessage('ERROR: Exoplanet name required.'); return; }
-            clearResults(); showLoader();
-            try {
-                const response = await fetch(`${APP_API_BASE_URL}/exoplanets/${encodeURIComponent(query)}`);
-                if (!response.ok) throw new Error(`SYSTEM ERROR: ${response.status}`);
-                const data = await response.json();
-                displayExoplanets(data);
-            } catch (error) { showMessage('EXOPLANET ARCHIVE LINK FAILED.'); } 
             finally { hideLoader(); }
         }
 
@@ -394,36 +375,6 @@
                 const dateString = date.toISOString().slice(0, 10);
                 const archiveUrl = `https://epic.gsfc.nasa.gov/archive/natural/${date.getFullYear()}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getDate().toString().padStart(2, '0')}/png/${image.image}.png`;
                 createMediaCard({ media_type: 'image', url: archiveUrl, title: `Earth: ${image.caption}`, explanation: `Image taken on ${dateString}.` });
-            });
-        }
-        
-        function displayExoplanets(planets) {
-            if (!planets || planets.length === 0) { showMessage('No exoplanet data found for that query.'); return; }
-            showMessage('');
-            planets.slice(0, 24).forEach(planet => {
-                const card = document.createElement('div');
-                card.className = 'card-glow rounded-lg overflow-hidden p-4 flex flex-col justify-between text-left';
-                
-                const name = planet.pl_name || 'Unknown';
-                const year = planet.discoveryyear || 'N/A';
-                const orbitalPeriod = planet.pl_orbper ? `${planet.pl_orbper.toFixed(2)} days` : 'N/A';
-                const mass = planet.pl_masse ? `${planet.pl_masse.toFixed(2)} Earth Masses` : 'N/A';
-
-                card.innerHTML = `
-                    <div>
-                        <h3 class="font-bold text-xl text-cyan-300 mb-2 truncate">${name}</h3>
-                        <p class="text-gray-400 text-sm">Discovered: ${year}</p>
-                        <p class="text-gray-400 text-sm">Orbital Period: ${orbitalPeriod}</p>
-                        <p class="text-gray-400 text-sm">Mass: ${mass}</p>
-                    </div>
-                    <div class="mt-4 text-center">
-                        <span class="text-xs text-gray-500">ARTIST'S CONCEPT</span>
-                        <div class="h-32 bg-black flex items-center justify-center rounded-md mt-1" style="background-image: radial-gradient(circle, #334455, #020813);">
-                             <svg class="w-16 h-16 text-cyan-400 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                        </div>
-                    </div>
-                `;
-                imageGrid.appendChild(card);
             });
         }
 
