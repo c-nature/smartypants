@@ -542,6 +542,28 @@
             box-shadow: 0 2px 8px rgba(0,0,0,0.3);
         }
 
+        /* Styles for the message box */
+        .message-box {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 0.5rem;
+            z-index: 1001;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+            pointer-events: none; /* Allows clicks to pass through when hidden */
+            font-family: 'Fredoka One', cursive;
+            text-align: center;
+        }
+        .message-box.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
         @media (max-width: 768px) {
             .auth-modal-content {
                 max-width: 95%;
@@ -826,6 +848,9 @@
         </div>
     </div>
 
+    <!-- Message Box for Copy Confirmation -->
+    <div id="messageBox" class="message-box"></div>
+
 
     <script>
         // --- Get references to all view containers ---
@@ -1012,9 +1037,23 @@
         const profileAvatarDisplay = document.getElementById('profileAvatarDisplay');
         const profileAvatarImg = document.getElementById('profileAvatarImg');
         const headerAvatarContainer = document.getElementById('header-avatar-container');
+        const messageBox = document.getElementById('messageBox'); // Get the message box element
 
         // FIX: The backend URL now correctly includes /api
         const BACKEND_URL = 'https://smartypantsbe.onrender.com/api/user';
+
+        /**
+         * Displays a temporary message box with the given text.
+         * @param {string} message The message to display.
+         * @param {number} duration The duration in milliseconds for which the message should be displayed.
+         */
+        function showMessageBox(message, duration = 3000) {
+            messageBox.textContent = message;
+            messageBox.classList.add('show');
+            setTimeout(() => {
+                messageBox.classList.remove('show');
+            }, duration);
+        }
 
         function updateAuthButtons() {
             const token = localStorage.getItem('token');
@@ -1607,11 +1646,53 @@
         authForm.addEventListener('submit', handleAuthSubmission);
         submitAuthBtn.addEventListener('click', handleAuthSubmission);
 
-        // Add event listener for the Contact button
+        // Add event listener for the Contact button with fallback to clipboard copy
         contactBtn.addEventListener('click', () => {
             playClickSound();
-            window.location.href = 'mailto:sbloom@cnature.net';
+            const emailAddress = 'sbloom@cnature.net';
+            
+            // Try to open mailto link
+            try {
+                // Attempt to open the mailto link
+                const mailtoLink = `mailto:${emailAddress}`;
+                const newWindow = window.open(mailtoLink, '_blank');
+
+                // Check if the new window was successfully opened (browser might block pop-ups, etc.)
+                // This check is a heuristic and might not be 100% reliable across all browsers.
+                // A small timeout is used to allow the browser to attempt opening the mailto link.
+                setTimeout(() => {
+                    if (!newWindow || newWindow.closed || typeof newWindow.focus !== 'function') {
+                        // If mailto failed, try copying to clipboard
+                        copyEmailToClipboard(emailAddress);
+                    }
+                }, 500); // Give browser 500ms to handle mailto
+            } catch (e) {
+                console.error("Error opening mailto link:", e);
+                // If an error occurs during mailto attempt, fall back to clipboard
+                copyEmailToClipboard(emailAddress);
+            }
         });
+
+        /**
+         * Copies the given text to the clipboard and shows a temporary message.
+         * @param {string} text The text to copy.
+         */
+        function copyEmailToClipboard(text) {
+            const tempInput = document.createElement('textarea'); // Use textarea for better cross-browser support
+            tempInput.value = text;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            tempInput.setSelectionRange(0, 99999); // For mobile devices
+            try {
+                document.execCommand('copy');
+                showMessageBox(`Email copied to clipboard: ${text}`);
+            } catch (err) {
+                console.error('Failed to copy email:', err);
+                showMessageBox('Failed to copy email. Please copy it manually: ' + text);
+            } finally {
+                document.body.removeChild(tempInput);
+            }
+        }
     </script>
 </body>
 </html>
