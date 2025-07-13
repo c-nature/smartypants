@@ -312,15 +312,27 @@
             finally { hideLoader(); }
         }
 
-        async function fetchExoplanets() {
+        async function fetchExoplanets(retryCount = 0) {
             clearResults(); showLoader();
             try {
                 const response = await fetch(`${APP_API_BASE_URL}/exoplanets`);
-                if (!response.ok) throw new Error(`SYSTEM ERROR: ${response.status}`);
+                if (!response.ok) {
+                    // FIX: Implement retry logic for server errors
+                    if (response.status === 500 && retryCount < 2) {
+                        showMessage(`Archive link unstable. Retrying... (${retryCount + 1}/2)`);
+                        setTimeout(() => fetchExoplanets(retryCount + 1), 2000);
+                    } else {
+                        throw new Error(`SYSTEM ERROR: ${response.status}`);
+                    }
+                    return;
+                }
                 const data = await response.json();
                 displayExoplanets(data);
-            } catch (error) { showMessage('EXOPLANET ARCHIVE LINK FAILED.'); } 
-            finally { hideLoader(); }
+            } catch (error) { 
+                showMessage('EXOPLANET ARCHIVE LINK FAILED. Please try again later.'); 
+            } finally { 
+                if (retryCount === 0) hideLoader();
+            }
         }
 
         async function searchImages() {
