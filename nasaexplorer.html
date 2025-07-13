@@ -117,6 +117,21 @@
         .card-glow:hover::before {
             left: 100%;
         }
+        
+        .play-icon-overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 60px;
+            height: 60px;
+            background-color: rgba(0,0,0,0.5);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none; /* Allows clicks to pass through to the card */
+        }
 
         @keyframes flicker {
             0%, 18%, 22%, 25%, 53%, 57%, 100% {
@@ -177,13 +192,14 @@
         </div>
     </div>
 
-    <!-- Image Modal -->
-    <div id="image-modal" class="fixed inset-0 bg-black bg-opacity-90 z-[100] hidden items-center justify-center p-4 transition-opacity duration-300">
+    <!-- Media Modal -->
+    <div id="media-modal" class="fixed inset-0 bg-black bg-opacity-90 z-[100] hidden items-center justify-center p-4 transition-opacity duration-300">
         <div class="container-glow rounded-lg p-4 max-w-5xl max-h-[95vh] w-full flex flex-col relative">
-            <button onclick="closeImageModal()" class="absolute -top-4 -right-4 text-white bg-red-500 rounded-full h-10 w-10 text-2xl flex items-center justify-center z-10 hover:bg-red-700 transition-colors">&times;</button>
+            <button onclick="closeMediaModal()" class="absolute -top-4 -right-4 text-white bg-red-500 rounded-full h-10 w-10 text-2xl flex items-center justify-center z-10 hover:bg-red-700 transition-colors">&times;</button>
             <div class="flex-grow overflow-y-auto flex flex-col md:flex-row gap-4">
-                <div class="md:w-2/3 flex-shrink-0 flex items-center justify-center">
-                     <img id="modal-image" src="" alt="Enlarged view" class="w-full h-auto max-h-[80vh] object-contain rounded-md">
+                <div class="md:w-2/3 flex-shrink-0 flex items-center justify-center bg-black rounded-md">
+                     <img id="modal-image" src="" alt="Enlarged view" class="w-full h-auto max-h-[80vh] object-contain hidden">
+                     <iframe id="modal-video" class="w-full h-full aspect-video hidden" src="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
                 </div>
                 <div class="md:w-1/3 text-gray-300 overflow-y-auto p-2">
                     <h2 id="modal-title" class="text-2xl text-cyan-300 font-bold mb-4 font-['Orbitron']"></h2>
@@ -200,8 +216,9 @@
         const messageDiv = document.getElementById('message');
         const imageGrid = document.getElementById('image-grid');
         
-        const imageModal = document.getElementById('image-modal');
+        const mediaModal = document.getElementById('media-modal');
         const modalImage = document.getElementById('modal-image');
+        const modalVideo = document.getElementById('modal-video');
         const modalTitle = document.getElementById('modal-title');
         const modalDescription = document.getElementById('modal-description');
 
@@ -227,18 +244,35 @@
         function showMessage(msg) { messageDiv.textContent = msg; }
         function clearResults() { imageGrid.innerHTML = ''; messageDiv.textContent = ''; }
 
-        function showImageModal(imageUrl, title, description) {
-            modalImage.src = imageUrl;
+        function showMediaModal(mediaType, url, title, description) {
             modalTitle.textContent = title;
             modalDescription.innerHTML = description;
-            imageModal.classList.remove('hidden');
-            imageModal.classList.add('flex');
+            
+            if (mediaType === 'image') {
+                modalImage.src = url;
+                modalImage.classList.remove('hidden');
+                modalVideo.classList.add('hidden');
+            } else if (mediaType === 'video') {
+                // Convert YouTube watch URLs to embed URLs
+                let videoUrl = url;
+                if (url.includes("youtube.com/watch?v=")) {
+                    const videoId = url.split('v=')[1].split('&')[0];
+                    videoUrl = `https://www.youtube.com/embed/${videoId}`;
+                }
+                modalVideo.src = videoUrl;
+                modalVideo.classList.remove('hidden');
+                modalImage.classList.add('hidden');
+            }
+            
+            mediaModal.classList.remove('hidden');
+            mediaModal.classList.add('flex');
         }
 
-        function closeImageModal() {
-            imageModal.classList.add('hidden');
-            imageModal.classList.remove('flex');
+        function closeMediaModal() {
+            mediaModal.classList.add('hidden');
+            mediaModal.classList.remove('flex');
             modalImage.src = '';
+            modalVideo.src = '';
         }
 
         async function fetchAPOD() {
@@ -317,18 +351,26 @@
             finally { hideLoader(); }
         }
 
-        function createImageCard(data) {
+        function createMediaCard(data) {
             const card = document.createElement('div');
             card.className = 'card-glow rounded-lg overflow-hidden';
-            const imageUrl = data.url || (data.links && data.links[0].href) || '';
-            const title = data.title || 'Untitled Image';
+            
+            const mediaType = data.media_type || 'image';
+            const imageUrl = mediaType === 'image' ? (data.url || (data.links && data.links[0].href)) : data.thumbnail_url || 'https://placehold.co/600x400/020813/00f6ff?text=VIDEO';
+            const title = data.title || 'Untitled';
             const description = data.explanation || (data.data && data.data[0].description) || 'No data available.';
             
             const escapedTitle = title.replace(/'/g, "\\'").replace(/"/g, '&quot;');
             const escapedDescription = description.replace(/'/g, "\\'").replace(/"/g, '&quot;').replace(/\n/g, '<br>');
 
-            card.setAttribute('onclick', `showImageModal('${imageUrl}', '${escapedTitle}', '${escapedDescription}')`);
-            card.innerHTML = `<div class="h-56 bg-black"><img src="${imageUrl}" alt="${escapedTitle}" class="w-full h-full object-cover" onerror="this.onerror=null;this.src='https://placehold.co/600x400/020813/00f6ff?text=SIGNAL+LOST';"></div><div class="p-4"><h3 class="font-bold text-lg text-cyan-300 mb-2 truncate">${escapedTitle}</h3><p class="text-gray-400 text-sm h-20 overflow-hidden">${description.substring(0, 120)}...</p></div>`;
+            card.setAttribute('onclick', `showMediaModal('${mediaType}', '${data.url}', '${escapedTitle}', '${escapedDescription}')`);
+
+            let playIcon = '';
+            if (mediaType === 'video') {
+                playIcon = `<div class="play-icon-overlay"><svg class="w-12 h-12 text-white" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"></path></svg></div>`;
+            }
+
+            card.innerHTML = `<div class="h-56 bg-black relative"><img src="${imageUrl}" alt="${escapedTitle}" class="w-full h-full object-cover" onerror="this.onerror=null;this.src='https://placehold.co/600x400/020813/00f6ff?text=SIGNAL+LOST';">${playIcon}</div><div class="p-4"><h3 class="font-bold text-lg text-cyan-300 mb-2 truncate">${escapedTitle}</h3><p class="text-gray-400 text-sm h-20 overflow-hidden">${description.substring(0, 120)}...</p></div>`;
             imageGrid.appendChild(card);
         }
         
@@ -340,31 +382,24 @@
             const camera = photo.camera.full_name;
             const date = photo.earth_date;
             const description = `Camera: ${camera}<br>Date: ${date}`;
-            card.setAttribute('onclick', `showImageModal('${imageUrl}', '${title.replace(/'/g, "\\'")}', '${description}')`);
+            card.setAttribute('onclick', `showMediaModal('image', '${imageUrl}', '${title.replace(/'/g, "\\'")}', '${description}')`);
             card.innerHTML = `<div class="h-56 bg-black"><img src="${imageUrl}" alt="${title}" class="w-full h-full object-cover" onerror="this.onerror=null;this.src='https://placehold.co/600x400/020813/00f6ff?text=SIGNAL+LOST';"></div><div class="p-4"><h3 class="font-bold text-lg text-cyan-300 mb-2">${title}</h3><p class="text-gray-400 text-sm">CAMERA: ${camera}</p><p class="text-gray-400 text-sm">DATE: ${date}</p></div>`;
             imageGrid.appendChild(card);
         }
 
-        function displayAPOD(data) { if (data.media_type === 'image') { createImageCard(data); } else { showMessage("APOD is a video. This terminal displays static images only."); } }
+        function displayAPOD(data) { createMediaCard(data); }
         function displayMarsPhotos(photos) { if (!photos || photos.length === 0) { showMessage('No image data found for this rover on the selected date.'); return; } photos.slice(0, 24).forEach(photo => createMarsImageCard(photo)); }
         
-        // FIX: This function now filters for images to prevent errors
         function displaySearchResults(items) {
-            if (!items || items.length === 0) {
-                showMessage('Query returned no results from the image database.');
-                return;
-            }
-            const imageItems = items.filter(item => item.data && item.data[0] && item.data[0].media_type === 'image' && item.links && item.links[0]);
-
-            if (imageItems.length === 0) {
-                showMessage('No images found in the results.');
-                return;
-            }
-            
-            showMessage(''); // Clear loading message
-            imageItems.slice(0, 24).forEach(item => {
-                createImageCard({
-                    url: item.links[0].href,
+            if (!items || items.length === 0) { showMessage('Query returned no results from the image database.'); return; }
+            const mediaItems = items.filter(item => item.data && item.data[0] && (item.data[0].media_type === 'image' || item.data[0].media_type === 'video') && item.links && item.links[0]);
+            if (mediaItems.length === 0) { showMessage('No images or videos found in the results.'); return; }
+            showMessage('');
+            mediaItems.slice(0, 24).forEach(item => {
+                createMediaCard({
+                    media_type: item.data[0].media_type,
+                    url: item.data[0].media_type === 'video' ? item.links[0].href : item.links[0].href, // Placeholder for video URL logic
+                    thumbnail_url: item.links[0].href, // Use image link as thumbnail
                     title: item.data[0].title,
                     explanation: item.data[0].description
                 });
@@ -377,7 +412,7 @@
                 const date = new Date(image.date);
                 const dateString = date.toISOString().slice(0, 10);
                 const archiveUrl = `https://epic.gsfc.nasa.gov/archive/natural/${date.getFullYear()}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getDate().toString().padStart(2, '0')}/png/${image.image}.png`;
-                createImageCard({ url: archiveUrl, title: `Earth: ${image.caption}`, explanation: `Image taken on ${dateString}.` });
+                createMediaCard({ media_type: 'image', url: archiveUrl, title: `Earth: ${image.caption}`, explanation: `Image taken on ${dateString}.` });
             });
         }
 
