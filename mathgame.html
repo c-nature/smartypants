@@ -36,7 +36,7 @@
 
         /* Specific background images for the BODY based on theme */
         /* IMPORTANT: Ensure these image files are present in the same directory (or correct relative path)
-           on your GitHub Pages server. File names are case-sensitive on GitHub! */
+            on your GitHub Pages server. File names are case-sensitive on GitHub! */
         .body-theme-underwater {
             background-image: url('underwaterBG.png'); 
         }
@@ -79,6 +79,23 @@
             100% { opacity: 1; transform: translateY(0); }
         }
 
+        @keyframes fadeIn {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+
+        @keyframes scaleIn {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        @keyframes pulseGlow {
+            0% { box-shadow: 0 0 15px 8px rgba(255, 165, 0, 0.7), 0 0 25px 15px rgba(255, 69, 0, 0.5); }
+            50% { box-shadow: 0 0 25px 12px rgba(255, 165, 0, 0.9), 0 0 40px 20px rgba(255, 69, 0, 0.7); }
+            100% { box-shadow: 0 0 15px 8px rgba(255, 165, 0, 0.7), 0 0 25px 15px rgba(255, 69, 0, 0.5); }
+        }
+
+
         .settings-group, .progress-display, .problem-area, .input-group, .feedback-area, .score-timer {
             background-color: rgba(255, 255, 255, 0.9); /* Consistent semi-transparent background */
             border-radius: 20px;
@@ -105,23 +122,6 @@
             0% { opacity: 0; transform: translateY(30px); }
             100% { opacity: 1; transform: translateY(0); }
         }
-
-        @keyframes fadeIn {
-            0% { opacity: 0; }
-            100% { opacity: 1; }
-        }
-
-        @keyframes scaleIn {
-            0% { transform: scale(0.8); opacity: 0; }
-            100% { transform: scale(1); opacity: 1; }
-        }
-
-        @keyframes pulseGlow {
-            0% { box-shadow: 0 0 15px 8px rgba(255, 165, 0, 0.7), 0 0 25px 15px rgba(255, 69, 0, 0.5); }
-            50% { box-shadow: 0 0 25px 12px rgba(255, 165, 0, 0.9), 0 0 40px 20px rgba(255, 69, 0, 0.7); }
-            100% { box-shadow: 0 0 15px 8px rgba(255, 165, 0, 0.7), 0 0 25px 15px rgba(255, 69, 0, 0.5); }
-        }
-
 
         .settings-row {
             display: flex;
@@ -248,7 +248,7 @@
         /* New: Styles for "on fire" input group */
         .input-group-on-fire {
             box-shadow: 0 0 15px 8px rgba(255, 165, 0, 0.7),
-                        0 0 25px 15px rgba(255, 69, 0, 0.5); /* Fiery glow */
+                                0 0 25px 15px rgba(255, 69, 0, 0.5); /* Fiery glow */
             border-color: #ff4500 !important; /* Stronger border */
             animation: pulseGlow 1.5s infinite alternate; /* Pulsing effect */
         }
@@ -489,10 +489,30 @@
         #confetti-container.active {
             opacity: 1; /* When we add the 'active' class, it becomes visible */
         }
+
+        /* Winner animation container styles */
+        #winner-animation-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1001; /* Higher than confetti to be on top */
+            pointer-events: none; /* Allow clicks through */
+            opacity: 0; /* Hidden by default */
+            transition: opacity 0.7s ease-out; /* Fade in/out */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent overlay */
+        }
+        #winner-animation-container.active {
+            opacity: 1;
+        }
     </style>
 </head>
 <body>
-    <h1>Math Challenge!</h1>
+    <h1>Multi-Grade Math Challenge</h1>
 
     <div class="settings-group">
         <div class="settings-row">
@@ -553,6 +573,9 @@
     <!-- Confetti animation container -->
     <div id="confetti-container"></div>
 
+    <!-- Winner animation container -->
+    <div id="winner-animation-container"></div>
+
     <!-- Hidden audio elements for click, correct, wrong, clap, and horn sounds -->
     <audio id="correctSoundElement" preload="auto">
         <source src="correct.wav" type="audio/wav">
@@ -584,6 +607,7 @@
     <script>
         // --- DOM Elements ---
         const problemDisplay = document.getElementById('problemDisplay');
+        // Removed initialMessageSpan as the new code uses querySelector
         const perQuestionTimerDisplay = document.getElementById('perQuestionTimerDisplay');
         const answerInput = document.getElementById('answerInput');
         const submitBtn = document.getElementById('submitBtn');
@@ -603,6 +627,7 @@
         const body = document.body;
         const inputGroup = document.querySelector('.input-group'); // Get the input group element
         const confettiContainer = document.getElementById('confetti-container'); // Confetti container
+        const winnerAnimationContainer = document.getElementById('winner-animation-container'); // Winner animation container
 
         // --- Game Variables ---
         let score = 0;
@@ -610,7 +635,7 @@
         let currentProblem = {};
         let overallGameTimerInterval;
         let isGameRunning = false;
-        let currentDifficulty = '4th';
+        let currentDifficulty = '4th'; // Default to 4th grade as per new user code
 
         let isPerQuestionTimeLimitEnabled = false;
         let selectedPerQuestionTime = parseInt(questionTimeInput.value);
@@ -637,8 +662,9 @@
         let isFireEffectActive = false; // Controls if fire animation runs
         let fireAnimationId; // Stores the requestAnimationFrame ID for fire
 
-        // Lottie animation instance for confetti
+        // Lottie animation instance for confetti and winner
         let confettiAnimation = null; // Initialize as null
+        let winnerAnimation = null; // Initialize as null
 
         // --- Difficulty Settings (base values for each grade) ---
         const difficultySettings = {
@@ -825,7 +851,7 @@
                         getFireHeat(x - 1, y + 1) + // Bottom-left
                         getFireHeat(x, y + 1) +    // Directly below
                         getFireHeat(x + 1, y + 1) + // Bottom-right
-                        getFireHeat(x, y + 2)       // Two steps below (to give more upward momentum)
+                        getFireHeat(x, y + 2)         // Two steps below (to give more upward momentum)
                     ) / 4.1;
                     
                     setFireHeat(x, y, c); // Update the current pixel's heat
@@ -850,7 +876,7 @@
             // so fireCanvas has correct dimensions relative to its parent inputGroup
             initFireCanvas(); 
             fireCanvas.style.display = 'block'; // Show the fire canvas
-            feedbackMessage.textContent = "YOU'RE ON FIRE! 🔥"; // Update the feedback message
+            feedbackMessage.textContent = "YOU'RE ON FIRE! �"; // Update the feedback message
             fireAnimationId = window.requestAnimationFrame(fireFrame); // Start fire animation
         }
 
@@ -1069,6 +1095,17 @@
 
             updateProgressDisplay();
             console.log('Game ended. UI reset to initial state.');
+
+            // Play winner animation if all rounds are completed successfully
+            if (currentRound > totalRounds) {
+                winnerAnimationContainer.classList.add('active'); // Show winner animation container
+                if (winnerAnimation) {
+                    winnerAnimation.goToAndPlay(0, true); // Play winner animation from beginning
+                    console.log("Attempting to play winner animation.");
+                } else {
+                    console.warn("Winner animation object is not loaded or null. Cannot play.");
+                }
+            }
         }
 
         /**
@@ -1095,7 +1132,7 @@
             feedbackMessage.textContent = ''; // Clear text feedback
             feedback.className = "feedback-area"; // Reset feedback class
 
-            problemDisplay.querySelector('span:first-child').textContent = `Select difficulty and click "Start Game"!`;
+            problemDisplay.querySelector('span:first-child').textContent = `Ready for ${currentDifficulty} grade math! Click "Start Game".`; // Updated initial message
 
             answerInput.value = '';
             answerInput.disabled = true;
@@ -1109,6 +1146,12 @@
             startGameBtn.disabled = false;
 
             endGameBtn.style.display = 'none';
+
+            // Hide confetti and winner animations
+            confettiContainer.classList.remove('active');
+            if (confettiAnimation) confettiAnimation.stop();
+            winnerAnimationContainer.classList.remove('active');
+            if (winnerAnimation) winnerAnimation.stop();
 
             updateProgressDisplay();
             updateBackground(); // Call update background to set the theme when resetting
@@ -1400,7 +1443,7 @@
                 confettiAnimation = lottie.loadAnimation({
                     container: confettiContainer, // the dom element that will contain the animation
                     renderer: 'svg', // Use 'svg' for better scalability and transparency handling
-                    loop: false,     // Do not loop the confetti animation
+                    loop: false,      // Do not loop the confetti animation
                     autoplay: false, // Do not autoplay, we will control it programmatically
                     path: 'Confetti.json' // the path to your animation json file
                 });
@@ -1432,6 +1475,43 @@
                     console.warn("confettiAnimation object is still null after lottie.loadAnimation call. Confetti might not work.");
                 }
 
+                // Initialize Lottie Winner Animation
+                console.log("Attempting to load Lottie animation from 'winner.lottie'");
+                winnerAnimation = lottie.loadAnimation({
+                    container: winnerAnimationContainer, // the dom element that will contain the animation
+                    renderer: 'svg', // Use 'svg' for better scalability and transparency handling
+                    loop: false,      // Do not loop the winner animation
+                    autoplay: false, // Do not autoplay, we will control it programmatically
+                    path: 'winner.lottie' // the path to your animation json file
+                });
+
+                // Add event listeners for Lottie winner animation loading status/errors
+                winnerAnimation.addEventListener('data_failed', (e) => {
+                    console.error("Winner Lottie animation data failed to load! This often means 'winner.lottie' is not found or corrupted.");
+                    console.error("Check the Network tab in developer tools for a 404 error on winner.lottie.");
+                    console.error("Ensure 'winner.lottie' exists at the correct path and its name matches exactly (case-sensitive) on GitHub.");
+                });
+                winnerAnimation.addEventListener('error', (e) => {
+                    console.error("Winner Lottie animation encountered an error:", e);
+                });
+                winnerAnimation.addEventListener('DOMLoaded', () => {
+                    console.log("Winner Lottie animation DOM loaded successfully.");
+                });
+                winnerAnimation.addEventListener('loaded_ready', () => {
+                    console.log("Winner Lottie animation loaded and ready.");
+                });
+
+                // Event listener for when the winner animation completes
+                if (winnerAnimation) {
+                    winnerAnimation.addEventListener('complete', () => {
+                        console.log("Winner animation completed.");
+                        winnerAnimationContainer.classList.remove('active'); // Hide winner container
+                        winnerAnimation.stop(); // Stop the animation
+                    });
+                } else {
+                    console.warn("winnerAnimation object is still null after lottie.loadAnimation call. Winner animation might not work.");
+                }
+
                 currentDifficulty = difficultySelect.value;
                 updateBackground();
                 problemDisplay.querySelector('span:first-child').textContent = `Ready for ${currentDifficulty} grade math! Click "Start Game".`;
@@ -1449,3 +1529,4 @@
     </script>
 </body>
 </html>
+�

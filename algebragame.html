@@ -36,7 +36,7 @@
 
         /* Specific background images for the BODY based on theme */
         /* IMPORTANT: Ensure these image files are present in the same directory (or correct relative path)
-           on your GitHub Pages server. File names are case-sensitive on GitHub! */
+            on your GitHub Pages server. File names are case-sensitive on GitHub! */
         .body-theme-forest {
             background-image: url('forestBG.png'); /* Placeholder for 7th grade */
         }
@@ -245,7 +245,7 @@
         /* New: Styles for "on fire" input group */
         .input-group-on-fire {
             box-shadow: 0 0 15px 8px rgba(255, 165, 0, 0.7),
-                        0 0 25px 15px rgba(255, 69, 0, 0.5); /* Fiery glow */
+                                0 0 25px 15px rgba(255, 69, 0, 0.5); /* Fiery glow */
             border-color: #ff4500 !important; /* Stronger border */
             animation: pulseGlow 1.5s infinite alternate; /* Pulsing effect */
         }
@@ -486,6 +486,26 @@
         #confetti-container.active {
             opacity: 1; /* When we add the 'active' class, it becomes visible */
         }
+
+        /* Winner animation container styles */
+        #winner-animation-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1001; /* Higher than confetti to be on top */
+            pointer-events: none; /* Allow clicks through */
+            opacity: 0; /* Hidden by default */
+            transition: opacity 0.7s ease-out; /* Fade in/out */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent overlay */
+        }
+        #winner-animation-container.active {
+            opacity: 1;
+        }
     </style>
 </head>
 <body>
@@ -549,10 +569,13 @@
     <!-- Confetti animation container -->
     <div id="confetti-container"></div>
 
+    <!-- Winner animation container -->
+    <div id="winner-animation-container"></div>
+
     <!-- Hidden audio elements for click, correct, wrong, clap, and horn sounds -->
     <!-- IMPORTANT: Ensure these audio files (correct.wav, wrong.wav, etc.) are present
-         in the same directory (or correct relative path) on your GitHub Pages server.
-         File names are case-sensitive on GitHub! -->
+            in the same directory (or correct relative path) on your GitHub Pages server.
+            File names are case-sensitive on GitHub! -->
     <audio id="correctSoundElement" preload="auto">
         <source src="correct.wav" type="audio/wav">
         <source src="correct.mp3" type="audio/mpeg">
@@ -603,6 +626,7 @@
         const body = document.body;
         const inputGroup = document.querySelector('.input-group'); // Get the input group element
         const confettiContainer = document.getElementById('confetti-container'); // Confetti container
+        const winnerAnimationContainer = document.getElementById('winner-animation-container'); // Winner animation container
 
         // --- Game Variables ---
         let score = 0;
@@ -637,8 +661,9 @@
         let isFireEffectActive = false; // Controls if fire animation runs
         let fireAnimationId; // Stores the requestAnimationFrame ID for fire
 
-        // Lottie animation instance for confetti
+        // Lottie animation instance for confetti and winner
         let confettiAnimation = null; // Initialize as null
+        let winnerAnimation = null; // Initialize as null
 
         // --- Difficulty Settings (base values for each grade) ---
         // These settings define the ranges for generating math problems and the background theme class.
@@ -817,7 +842,7 @@
                         getFireHeat(x - 1, y + 1) + // Bottom-left
                         getFireHeat(x, y + 1) +    // Directly below
                         getFireHeat(x + 1, y + 1) + // Bottom-right
-                        getFireHeat(x, y + 2)        // Two steps below (to give more upward momentum)
+                        getFireHeat(x, y + 2)         // Two steps below (to give more upward momentum)
                     ) / 4.1;
                     
                     setFireHeat(x, y, c); // Update the current pixel's heat
@@ -971,131 +996,6 @@
         }
 
         /**
-         * Generates a new math problem based on the current difficulty level and round.
-         */
-        function generateProblem() {
-            console.log('--- Generating problem ---');
-            const baseSettings = difficultySettings[currentDifficulty];
-            const adjustedSettings = adjustDifficultyForRound(baseSettings, currentRound);
-            
-            // Select a random problem type from the allowed types for the current difficulty
-            const problemTypes = adjustedSettings.problemTypes;
-            const problemType = problemTypes[getRandomInt(0, problemTypes.length - 1)];
-
-            let problemString = '';
-            let answer;
-
-            switch (problemType) {
-                case 'linear':
-                    // Linear equation logic (ax + b = c)
-                    let a_linear, b_linear, x_linear, c_linear;
-                    do {
-                        a_linear = getRandomInt(adjustedSettings.min_a, adjustedSettings.max_a);
-                        if (a_linear === 0) a_linear = 1; // Prevent division by zero or trivial 0x problems
-                        b_linear = getRandomInt(adjustedSettings.min_b, adjustedSettings.max_b);
-                        x_linear = getRandomInt(adjustedSettings.min_x, adjustedSettings.max_x);
-                        c_linear = (a_linear * x_linear) + b_linear;
-                    } while (false); // Loop only once as x is guaranteed to be integer
-
-                    currentProblem = { a: a_linear, b: b_linear, c: c_linear, x: x_linear };
-
-                    // Construct the problem string: ax + b = c
-                    problemString = `${a_linear}`;
-                    if (a_linear === 1) problemString = ''; // For 1x, just show x
-                    else if (a_linear === -1) problemString = '-'; // For -1x, just show -x
-
-                    problemString += 'x';
-
-                    if (b_linear > 0) {
-                        problemString += ` + ${b_linear}`;
-                    } else if (b_linear < 0) {
-                        problemString += ` - ${Math.abs(b_linear)}`;
-                    }
-                    problemString += ` = ${c_linear}`;
-                    currentProblem.problemString = problemString;
-                    answer = x_linear;
-                    break;
-
-                case 'quadratic':
-                    // Quadratic equation logic (Ax^2 + Bx + C = 0)
-                    let x1_quad, x2_quad, k_quad;
-                    let A_quad, B_quad, C_quad;
-
-                    // Generate integer roots
-                    x1_quad = getRandomInt(adjustedSettings.min_x_quad_root, adjustedSettings.max_x_quad_root);
-                    x2_quad = getRandomInt(adjustedSettings.min_x_quad_root, adjustedSettings.max_x_quad_root);
-
-                    // Generate a multiplier
-                    k_quad = getRandomInt(adjustedSettings.min_k_quad, adjustedSettings.max_k_quad);
-                    if (k_quad === 0) k_quad = 1; // Ensure k is not zero
-
-                    // Calculate coefficients A, B, C
-                    A_quad = k_quad;
-                    B_quad = -k_quad * (x1_quad + x2_quad);
-                    C_quad = k_quad * x1_quad * x2_quad;
-
-                    // Decide which root to ask for (for simplicity, just x1)
-                    currentProblem = { a: A_quad, b: B_quad, c: C_quad, x1: x1_quad, x2: x2_quad };
-                    answer = x1_quad; // The game expects one integer answer
-
-                    // Construct the quadratic problem string
-                    problemString = '';
-                    if (A_quad === 1) {
-                        problemString += 'x²';
-                    } else if (A_quad === -1) {
-                        problemString += '-x²';
-                    } else {
-                        problemString += `${A_quad}x²`;
-                    }
-
-                    if (B_quad !== 0) {
-                        if (B_quad > 0) {
-                            problemString += ` + ${B_quad}`;
-                        } else {
-                            problemString += ` - ${Math.abs(B_quad)}`;
-                        }
-                        problemString += 'x';
-                    }
-
-                    if (C_quad !== 0) {
-                        if (C_quad > 0) {
-                            problemString += ` + ${C_quad}`;
-                        } else {
-                            problemString += ` - ${Math.abs(C_quad)}`;
-                        }
-                    }
-                    problemString += ' = 0';
-                    break;
-
-                case 'square_root':
-                    // Square root problem logic (√X = ?)
-                    let root_val = getRandomInt(adjustedSettings.min_root, adjustedSettings.max_root);
-                    let num_to_root = root_val * root_val;
-                    
-                    currentProblem = { num: num_to_root, root: root_val };
-                    problemString = `√${num_to_root} = ?`;
-                    answer = root_val;
-                    break;
-            }
-
-            currentProblem.problemString = problemString; // Store the formatted string
-            currentProblem.answer = answer; // Store the correct answer
-
-            console.log('Generated problem:', currentProblem);
-            console.log('Problem text to display:', problemString);
-
-            // Update the problem display
-            initialMessageSpan.textContent = problemString; // Update the content of the specific span
-            
-            answerInput.value = '';
-            answerInput.focus();
-            feedbackMessage.textContent = ''; // Clear text feedback
-            feedback.className = "feedback-area"; // Reset feedback class
-            startPerQuestionTimer();
-            console.log('--- Problem generation complete ---');
-        }
-
-        /**
          * Ends the entire game session.
          */
         function endGame() {
@@ -1121,6 +1021,17 @@
 
             updateProgressDisplay();
             console.log('Game ended. UI reset to initial state.');
+
+            // Play winner animation if all rounds are completed successfully
+            if (currentRound > totalRounds) {
+                winnerAnimationContainer.classList.add('active'); // Show winner animation container
+                if (winnerAnimation) {
+                    winnerAnimation.goToAndPlay(0, true); // Play winner animation from beginning
+                    console.log("Attempting to play winner animation.");
+                } else {
+                    console.warn("Winner animation object is not loaded or null. Cannot play.");
+                }
+            }
         }
 
         /**
@@ -1161,6 +1072,12 @@
             startGameBtn.disabled = false;
 
             endGameBtn.style.display = 'none';
+
+            // Hide confetti and winner animations
+            confettiContainer.classList.remove('active');
+            if (confettiAnimation) confettiAnimation.stop();
+            winnerAnimationContainer.classList.remove('active');
+            if (winnerAnimation) winnerAnimation.stop();
 
             updateProgressDisplay();
             updateBackground(); // Call update background to set the theme when resetting
@@ -1285,7 +1202,7 @@
 
                 currentRound++;
                 if (currentRound > totalRounds) {
-                    setTimeout(endGame, 2000);
+                    setTimeout(endGame, 2000); // Game over if all rounds completed
                 } else {
                     setTimeout(startNewRound, 2000);
                 }
@@ -1455,7 +1372,7 @@
                 confettiAnimation = lottie.loadAnimation({
                     container: confettiContainer, // the dom element that will contain the animation
                     renderer: 'svg', // Use 'svg' for better scalability and transparency handling
-                    loop: false,     // Do not loop the confetti animation
+                    loop: false,      // Do not loop the confetti animation
                     autoplay: false, // Do not autoplay, we will control it programmatically
                     path: 'Confetti.json' // the path to your animation json file
                 });
@@ -1485,6 +1402,43 @@
                     });
                 } else {
                     console.warn("confettiAnimation object is still null after lottie.loadAnimation call. Confetti might not work.");
+                }
+
+                // Initialize Lottie Winner Animation
+                console.log("Attempting to load Lottie animation from 'winner.lottie'");
+                winnerAnimation = lottie.loadAnimation({
+                    container: winnerAnimationContainer, // the dom element that will contain the animation
+                    renderer: 'svg', // Use 'svg' for better scalability and transparency handling
+                    loop: false,      // Do not loop the winner animation
+                    autoplay: false, // Do not autoplay, we will control it programmatically
+                    path: 'winner.lottie' // the path to your animation json file
+                });
+
+                // Add event listeners for Lottie winner animation loading status/errors
+                winnerAnimation.addEventListener('data_failed', (e) => {
+                    console.error("Winner Lottie animation data failed to load! This often means 'winner.lottie' is not found or corrupted.");
+                    console.error("Check the Network tab in developer tools for a 404 error on winner.lottie.");
+                    console.error("Ensure 'winner.lottie' exists at the correct path and its name matches exactly (case-sensitive) on GitHub.");
+                });
+                winnerAnimation.addEventListener('error', (e) => {
+                    console.error("Winner Lottie animation encountered an error:", e);
+                });
+                winnerAnimation.addEventListener('DOMLoaded', () => {
+                    console.log("Winner Lottie animation DOM loaded successfully.");
+                });
+                winnerAnimation.addEventListener('loaded_ready', () => {
+                    console.log("Winner Lottie animation loaded and ready.");
+                });
+
+                // Event listener for when the winner animation completes
+                if (winnerAnimation) {
+                    winnerAnimation.addEventListener('complete', () => {
+                        console.log("Winner animation completed.");
+                        winnerAnimationContainer.classList.remove('active'); // Hide winner container
+                        winnerAnimation.stop(); // Stop the animation
+                    });
+                } else {
+                    console.warn("winnerAnimation object is still null after lottie.loadAnimation call. Winner animation might not work.");
                 }
 
                 currentDifficulty = difficultySelect.value;
