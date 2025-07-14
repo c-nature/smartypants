@@ -524,7 +524,7 @@
     </div>
 
     <div id="problemDisplay" class="problem-area">
-        <span>Select difficulty and click "Start Game"!</span>
+        <span id="initialMessage">Select difficulty and click "Start Game"!</span>
         <span id="perQuestionTimerDisplay"></span>
     </div>
 
@@ -583,6 +583,7 @@
     <script>
         // --- DOM Elements ---
         const problemDisplay = document.getElementById('problemDisplay');
+        const initialMessageSpan = document.getElementById('initialMessage'); // NEW: Span for initial message
         const perQuestionTimerDisplay = document.getElementById('perQuestionTimerDisplay');
         const answerInput = document.getElementById('answerInput');
         const submitBtn = document.getElementById('submitBtn');
@@ -643,39 +644,45 @@
         // These settings define the ranges for generating math problems and the background theme class.
         const difficultySettings = {
             '7th': {
-                themeClass: 'body-theme-forest', // Placeholder for user's PNGs
-                problemTypes: ['linear'], // Can add other types later if needed
-                min_a: 1, max_a: 10, // Coefficient for x (a in ax + b = c)
-                min_b: -20, max_b: 20, // Constant term (b in ax + b = c)
-                min_x: -20, max_x: 20, // Solution for x
-                a_increment: 1, b_increment: 10, x_increment: 10 // How much ranges increase per round
+                themeClass: 'body-theme-forest',
+                problemTypes: ['linear'], // No square roots yet
+                min_a: 1, max_a: 10,
+                min_b: -20, max_b: 20,
+                min_x: -20, max_x: 20,
+                a_increment: 1, b_increment: 10, x_increment: 10
             },
             '8th': {
-                themeClass: 'body-theme-desert', // Placeholder
-                problemTypes: ['linear'],
+                themeClass: 'body-theme-desert',
+                problemTypes: ['linear', 'square_root'], // Added square_root
                 min_a: 1, max_a: 15,
                 min_b: -30, max_b: 30,
                 min_x: -30, max_x: 30,
-                a_increment: 2, b_increment: 15, x_increment: 15
+                a_increment: 2, b_increment: 15, x_increment: 15,
+                min_root: 1, max_root: 10, // Base for square roots
+                root_increment: 2
             },
             '9th': {
-                themeClass: 'body-theme-mountain', // Placeholder
-                problemTypes: ['linear'],
+                themeClass: 'body-theme-mountain',
+                problemTypes: ['linear', 'square_root'], // Added square_root
                 min_a: 1, max_a: 20,
                 min_b: -50, max_b: 50,
                 min_x: -50, max_x: 50,
-                a_increment: 3, b_increment: 20, x_increment: 20
+                a_increment: 3, b_increment: 20, x_increment: 20,
+                min_root: 1, max_root: 15, // Base for square roots
+                root_increment: 3
             },
             '10th': {
-                themeClass: 'body-theme-space', // Placeholder
-                problemTypes: ['linear'],
+                themeClass: 'body-theme-space',
+                problemTypes: ['linear', 'square_root'], // Added square_root
                 min_a: 1, max_a: 25,
                 min_b: -100, max_b: 100,
                 min_x: -100, max_x: 100,
-                a_increment: 5, b_increment: 30, x_increment: 30
+                a_increment: 5, b_increment: 30, x_increment: 30,
+                min_root: 1, max_root: 20, // Base for square roots
+                root_increment: 5
             },
             '11th': {
-                themeClass: 'body-theme-galaxy', // Placeholder
+                themeClass: 'body-theme-galaxy',
                 problemTypes: ['quadratic'], // Strictly quadratic for 11th grade
                 // Parameters for quadratic equations (Ax^2 + Bx + C = 0)
                 min_x_quad_root: -10, max_x_quad_root: 10, // Range for integer roots x1, x2
@@ -913,6 +920,13 @@
                 if (adjustedSettings.min_k_quad > adjustedSettings.max_k_quad) adjustedSettings.min_k_quad = adjustedSettings.max_k_quad - 1;
             }
 
+            // Adjust square root parameters if applicable
+            if (baseSettings.problemTypes && baseSettings.problemTypes.includes('square_root')) {
+                adjustedSettings.max_root += (round - 1) * (baseSettings.root_increment || 0);
+                adjustedSettings.min_root = Math.max(1, adjustedSettings.min_root); // Ensure min_root is at least 1
+                if (adjustedSettings.min_root > adjustedSettings.max_root) adjustedSettings.min_root = adjustedSettings.max_root; // Adjust if min exceeds max
+            }
+
             return adjustedSettings;
         }
 
@@ -963,15 +977,10 @@
             console.log('--- Generating problem ---');
             const baseSettings = difficultySettings[currentDifficulty];
             const adjustedSettings = adjustDifficultyForRound(baseSettings, currentRound);
-            let problemType;
-
-            // Select problem type based on difficulty. For 11th, it's always quadratic.
-            // For others, it's linear.
-            if (currentDifficulty === '11th') {
-                problemType = 'quadratic';
-            } else {
-                problemType = 'linear';
-            }
+            
+            // Select a random problem type from the allowed types for the current difficulty
+            const problemTypes = adjustedSettings.problemTypes;
+            const problemType = problemTypes[getRandomInt(0, problemTypes.length - 1)];
 
             let problemString = '';
             let answer;
@@ -1057,6 +1066,16 @@
                     }
                     problemString += ' = 0';
                     break;
+
+                case 'square_root':
+                    // Square root problem logic (√X = ?)
+                    let root_val = getRandomInt(adjustedSettings.min_root, adjustedSettings.max_root);
+                    let num_to_root = root_val * root_val;
+                    
+                    currentProblem = { num: num_to_root, root: root_val };
+                    problemString = `√${num_to_root} = ?`;
+                    answer = root_val;
+                    break;
             }
 
             currentProblem.problemString = problemString; // Store the formatted string
@@ -1066,11 +1085,7 @@
             console.log('Problem text to display:', problemString);
 
             // Update the problem display
-            if (problemDisplay.querySelector('span:first-child')) {
-                problemDisplay.querySelector('span:first-child').textContent = problemString;
-            } else {
-                console.error('Could not find the first span in problemDisplay to update text.');
-            }
+            initialMessageSpan.textContent = problemString; // Update the content of the specific span
             
             answerInput.value = '';
             answerInput.focus();
@@ -1085,7 +1100,7 @@
          */
         function endGame() {
             console.log('--- Ending Game ---');
-            problemDisplay.querySelector('span:first-child').textContent = `Game Over! Your final score is: ${score} points!`;
+            initialMessageSpan.textContent = `Game Over! Your final score is: ${score} points!`; // Update the specific span
             feedbackMessage.textContent = `Game completed! You spent a total of ${overallGameElapsedTime} seconds over ${currentRound - 1} rounds. Click "Play Again" to restart!`;
             feedback.className = "feedback-area";
             deactivateFireEffect(); // Ensure fire is off at game end
@@ -1132,7 +1147,7 @@
             feedbackMessage.textContent = ''; // Clear text feedback
             feedback.className = "feedback-area"; // Reset feedback class
 
-            problemDisplay.querySelector('span:first-child').textContent = `Select difficulty and click "Start Game"!`;
+            initialMessageSpan.textContent = `Get Ready for ${currentDifficulty} Algebra!`; // Updated initial message
 
             answerInput.value = '';
             answerInput.disabled = true;
@@ -1365,7 +1380,7 @@
             updateBackground(); // Change background based on new difficulty
             if (!isGameRunning) {
                 // Update problem display text only if game is not running
-                problemDisplay.querySelector('span:first-child').textContent = `Ready for ${currentDifficulty} grade math! Click "Start Game".`;
+                initialMessageSpan.textContent = `Get Ready for ${currentDifficulty} Algebra!`; // Updated initial message
             }
         });
 
@@ -1474,7 +1489,7 @@
 
                 currentDifficulty = difficultySelect.value;
                 updateBackground();
-                problemDisplay.querySelector('span:first-child').textContent = `Ready for ${currentDifficulty} grade math! Click "Start Game".`;
+                initialMessageSpan.textContent = `Get Ready for ${currentDifficulty} Algebra!`; // Updated initial message
                 
                 if (timeLimitToggle.value === 'yes') {
                     questionTimeSettings.classList.remove('hidden');
