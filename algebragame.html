@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Multi-Grade Math Challenge</title>
+    <title>Algebra Challenge</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts for Luckiest Guy and Fredoka One -->
     <link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&family=Fredoka+One&display=swap" rel="stylesheet">
@@ -37,23 +37,20 @@
         /* Specific background images for the BODY based on theme */
         /* IMPORTANT: Ensure these image files are present in the same directory (or correct relative path)
             on your GitHub Pages server. File names are case-sensitive on GitHub! */
-        .body-theme-underwater {
-            background-image: url('https://placehold.co/1920x1080/f0f8ff/000000?text=Underwater+Theme+BG');
+        .body-theme-forest {
+            background-image: url('forestBG.png'); /* Placeholder for 7th grade */
         }
-        .body-theme-undergroundcity {
-            background-image: url('https://placehold.co/1920x1080/f0f8ff/000000?text=Underground+City+Theme+BG');
+        .body-theme-desert {
+            background-image: url('desertBG.png'); /* Placeholder for 8th grade */
         }
-        .body-theme-ice {
-            background-image: url('https://placehold.co/1920x1080/f0f8ff/000000?text=Ice+Theme+BG');
+        .body-theme-mountain {
+            background-image: url('mountainBG.png'); /* Placeholder for 9th grade */
         }
-        .body-theme-rainforest {
-            background-image: url('https://placehold.co/1920x1080/f0f8ff/000000?text=Rainforest+Theme+BG');
+        .body-theme-space {
+            background-image: url('galaxyBG.png'); /* Placeholder for 10th grade */
         }
-        .body-theme-cybercity {
-            background-image: url('https://placehold.co/1920x1080/f0f8ff/000000?text=Cybercity+Theme+BG');
-        }
-        .body-theme-lava {
-            background-image: url('https://placehold.co/1920x1080/f0f8ff/000000?text=Lava+Theme+BG');
+        .body-theme-galaxy {
+            background-image: url('oceanBG.png'); /* Placeholder for 11th grade */
         }
 
         /* Elements that were inside the game-container now styled individually */
@@ -512,18 +509,17 @@
     </style>
 </head>
 <body>
-    <h1>Multi-Grade Math Challenge</h1>
+    <h1>Math Challenge!</h1>
 
     <div class="settings-group">
         <div class="settings-row">
             <label for="difficultySelect">Difficulty:</label>
             <select id="difficultySelect">
-                <option value="1st">1st Grade</option>
-                <option value="2nd">2nd Grade</option>
-                <option value="3rd">3rd Grade</option>
-                <option value="4th" selected>4th Grade</option>
-                <option value="5th">5th Grade</option>
-                <option value="6th">6th Grade</option>
+                <option value="7th" selected>7th Grade</option>
+                <option value="8th">8th Grade</option>
+                <option value="9th">9th Grade</option>
+                <option value="10th">10th Grade</option>
+                <option value="11th">11th Grade</option>
             </select>
         </div>
 
@@ -548,7 +544,7 @@
     </div>
 
     <div id="problemDisplay" class="problem-area">
-        <span>Select difficulty and click "Start Game"!</span>
+        <span id="initialMessage">Select difficulty and click "Start Game"!</span>
         <span id="perQuestionTimerDisplay"></span>
     </div>
 
@@ -577,28 +573,31 @@
     <div id="winner-animation-container"></div>
 
     <!-- Hidden audio elements for click, correct, wrong, clap, and horn sounds -->
+    <!-- IMPORTANT: Ensure these audio files (correct.wav, wrong.wav, etc.) are present
+            in the same directory (or correct relative path) on your GitHub Pages server.
+            File names are case-sensitive on GitHub! -->
     <audio id="correctSoundElement" preload="auto">
-        <source src="https://www.soundjay.com/buttons/beep-07a.mp3" type="audio/mpeg">
         <source src="correct.wav" type="audio/wav">
+        <source src="correct.mp3" type="audio/mpeg">
         <source src="correct.ogg" type="audio/ogg">
     </audio>
     <audio id="wrongSoundElement" preload="auto">
-        <source src="https://www.soundjay.com/buttons/beep-08a.mp3" type="audio/mpeg">
         <source src="wrong.wav" type="audio/wav">
+        <source src="wrong.mp3" type="audio/mpeg">
         <source src="wrong.ogg" type="audio/ogg">
     </audio>
     <audio id="clickSoundElement" preload="auto">
-        <source src="https://www.soundjay.com/buttons/button-2.mp3" type="audio/mpeg">
+        <source src="click.mp3" type="audio/mpeg">
         <source src="click.ogg" type="audio/ogg">
         <source src="click.wav" type="audio/wav">
     </audio>
     <audio id="clapSoundElement" preload="auto">
-        <source src="https://www.soundjay.com/human/clapping-1.mp3" type="audio/mpeg">
+        <source src="clap.mp3" type="audio/mpeg">
         <source src="clap.ogg" type="audio/ogg">
         <source src="clap.wav" type="audio/wav">
     </audio>
     <audio id="hornSoundElement" preload="auto">
-        <source src="https://www.soundjay.com/misc/car-horn-2.mp3" type="audio/mpeg">
+        <source src="horn.mp3" type="audio/mpeg">
         <source src="horn.ogg" type="audio/ogg">
         <source src="horn.wav" type="audio/wav">
     </audio>
@@ -607,7 +606,7 @@
     <script>
         // --- DOM Elements ---
         const problemDisplay = document.getElementById('problemDisplay');
-        // Removed initialMessageSpan as the new code uses querySelector
+        const initialMessageSpan = document.getElementById('initialMessage'); // NEW: Span for initial message
         const perQuestionTimerDisplay = document.getElementById('perQuestionTimerDisplay');
         const answerInput = document.getElementById('answerInput');
         const submitBtn = document.getElementById('submitBtn');
@@ -635,7 +634,7 @@
         let currentProblem = {};
         let overallGameTimerInterval;
         let isGameRunning = false;
-        let currentDifficulty = '4th'; // Default to 4th grade as per new user code
+        let currentDifficulty = '7th'; // Default to 7th grade as 6th is removed
 
         let isPerQuestionTimeLimitEnabled = false;
         let selectedPerQuestionTime = parseInt(questionTimeInput.value);
@@ -667,63 +666,55 @@
         let winnerAnimation = null; // Initialize as null
 
         // --- Difficulty Settings (base values for each grade) ---
+        // These settings define the ranges for generating math problems and the background theme class.
         const difficultySettings = {
-            '1st': {
-                themeClass: 'body-theme-underwater', // Class for background image
-                addSubtractRange: { min: 1, max: 20 },
-                multiplyRange: { min1: 0, max1: 0, min2: 0, max2: 0 }, // Not applicable for 1st grade
-                divideRange: { divisorMin: 0, divisorMax: 0, quotientMin: 0, quotientMax: 0 }, // Not applicable for 1st grade
-                operators: ['+'],
-                addSubtractMaxIncrement: 5 // Max value increases by 5 each round
+            '7th': {
+                themeClass: 'body-theme-forest',
+                problemTypes: ['linear'], // No square roots yet
+                min_a: 1, max_a: 10,
+                min_b: -20, max_b: 20,
+                min_x: -20, max_x: 20,
+                a_increment: 1, b_increment: 10, x_increment: 10
             },
-            '2nd': {
-                themeClass: 'body-theme-undergroundcity',
-                addSubtractRange: { min: 1, max: 100 },
-                multiplyRange: { min1: 2, max1: 5, min2: 2, max2: 5 },
-                divideRange: { divisorMin: 2, divisorMax: 5, quotientMin: 2, quotientMax: 5 },
-                operators: ['+', '-', '*'],
-                addSubtractMaxIncrement: 10,
-                multiplyMaxIncrement: 1 // Max factor for multiplication/division increases by 1
+            '8th': {
+                themeClass: 'body-theme-desert',
+                problemTypes: ['linear', 'square_root'], // Added square_root
+                min_a: 1, max_a: 15,
+                min_b: -30, max_b: 30,
+                min_x: -30, max_x: 30,
+                a_increment: 2, b_increment: 15, x_increment: 15,
+                min_root: 1, max_root: 10, // Base for square roots
+                root_increment: 2
             },
-            '3rd': {
-                themeClass: 'body-theme-ice',
-                addSubtractRange: { min: 10, max: 1000 },
-                multiplyRange: { min1: 2, max1: 12, min2: 2, max2: 12 },
-                divideRange: { divisorMin: 2, divisorMax: 12, quotientMin: 2, quotientMax: 12 },
-                operators: ['+', '-', '*', '/'],
-                addSubtractMaxIncrement: 50,
-                multiplyMaxIncrement: 2,
-                divideMaxIncrement: 2
+            '9th': {
+                themeClass: 'body-theme-mountain',
+                problemTypes: ['linear', 'square_root'], // Added square_root
+                min_a: 1, max_a: 20,
+                min_b: -50, max_b: 50,
+                min_x: -50, max_x: 50,
+                a_increment: 3, b_increment: 20, x_increment: 20,
+                min_root: 1, max_root: 15, // Base for square roots
+                root_increment: 3
             },
-            '4th': {
-                themeClass: 'body-theme-rainforest',
-                addSubtractRange: { min: 10, max: 500 },
-                multiplyRange: { min1: 2, max1: 12, min2: 2, max2: 100 },
-                divideRange: { divisorMin: 2, divisorMax: 12, quotientMin: 2, quotientMax: 100 },
-                operators: ['+', '-', '*', '/'],
-                addSubtractMaxIncrement: 100,
-                multiplyMaxIncrement: 5,
-                divideMaxIncrement: 5
+            '10th': {
+                themeClass: 'body-theme-space',
+                problemTypes: ['linear', 'square_root'], // Added square_root
+                min_a: 1, max_a: 25,
+                min_b: -100, max_b: 100,
+                min_x: -100, max_x: 100,
+                a_increment: 5, b_increment: 30, x_increment: 30,
+                min_root: 1, max_root: 20, // Base for square roots
+                root_increment: 5
             },
-            '5th': {
-                themeClass: 'body-theme-cybercity',
-                addSubtractRange: { min: 100, max: 5000 },
-                multiplyRange: { min1: 10, max1: 100, min2: 10, max2: 100 },
-                divideRange: { divisorMin: 5, divisorMax: 20, quotientMin: 10, quotientMax: 200 },
-                operators: ['+', '-', '*', '/'],
-                addSubtractMaxIncrement: 200,
-                multiplyMaxIncrement: 10,
-                divideMaxIncrement: 10
-            },
-            '6th': {
-                themeClass: 'body-theme-lava',
-                addSubtractRange: { min: 1000, max: 10000 },
-                multiplyRange: { min1: 100, max1: 500, min2: 10, max2: 100 },
-                divideRange: { divisorMin: 10, divisorMax: 30, quotientMin: 20, quotientMax: 300 },
-                operators: ['+', '-', '*', '/'],
-                addSubtractMaxIncrement: 500,
-                multiplyMaxIncrement: 20,
-                divideMaxIncrement: 20
+            '11th': {
+                themeClass: 'body-theme-galaxy',
+                problemTypes: ['quadratic'], // Strictly quadratic for 11th grade
+                // Parameters for quadratic equations (Ax^2 + Bx + C = 0)
+                min_x_quad_root: -10, max_x_quad_root: 10, // Range for integer roots x1, x2
+                min_k_quad: 1, max_k_quad: 5, // Range for multiplier k (A in Ax^2)
+                // Increments for quadratic difficulty per round
+                x_quad_root_increment: 2, // Increase root range by this much per round
+                k_quad_increment: 1 // Increase multiplier range by this much per round
             }
         };
 
@@ -851,7 +842,7 @@
                         getFireHeat(x - 1, y + 1) + // Bottom-left
                         getFireHeat(x, y + 1) +    // Directly below
                         getFireHeat(x + 1, y + 1) + // Bottom-right
-                        getFireHeat(x, y + 2)       // Two steps below (to give more upward momentum)
+                        getFireHeat(x, y + 2)         // Two steps below (to give more upward momentum)
                     ) / 4.1;
                     
                     setFireHeat(x, y, c); // Update the current pixel's heat
@@ -874,7 +865,7 @@
             inputGroup.classList.add('input-group-on-fire'); // Apply fire glow to the input group
             // Ensure initFireCanvas is called before starting the animation frame
             // so fireCanvas has correct dimensions relative to its parent inputGroup
-            initFireCanvas();
+            initFireCanvas(); 
             fireCanvas.style.display = 'block'; // Show the fire canvas
             feedbackMessage.textContent = "YOU'RE ON FIRE! 🔥"; // Update the feedback message
             fireAnimationId = window.requestAnimationFrame(fireFrame); // Start fire animation
@@ -921,31 +912,45 @@
         }
 
         /**
-         * Adjusts problem generation ranges based on the current round.
+         * Adjusts problem generation ranges based on the current round for various problem types.
          * @param {object} baseSettings - The base difficulty settings for the current grade.
          * @param {number} round - The current round number (1-10).
          * @returns {object} Adjusted difficulty ranges for the current round.
          */
         function adjustDifficultyForRound(baseSettings, round) {
-            const adjustedSettings = JSON.parse(JSON.stringify(baseSettings));
+            const adjustedSettings = JSON.parse(JSON.stringify(baseSettings)); // Deep copy
 
-            adjustedSettings.addSubtractRange.max += (round - 1) * (baseSettings.addSubtractMaxIncrement || 0);
+            // Adjust linear equation parameters if applicable
+            if (baseSettings.problemTypes && baseSettings.problemTypes.includes('linear')) {
+                adjustedSettings.max_a += (round - 1) * (baseSettings.a_increment || 0);
+                adjustedSettings.max_b += (round - 1) * (baseSettings.b_increment || 0);
+                adjustedSettings.min_b -= (round - 1) * (baseSettings.b_increment || 0); // Allow 'b' to go more negative
+                adjustedSettings.max_x += (round - 1) * (baseSettings.x_increment || 0);
+                adjustedSettings.min_x -= (round - 1) * (baseSettings.x_increment || 0); // Allow 'x' to go more negative
 
-            if (adjustedSettings.multiplyRange.max1 > 0) {
-                adjustedSettings.multiplyRange.max1 += (round - 1) * (baseSettings.multiplyMaxIncrement || 0);
-                adjustedSettings.multiplyRange.max2 += (round - 1) * (baseSettings.multiplyMaxIncrement || 0);
+                // Ensure min values do not exceed max values after incrementing
+                if (adjustedSettings.min_a > adjustedSettings.max_a) adjustedSettings.min_a = adjustedSettings.max_a - 1;
+                if (adjustedSettings.min_b > adjustedSettings.max_b) adjustedSettings.min_b = adjustedSettings.max_b - 1;
+                if (adjustedSettings.min_x > adjustedSettings.max_x) adjustedSettings.min_x = adjustedSettings.max_x - 1;
             }
-            if (adjustedSettings.divideRange.divisorMax > 0) {
-                adjustedSettings.divideRange.divisorMax += (round - 1) * (baseSettings.divideMaxIncrement || 0);
-                adjustedSettings.divideRange.quotientMax += (round - 1) * (baseSettings.divideMaxIncrement || 0);
+
+            // Adjust quadratic equation parameters if applicable
+            if (baseSettings.problemTypes && baseSettings.problemTypes.includes('quadratic')) {
+                adjustedSettings.max_x_quad_root += (round - 1) * (baseSettings.x_quad_root_increment || 0);
+                adjustedSettings.min_x_quad_root -= (round - 1) * (baseSettings.x_quad_root_increment || 0);
+                adjustedSettings.max_k_quad += (round - 1) * (baseSettings.k_quad_increment || 0);
+
+                // Ensure min values do not exceed max values after incrementing
+                if (adjustedSettings.min_x_quad_root > adjustedSettings.max_x_quad_root) adjustedSettings.min_x_quad_root = adjustedSettings.max_x_quad_root - 1;
+                if (adjustedSettings.min_k_quad > adjustedSettings.max_k_quad) adjustedSettings.min_k_quad = adjustedSettings.max_k_quad - 1;
             }
 
-            // Ensure min values do not exceed max values after incrementing
-            if (adjustedSettings.addSubtractRange.min > adjustedSettings.addSubtractRange.max) adjustedSettings.addSubtractRange.min = adjustedSettings.addSubtractRange.max - 1;
-            if (adjustedSettings.multiplyRange.max1 > 0 && adjustedSettings.multiplyRange.min1 > adjustedSettings.multiplyRange.max1) adjustedSettings.multiplyRange.min1 = adjustedSettings.multiplyRange.max1 - 1;
-            if (adjustedSettings.multiplyRange.max2 > 0 && adjustedSettings.multiplyRange.min2 > adjustedSettings.multiplyRange.max2) adjustedSettings.multiplyRange.min2 = adjustedSettings.multiplyRange.max2 - 1;
-            if (adjustedSettings.divideRange.divisorMax > 0 && adjustedSettings.divideRange.divisorMin > adjustedSettings.divideRange.divisorMax) adjustedSettings.divideRange.divisorMin = adjustedSettings.divideRange.divisorMax - 1;
-            if (adjustedSettings.divideRange.quotientMax > 0 && adjustedSettings.divideRange.quotientMin > adjustedSettings.divideRange.quotientMax) adjustedSettings.divideRange.quotientMin = adjustedSettings.divideRange.quotientMax - 1;
+            // Adjust square root parameters if applicable
+            if (baseSettings.problemTypes && baseSettings.problemTypes.includes('square_root')) {
+                adjustedSettings.max_root += (round - 1) * (baseSettings.root_increment || 0);
+                adjustedSettings.min_root = Math.max(1, adjustedSettings.min_root); // Ensure min_root is at least 1
+                if (adjustedSettings.min_root > adjustedSettings.max_root) adjustedSettings.min_root = adjustedSettings.max_root; // Adjust if min exceeds max
+            }
 
             return adjustedSettings;
         }
@@ -982,7 +987,7 @@
                     feedback.className = "feedback-area feedback-incorrect";
                     consecutiveCorrectAnswers = 0; // Reset consecutive answers on time out
                     deactivateFireEffect(); // Deactivate fire if time runs out
-                    playWrongSound();
+                    playWrongSound(); 
                     questionsAnsweredInRound++;
                     updateProgressDisplay();
                     setTimeout(nextQuestionOrRound, 1000);
@@ -991,91 +996,11 @@
         }
 
         /**
-         * Generates a new math problem based on the current difficulty level and round.
-         */
-        function generateProblem() {
-            console.log('--- Generating problem ---');
-            const baseSettings = difficultySettings[currentDifficulty];
-            const adjustedSettings = adjustDifficultyForRound(baseSettings, currentRound);
-            const operators = adjustedSettings.operators;
-            let operator = operators[getRandomInt(0, operators.length - 1)]; // Use 'let' to allow re-assignment
-            let displayOperator = operator; // Initialize display operator for human-readable symbols
-
-            let num1, num2, answer;
-
-            switch (operator) {
-                case '+':
-                    num1 = getRandomInt(adjustedSettings.addSubtractRange.min, adjustedSettings.addSubtractRange.max);
-                    num2 = getRandomInt(adjustedSettings.addSubtractRange.min, adjustedSettings.addSubtractRange.max);
-                    answer = num1 + num2;
-                    break;
-                case '-':
-                    num1 = getRandomInt(adjustedSettings.addSubtractRange.min, adjustedSettings.addSubtractRange.max);
-                    // Ensure num1 is greater than or equal to num2 for non-negative answers
-                    num2 = getRandomInt(adjustedSettings.addSubtractRange.min, num1);
-                    answer = num1 - num2;
-                    break;
-                case '*':
-                    if (adjustedSettings.multiplyRange.max1 > 0) {
-                        num1 = getRandomInt(adjustedSettings.multiplyRange.min1, adjustedSettings.multiplyRange.max1);
-                        num2 = getRandomInt(adjustedSettings.multiplyRange.min2, adjustedSettings.multiplyRange.max2);
-                        answer = num1 * num2;
-                        displayOperator = '×'; // Set for display
-                    } else {
-                        // Fallback to addition if multiplication not applicable (e.g., 1st grade)
-                        console.warn('Multiplication not applicable for current settings. Falling back to addition.');
-                        operator = '+'; // Change internal operator to '+'
-                        num1 = getRandomInt(adjustedSettings.addSubtractRange.min, adjustedSettings.addSubtractRange.max);
-                        num2 = getRandomInt(adjustedSettings.addSubtractRange.min, adjustedSettings.addSubtractRange.max);
-                        answer = num1 + num2;
-                        displayOperator = '+'; // Reset display operator for fallback
-                    }
-                    break;
-                case '/':
-                    if (adjustedSettings.divideRange.divisorMax > 0) {
-                        // Generate an answer first, then calculate num1 to ensure whole numbers
-                        num2 = getRandomInt(adjustedSettings.divideRange.divisorMin, adjustedSettings.divideRange.divisorMax);
-                        answer = getRandomInt(adjustedSettings.divideRange.quotientMin, adjustedSettings.divideRange.quotientMax);
-                        num1 = num2 * answer; // Ensure num1 is a multiple of num2
-                        displayOperator = '÷'; // Set for display
-                    } else {
-                        // Fallback to addition if division not applicable (e.g., 1st grade)
-                        console.warn('Division not applicable for current settings. Falling back to addition.');
-                        operator = '+'; // Change internal operator to '+'
-                        num1 = getRandomInt(adjustedSettings.addSubtractRange.min, adjustedSettings.addSubtractRange.max);
-                        num2 = getRandomInt(adjustedSettings.addSubtractRange.min, adjustedSettings.addSubtractRange.max);
-                        answer = num1 + num2;
-                        displayOperator = '+'; // Reset display operator for fallback
-                    }
-                    break;
-            }
-
-            currentProblem = { num1, num2, operator, answer };
-            console.log('Generated problem object:', currentProblem); // Log the full object
-
-            const problemTextSpan = problemDisplay.querySelector('span:first-child');
-            if (problemTextSpan) {
-                const problemText = `${num1} ${displayOperator} ${num2} = ?`;
-                console.log('Attempting to set problem text:', problemText); // Log the string being set
-                problemTextSpan.textContent = problemText;
-            } else {
-                console.error('Could not find the first span in problemDisplay to update text.');
-            }
-            
-            answerInput.value = '';
-            answerInput.focus();
-            feedbackMessage.textContent = ''; // Clear text feedback
-            feedback.className = "feedback-area"; // Reset feedback class
-            startPerQuestionTimer();
-            console.log('--- Problem generation complete ---');
-        }
-
-        /**
          * Ends the entire game session.
          */
         function endGame() {
             console.log('--- Ending Game ---');
-            problemDisplay.querySelector('span:first-child').textContent = `Game Over! Your final score is: ${score} points!`;
+            initialMessageSpan.textContent = `Game Over! Your final score is: ${score} points!`; // Update the specific span
             feedbackMessage.textContent = `Game completed! You spent a total of ${overallGameElapsedTime} seconds over ${currentRound - 1} rounds. Click "Play Again" to restart!`;
             feedback.className = "feedback-area";
             deactivateFireEffect(); // Ensure fire is off at game end
@@ -1122,7 +1047,7 @@
             questionsAnsweredInRound = 0;
             correctAnswersInRound = 0;
             consecutiveCorrectAnswers = 0; // Reset consecutive correct answers
-            
+
             clearInterval(overallGameTimerInterval);
             clearInterval(perQuestionTimerInterval);
             perQuestionTimerDisplay.textContent = '';
@@ -1133,7 +1058,7 @@
             feedbackMessage.textContent = ''; // Clear text feedback
             feedback.className = "feedback-area"; // Reset feedback class
 
-            problemDisplay.querySelector('span:first-child').textContent = `Ready for ${currentDifficulty} grade math! Click "Start Game".`; // Updated initial message
+            initialMessageSpan.textContent = `Get Ready for ${currentDifficulty} Algebra!`; // Updated initial message
 
             answerInput.value = '';
             answerInput.disabled = true;
@@ -1203,24 +1128,27 @@
 
             const userAnswer = parseInt(answerInput.value);
 
+            // The correct answer is stored in currentProblem.answer
+            const correctAnswer = currentProblem.answer;
+
             if (isNaN(userAnswer)) {
                 feedbackMessage.textContent = "Please enter a number!";
                 feedback.className = "feedback-area feedback-incorrect";
                 consecutiveCorrectAnswers = 0; // Reset consecutive answers on invalid input
                 deactivateFireEffect(); // Deactivate fire on invalid input
-                playWrongSound();
+                playWrongSound(); 
                 return;
             }
 
             questionsAnsweredInRound++;
 
-            if (userAnswer === currentProblem.answer) {
+            if (userAnswer === correctAnswer) {
                 score += 10;
                 correctAnswersInRound++;
                 consecutiveCorrectAnswers++; // Increment consecutive correct answers
                 feedbackMessage.textContent = "Correct! ✅";
                 feedback.className = "feedback-area feedback-correct";
-                playCorrectSound();
+                playCorrectSound(); 
 
                 // Animate score display (Anime.js)
                 anime({
@@ -1237,9 +1165,9 @@
             } else {
                 consecutiveCorrectAnswers = 0; // Reset consecutive correct answers on incorrect answer
                 deactivateFireEffect(); // Deactivate fire effect
-                feedbackMessage.textContent = `Incorrect. The answer was ${currentProblem.answer}. 🙁`;
+                feedbackMessage.textContent = `Incorrect. The answer was ${correctAnswer}. 🙁`; 
                 feedback.className = "feedback-area feedback-incorrect";
-                playWrongSound();
+                playWrongSound(); 
             }
             scoreDisplay.textContent = `Score: ${score}`;
             updateProgressDisplay();
@@ -1268,13 +1196,13 @@
                     console.warn("Confetti animation object is not loaded or null. Cannot play.");
                 }
                 // Play clap and horn sounds along with confetti
-                playClapSound();
+                playClapSound(); 
                 playHornSound();
                 // --- End Lottie Confetti Trigger ---
 
                 currentRound++;
                 if (currentRound > totalRounds) {
-                    setTimeout(endGame, 2000);
+                    setTimeout(endGame, 2000); // Game over if all rounds completed
                 } else {
                     setTimeout(startNewRound, 2000);
                 }
@@ -1323,8 +1251,8 @@
         const correctSoundElement = document.getElementById('correctSoundElement');
         const wrongSoundElement = document.getElementById('wrongSoundElement');
         const clickSoundElement = document.getElementById('clickSoundElement');
-        const clapSoundElement = document.getElementById('clapSoundElement');
-        const hornSoundElement = document.getElementById('hornSoundElement');
+        const clapSoundElement = document.getElementById('clapSoundElement'); 
+        const hornSoundElement = document.getElementById('hornSoundElement'); 
 
         /**
          * Generic play sound function to handle multiple audio elements
@@ -1369,7 +1297,7 @@
             updateBackground(); // Change background based on new difficulty
             if (!isGameRunning) {
                 // Update problem display text only if game is not running
-                problemDisplay.querySelector('span:first-child').textContent = `Ready for ${currentDifficulty} grade math! Click "Start Game".`;
+                initialMessageSpan.textContent = `Get Ready for ${currentDifficulty} Algebra!`; // Updated initial message
             }
         });
 
@@ -1444,9 +1372,9 @@
                 confettiAnimation = lottie.loadAnimation({
                     container: confettiContainer, // the dom element that will contain the animation
                     renderer: 'svg', // Use 'svg' for better scalability and transparency handling
-                    loop: false,     // Do not loop the confetti animation
+                    loop: false,      // Do not loop the confetti animation
                     autoplay: false, // Do not autoplay, we will control it programmatically
-                    path: 'https://lottie.host/1715457a-939e-4361-871d-531e21b069b2/h0311K63uL.json' // the path to your animation json file
+                    path: 'Confetti.json' // the path to your animation json file
                 });
 
                 // Add event listeners for Lottie animation loading status/errors
@@ -1481,9 +1409,9 @@
                 winnerAnimation = lottie.loadAnimation({
                     container: winnerAnimationContainer, // the dom element that will contain the animation
                     renderer: 'svg', // Use 'svg' for better scalability and transparency handling
-                    loop: false,     // Do not loop the winner animation
+                    loop: false,      // Do not loop the winner animation
                     autoplay: false, // Do not autoplay, we will control it programmatically
-                    path: 'https://lottie.host/88169c9b-648b-4999-9f79-40e9089201a0/m8m2n0Vj7m.json' // the path to your animation json file
+                    path: 'winner.lottie' // the path to your animation json file
                 });
 
                 // Add event listeners for Lottie winner animation loading status/errors
@@ -1515,7 +1443,7 @@
 
                 currentDifficulty = difficultySelect.value;
                 updateBackground();
-                problemDisplay.querySelector('span:first-child').textContent = `Ready for ${currentDifficulty} grade math! Click "Start Game".`;
+                initialMessageSpan.textContent = `Get Ready for ${currentDifficulty} Algebra!`; // Updated initial message
                 
                 if (timeLimitToggle.value === 'yes') {
                     questionTimeSettings.classList.remove('hidden');
