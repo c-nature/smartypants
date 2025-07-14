@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-P8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Retro Subnet Calculator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'VT323', monospace;
+            background-color: #1A1A2E; /* Dark bluish-purple */
+            color: #E0F2E9; /* Light minty */
+            display: flex;
+            justify-content: center;
+            align-items: flex-start; /* Align to top for scrolling */
+            min-height: 100vh;
+            padding: 20px;
+            overflow-y: auto; /* Allow vertical scrolling */
+        }
+        .container {
+            background-color: #2A2A4E; /* Slightly lighter dark purple */
+            padding: 20px;
+            border-radius: 15px; /* Rounded edges */
+            border: 3px solid #FF007F; /* Neon pink border */
+            box-shadow: 0 0 15px #FF007F, 0 0 5px #FF007F inset;
+            width: 100%;
+            max-width: 600px;
+        }
+        h1 {
+            font-family: 'Press Start 2P', cursive;
+            color: #00F0B5; /* Neon teal/green */
+            text-align: center;
+            margin-bottom: 25px;
+            font-size: 1.5rem; /* Responsive font size */
+        }
+        label {
+            color: #00F0B5; /* Neon teal/green */
+            margin-bottom: 5px;
+            display: block;
+            font-size: 1.1rem;
+        }
+        input[type="text"] {
+            background-color: #1A1A2E;
+            border: 2px solid #FF007F;
+            color: #E0F2E9;
+            padding: 10px;
+            border-radius: 8px;
+            width: 100%;
+            margin-bottom: 15px;
+            font-size: 1rem;
+            box-shadow: 0 0 5px #FF007F inset;
+        }
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #00F0B5;
+            box-shadow: 0 0 10px #00F0B5;
+        }
+        button {
+            background-color: #FF007F; /* Neon pink */
+            color: #1A1A2E; /* Dark background for contrast */
+            font-family: 'Press Start 2P', cursive;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.2s ease-in-out;
+            box-shadow: 0 0 8px #FF007F;
+            margin-top: 10px;
+        }
+        button:hover {
+            background-color: #00F0B5; /* Neon teal/green */
+            box-shadow: 0 0 12px #00F0B5;
+            transform: translateY(-2px);
+        }
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .result-item {
+            background-color: #1A1A2E;
+            padding: 10px;
+            border-radius: 8px;
+            border: 2px solid #00F0B5;
+            box-shadow: 0 0 5px #00F0B5 inset;
+        }
+        .result-item strong {
+            color: #FF007F; /* Neon pink for labels */
+            display: block;
+            margin-bottom: 5px;
+        }
+        #messageArea {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: bold;
+        }
+        .error-message {
+            background-color: #FF007F; /* Pink for error */
+            color: #1A1A2E;
+            border: 2px solid #E0F2E9;
+        }
+        .success-message { /* Not used yet, but for potential future use */
+            background-color: #00F0B5;
+            color: #1A1A2E;
+            border: 2px solid #E0F2E9;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 640px) {
+            h1 {
+                font-size: 1.25rem;
+            }
+            button {
+                font-size: 0.8rem;
+                width: 100%;
+                margin-bottom: 10px;
+            }
+            .results-grid {
+                grid-template-columns: 1fr; /* Stack results on small screens */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Subnet Calculator</h1>
+
+        <div>
+            <label for="ipAddress">IP Address:</label>
+            <input type="text" id="ipAddress" placeholder="e.g., 192.168.1.10">
+        </div>
+
+        <div>
+            <label for="subnetMask">Subnet Mask:</label>
+            <input type="text" id="subnetMask" placeholder="e.g., 255.255.255.0">
+        </div>
+
+        <button id="calculateBtn">Calculate</button>
+        <div id="messageArea"></div>
+
+        <div class="results-grid">
+            <div class="result-item"><strong>Network Address:</strong> <span id="networkAddress">-</span></div>
+            <div class="result-item"><strong>Broadcast Address:</strong> <span id="broadcastAddress">-</span></div>
+            <div class="result-item"><strong>Number of Hosts:</strong> <span id="numHosts">-</span></div>
+            <div class="result-item"><strong>Wildcard Mask:</strong> <span id="wildcardMask">-</span></div>
+            <div class="result-item"><strong>Mask Bits (CIDR):</strong> <span id="maskBits">-</span></div>
+        </div>
+
+        <button id="generateRandomIpBtn" style="margin-top: 20px;">Generate Random IP</button>
+        <div class="result-item" style="margin-top: 10px;">
+            <strong>Random IP:</strong> <span id="randomIpResult">-</span>
+        </div>
+    </div>
+
+    <script>
+        // --- DOM Elements ---
+        const ipAddressInput = document.getElementById('ipAddress');
+        const subnetMaskInput = document.getElementById('subnetMask');
+        const calculateBtn = document.getElementById('calculateBtn');
+        const generateRandomIpBtn = document.getElementById('generateRandomIpBtn');
+        const messageArea = document.getElementById('messageArea');
+
+        const networkAddressEl = document.getElementById('networkAddress');
+        const broadcastAddressEl = document.getElementById('broadcastAddress');
+        const numHostsEl = document.getElementById('numHosts');
+        const wildcardMaskEl = document.getElementById('wildcardMask');
+        const maskBitsEl = document.getElementById('maskBits');
+        const randomIpResultEl = document.getElementById('randomIpResult');
+
+        // Store calculated values for random IP generation
+        let currentNetworkInfo = null;
+
+        // --- Helper Functions (Ported from Python) ---
+        function validateIpAddress(ip) {
+            const octets = ip.split('.');
+            if (octets.length !== 4) return false;
+            return octets.every(octetStr => {
+                const octet = parseInt(octetStr);
+                return !isNaN(octet) && octet >= 0 && octet <= 255;
+            }) &&
+            (parseInt(octets[0]) >= 1 && parseInt(octets[0]) <= 223) &&
+            (parseInt(octets[0]) !== 127) &&
+            (parseInt(octets[0]) !== 169 || parseInt(octets[1]) !== 254);
+        }
+
+        function validateSubnetMask(mask) {
+            const octets = mask.split('.');
+            if (octets.length !== 4) return false;
+
+            const validMaskValues = [255, 254, 252, 248, 240, 224, 192, 128, 0];
+            const numOctets = octets.map(o => parseInt(o));
+
+            if (numOctets.some(isNaN)) return false;
+            if (numOctets[0] !== 255) return false;
+            for (let i = 1; i < 4; i++) {
+                if (!validMaskValues.includes(numOctets[i])) return false;
+            }
+            // Check if mask is contiguous (e.g., 255.255.0.255 is invalid)
+            // Convert to binary string and check for 0 followed by 1
+            let binaryMask = numOctets.map(octet => octet.toString(2).padStart(8, '0')).join('');
+            if (binaryMask.indexOf('01') !== -1 && binaryMask.indexOf('01') < binaryMask.lastIndexOf('1')) return false;
+            
+            // Check octet order (e.g. 255.0.255.0 is invalid)
+            return numOctets[0] >= numOctets[1] && numOctets[1] >= numOctets[2] && numOctets[2] >= numOctets[3];
+        }
+
+        function ipToBinary(ip) {
+            return ip.split('.').map(octet => parseInt(octet).toString(2).padStart(8, '0')).join('');
+        }
+
+        function binaryToIp(binary) {
+            const octets = [];
+            for (let i = 0; i < 32; i += 8) {
+                octets.push(parseInt(binary.substring(i, i + 8), 2).toString());
+            }
+            return octets.join('.');
+        }
+
+        // --- Event Listeners ---
+        calculateBtn.addEventListener('click', () => {
+            const ip = ipAddressInput.value.trim();
+            const mask = subnetMaskInput.value.trim();
+
+            messageArea.textContent = '';
+            messageArea.className = ''; // Clear previous styles
+
+            if (!validateIpAddress(ip)) {
+                messageArea.textContent = 'Invalid IP Address format or range.';
+                messageArea.classList.add('error-message');
+                clearResults();
+                currentNetworkInfo = null;
+                return;
+            }
+            if (!validateSubnetMask(mask)) {
+                messageArea.textContent = 'Invalid Subnet Mask format or values.';
+                messageArea.classList.add('error-message');
+                clearResults();
+                currentNetworkInfo = null;
+                return;
+            }
+
+            const binaryIp = ipToBinary(ip);
+            const binaryMask = ipToBinary(mask);
+
+            const noOfOnes = binaryMask.split('1').length - 1;
+            const noOfZeros = 32 - noOfOnes;
+            const numHosts = Math.pow(2, noOfZeros) - 2;
+
+            const networkAddressBinary = binaryIp.substring(0, noOfOnes) + '0'.repeat(noOfZeros);
+            const broadcastAddressBinary = binaryIp.substring(0, noOfOnes) + '1'.repeat(noOfZeros);
+
+            const networkAddress = binaryToIp(networkAddressBinary);
+            const broadcastAddress = binaryToIp(broadcastAddressBinary);
+
+            const wildcardOctets = mask.split('.').map(octet => 255 - parseInt(octet));
+            const wildcardMask = wildcardOctets.join('.');
+
+            networkAddressEl.textContent = networkAddress;
+            broadcastAddressEl.textContent = broadcastAddress;
+            numHostsEl.textContent = numHosts < 0 ? 0 : numHosts; // Display 0 for /31, /32
+            wildcardMaskEl.textContent = wildcardMask;
+            maskBitsEl.textContent = `/${noOfOnes}`;
+            randomIpResultEl.textContent = '-'; // Reset random IP
+
+            currentNetworkInfo = {
+                networkAddressOctets: networkAddress.split('.').map(o => parseInt(o)),
+                numHosts: numHosts,
+                noOfOnes: noOfOnes
+            };
+        });
+
+        generateRandomIpBtn.addEventListener('click', () => {
+            if (!currentNetworkInfo || currentNetworkInfo.numHosts <= 0) {
+                randomIpResultEl.textContent = 'N/A (Calculate subnet first or no hosts)';
+                if (currentNetworkInfo && currentNetworkInfo.numHosts <=0) {
+                     randomIpResultEl.textContent = 'N/A (No assignable hosts)';
+                }
+                return;
+            }
+
+            let netAddrInt = 0;
+            currentNetworkInfo.networkAddressOctets.forEach(octet => {
+                netAddrInt = (netAddrInt << 8) + octet;
+            });
+
+            const randomHostNum = Math.floor(Math.random() * currentNetworkInfo.numHosts) + 1;
+            const randomIpInt = netAddrInt + randomHostNum;
+
+            const generatedIpStrParts = [];
+            let tempIpInt = randomIpInt;
+            for (let i = 0; i < 4; i++) {
+                generatedIpStrParts.unshift((tempIpInt & 255).toString());
+                tempIpInt >>= 8;
+            }
+            randomIpResultEl.textContent = generatedIpStrParts.join('.');
+        });
+        
+        function clearResults() {
+            networkAddressEl.textContent = '-';
+            broadcastAddressEl.textContent = '-';
+            numHostsEl.textContent = '-';
+            wildcardMaskEl.textContent = '-';
+            maskBitsEl.textContent = '-';
+            randomIpResultEl.textContent = '-';
+        }
+
+    </script>
+</body>
+</html>
