@@ -648,7 +648,16 @@
                     <button class="play-game-button-new-window" onclick="playClickSound(); openGameInNewWindow('mathgame.html');">Open in New Window</button>
                 </div>
             </div>
+            <!-- NEW: Multi-Grade Math Challenge Game Card -->
+            <div class="game-list-card" style="background-image: url('https://placehold.co/400x200/50B498/FFFFFF?text=Algebra+Challenge'); background-size: cover; background-position: center;">
+                <h3 style="color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);">Algebra Challenge</h3>
+                <p style="color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);">Solve linear and quadratic equations!</p>
+                <div class="game-card-buttons">
+                    <button class="play-game-button" onclick="playClickSound(); showAlgebraGame();">Play Here</button>
+                    <button class="play-game-button-new-window" onclick="playClickSound(); openGameInNewWindow('algebragame.html');">Open in New Window</button>
+                </div>
             </div>
+        </div>
     </div>
 
     <div id="science-category-view" class="category-view hidden">
@@ -696,7 +705,7 @@
                     <button class="play-game-button-new-window" onclick="playClickSound(); openGameInNewWindow('WordWarrior.html');">Open in New Window</button>
                 </div>
             </div>
-            </div>
+        </div>
     </div>
 
     <div id="social-studies-category-view" class="category-view hidden">
@@ -710,7 +719,7 @@
                     <button class="play-game-button" onclick="playClickSound(); openGameInNewWindow('https://presidentialpong.vercel.app/');">Play Now</button>
                 </div>
             </div>
-            </div>
+        </div>
     </div>
 
 
@@ -740,6 +749,14 @@
             &larr; Back to Science Menu
         </button>
         <iframe id="nasa-game-iframe" src="" title="NASA Explorer" class="game-iframe"></iframe>
+    </div>
+
+    <!-- NEW: Algebra Game Iframe Container -->
+    <div id="algebra-game-view" class="game-iframe-container">
+        <button onclick="playClickSound(); showMathCategoryView();" class="back-button">
+            &larr; Back to Math Menu
+        </button>
+        <iframe id="algebra-game-iframe" src="algebragame.html" title="Multi-Grade Math Challenge" class="game-iframe"></iframe>
     </div>
 
 
@@ -876,13 +893,15 @@
         const mathGameView = document.getElementById('math-game-view');
         const scienceGameView = document.getElementById('science-game-view');
         const elaGameView = document.getElementById('ela-game-view');
-        const nasaGameView = document.getElementById('nasa-game-view'); // NEW
+        const nasaGameView = document.getElementById('nasa-game-view'); // NASA game view
+        const algebraGameView = document.getElementById('algebra-game-view'); // NEW Algebra game view
 
         // Game Iframes
         const mathGameIframe = document.getElementById('math-game-iframe');
         const scienceGameIframe = document.getElementById('science-game-iframe');
         const elaGameIframe = document.getElementById('ela-game-iframe');
-        const nasaGameIframe = document.getElementById('nasa-game-iframe'); // NEW
+        const nasaGameIframe = document.getElementById('nasa-game-iframe'); // NASA game iframe
+        const algebraGameIframe = document.getElementById('algebra-game-iframe'); // NEW Algebra game iframe
 
         const mainClickSoundElement = document.getElementById('mainClickSoundElement');
 
@@ -908,16 +927,19 @@
             mathGameView.style.display = 'none';
             scienceGameView.style.display = 'none';
             elaGameView.style.display = 'none';
-            nasaGameView.style.display = 'none'; // NEW
+            nasaGameView.style.display = 'none'; // Hide NASA game view
+            algebraGameView.style.display = 'none'; // Hide Algebra game view
         }
 
         function showMainMenu() {
             hideAllViews();
             mainMenuContainer.style.display = 'block';
+            // Clear iframe sources to stop games when navigating away
             mathGameIframe.src = '';
             scienceGameIframe.src = '';
             elaGameIframe.src = '';
-            nasaGameIframe.src = ''; // NEW
+            nasaGameIframe.src = '';
+            algebraGameIframe.src = ''; // Clear Algebra game iframe source
             document.body.style.overflow = 'auto';
         }
 
@@ -968,7 +990,7 @@
             document.body.style.overflow = 'hidden';
         }
         
-        // NEW: Function to show NASA game
+        // Function to show NASA game
         function showNasaGame() {
             hideAllViews();
             nasaGameView.style.display = 'flex';
@@ -976,7 +998,15 @@
             document.body.style.overflow = 'hidden';
         }
 
-        // NEW: Function to open a game in a new window
+        // NEW: Function to show Algebra game
+        function showAlgebraGame() {
+            hideAllViews();
+            algebraGameView.style.display = 'flex';
+            algebraGameIframe.src = 'algebragame.html'; // Path to the algebra game HTML file
+            document.body.style.overflow = 'hidden';
+        }
+
+        // Function to open a game in a new window
         function openGameInNewWindow(gameUrl) {
             window.open(gameUrl, '_blank');
         }
@@ -1499,7 +1529,7 @@
                     // Merge the updates from the server response into the existing user object
                     const updatedUser = {
                         ...existingUser, // Keeps old avatar_config if not explicitly returned
-                        ...data.data      // Overwrites with fresh data from the avatar save response
+                        ...data.data     // Overwrites with fresh data from the avatar save response
                     };
 
                     // Save the complete, merged user object back to localStorage
