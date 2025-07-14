@@ -689,11 +689,11 @@
         <!-- Computer Science Section -->
         <h2 class="text-3xl font-bold text-gray-800 mt-8 mb-4 text-center">Computer Science</h2>
         <div class="game-list-layout">
-            <div class="game-list-card" style="background-image: url('subcalcicon.png'); background-size: cover; background-position: center;">
+            <div class="game-list-card" style="background-image: url('https://placehold.co/400x200/6A5ACD/FFFFFF?text=Subnet+Calculator'); background-size: cover; background-position: center;">
                 <h3 style="color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);">Subnet Calculator</h3>
                 <p style="color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);">Calculate IP subnets easily!</p>
                 <div class="game-card-buttons">
-                    <button class="play-game-button" onclick="playClickSound(); openGameInNewWindow('subcalc.html');">Open Here</button>
+                    <button class="play-game-button" onclick="playClickSound(); showSubnetCalculatorGame();">Open Here</button>
                     <button class="play-game-button-new-window" onclick="playClickSound(); openGameInNewWindow('subnetcalculator.html');">Open in New Window</button>
                 </div>
             </div>
@@ -778,6 +778,14 @@
             &larr; Back to Math Menu
         </button>
         <iframe id="algebra-game-iframe" src="algebragame.html" title="Multi-Grade Math Challenge" class="game-iframe"></iframe>
+    </div>
+
+    <!-- NEW: Subnet Calculator Game Iframe Container -->
+    <div id="subnet-calculator-game-view" class="game-iframe-container">
+        <button onclick="playClickSound(); showScienceCategoryView();" class="back-button">
+            &larr; Back to Science Menu
+        </button>
+        <iframe id="subnet-calculator-game-iframe" src="" title="Subnet Calculator Game" class="game-iframe"></iframe>
     </div>
 
 
@@ -916,6 +924,7 @@
         const elaGameView = document.getElementById('ela-game-view');
         const nasaGameView = document.getElementById('nasa-game-view'); // NASA game view
         const algebraGameView = document.getElementById('algebra-game-view'); // NEW Algebra game view
+        const subnetCalculatorGameView = document.getElementById('subnet-calculator-game-view'); // NEW Subnet Calculator game view
 
         // Game Iframes
         const mathGameIframe = document.getElementById('math-game-iframe');
@@ -923,6 +932,7 @@
         const elaGameIframe = document.getElementById('ela-game-iframe');
         const nasaGameIframe = document.getElementById('nasa-game-iframe'); // NASA game iframe
         const algebraGameIframe = document.getElementById('algebra-game-iframe'); // NEW Algebra game iframe
+        const subnetCalculatorGameIframe = document.getElementById('subnet-calculator-game-iframe'); // NEW Subnet Calculator game iframe
 
         const mainClickSoundElement = document.getElementById('mainClickSoundElement');
 
@@ -950,6 +960,7 @@
             elaGameView.style.display = 'none';
             nasaGameView.style.display = 'none'; // Hide NASA game view
             algebraGameView.style.display = 'none'; // Hide Algebra game view
+            subnetCalculatorGameView.style.display = 'none'; // Hide Subnet Calculator game view
         }
 
         function showMainMenu() {
@@ -961,6 +972,7 @@
             elaGameIframe.src = '';
             nasaGameIframe.src = '';
             algebraGameIframe.src = ''; // Clear Algebra game iframe source
+            subnetCalculatorGameIframe.src = ''; // Clear Subnet Calculator game iframe source
             document.body.style.overflow = 'auto';
         }
 
@@ -1027,6 +1039,14 @@
             document.body.style.overflow = 'hidden';
         }
 
+        // NEW: Function to show Subnet Calculator game
+        function showSubnetCalculatorGame() {
+            hideAllViews();
+            subnetCalculatorGameView.style.display = 'flex';
+            subnetCalculatorGameIframe.src = 'subnetcalculator.html'; // Path to the subnet calculator HTML file
+            document.body.style.overflow = 'hidden';
+        }
+
         // Function to open a game in a new window
         function openGameInNewWindow(gameUrl) {
             window.open(gameUrl, '_blank');
@@ -1082,7 +1102,7 @@
         const topTypeSelect = document.getElementById('topTypeSelect');
         const topColorSelect = document.getElementById('topColorSelect');
         const hairColorSelect = document.getElementById('hairColorSelect');
-        const facialHairTypeSelect = document.getElementById('facialHairTypeSelect');
+        const facialHairTypeSelect = document = document.getElementById('facialHairTypeSelect');
         const facialHairColorSelect = document.getElementById('facialHairColorSelect');
         const eyeTypeSelect = document.getElementById('eyeTypeSelect');
         const eyebrowTypeSelect = document.getElementById('eyebrowTypeSelect');
