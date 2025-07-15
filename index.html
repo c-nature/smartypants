@@ -98,45 +98,28 @@
             background-color: rgba(59, 255, 131, 0.9);
             border-color:rgb(22, 189, 122);
         }
-        /* Complementary colors for Math card text and shadow */
-        .category-card.math .category-title,
-        .category-card.math .category-description {
-            color: black; /* Changed to black */
-            text-shadow: -1px -1px 0 #FF00FF, 1px -1px 0 #FF00FF, -1px 1px 0 #FF00FF, 1px 1px 0 #FF00FF, 2px 2px 4px #8B008B; /* Darker magenta shadow */
+        /* Common text styling for all category card titles and descriptions */
+        .category-card .category-title,
+        .category-card .category-description {
+            color: white; /* All text white */
+            text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000, 2px 2px 4px #000; /* Black outline, Black shadow */
+            font-weight: normal; /* Ensure not bold */
         }
 
         .category-card.science {
             background-color: rgba(21, 178, 235, 0.9);
             border-color:rgb(67, 144, 160);
         }
-        /* Complementary colors for Science card text and shadow */
-        .category-card.science .category-title,
-        .category-card.science .category-description {
-            color: black; /* Changed to black */
-            text-shadow: -1px -1px 0 #FFA500, 1px -1px 0 #FFA500, -1px 1px 0 #FFA500, 1px 1px 0 #FFA500, 2px 2px 4px #CD853F; /* Darker orange shadow */
-        }
 
         .category-card.ela {
             background-color: rgba(240, 60, 60, 0.9);
             border-color:rgb(189, 37, 37);
-        }
-        /* Complementary colors for ELA card text and shadow */
-        .category-card.ela .category-title,
-        .category-card.ela .category-description {
-            color: black; /* Changed to black */
-            text-shadow: -1px -1px 0 #00FFFF, 1px -1px 0 #00FFFF, -1px 1px 0 #00FFFF, 1px 1px 0 #00FFFF, 2px 2px 4px #008B8B; /* Darker cyan shadow */
         }
 
         /* New styles for Social Studies card */
         .category-card.social-studies {
             background-color: rgba(255, 165, 0, 0.9); /* Orange background */
             border-color: rgb(204, 132, 0); /* Darker orange border */
-        }
-        /* Complementary colors for Social Studies card text and shadow */
-        .category-card.social-studies .category-title,
-        .category-card.social-studies .category-description {
-            color: black; /* Changed to black */
-            text-shadow: -1px -1px 0 #4169E1, 1px -1px 0 #4169E1, -1px 1px 0 #4169E1, 1px 1px 0 #4169E1, 2px 2px 4px #191970; /* Darker royal blue shadow */
         }
 
 
@@ -150,13 +133,11 @@
 
         .category-title {
             font-size: 2.25rem;
-            font-weight: normal; /* Changed to normal to make it not bold */
             margin-bottom: 0.5rem;
         }
 
         .category-description {
             font-size: 1.25rem;
-            font-weight: normal; /* Changed to normal to make it not bold */
             flex-grow: 1;
             margin-bottom: 1rem;
         }
@@ -1386,7 +1367,7 @@
 
             // Clean up config object based on topType
             if (hatTypes.includes(topType)) {
-                delete currentAvatarConfig.topColor; // Remove incorrect property
+                delete currentAvatarConfig.hatColor; // Remove incorrect property
                 if (!currentAvatarConfig.hatColor) {
                     currentAvatarConfig.hatColor = topColorSelect.value;
                 }
