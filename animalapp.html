@@ -230,32 +230,80 @@
 
             if (findOne) {
                 // For a single image (thumbnail) using pageimages property from Wikipedia
-                const url = `${wikipediaApiUrl}&prop=pageimages&pithumbsize=400&titles=${queryTitle}&redirects=1`;
+                let imageUrl = null;
+                const wikiPageUrl = `${wikipediaApiUrl}&prop=pageimages&pithumbsize=400&titles=${queryTitle}&redirects=1`;
                 try {
-                    const response = await fetch(url);
-                    if (!response.ok) { console.warn(`Wikipedia API (single image) failed: ${response.status}`); return null; }
+                    const response = await fetch(wikiPageUrl);
+                    if (!response.ok) { console.warn(`Wikipedia API (single image) failed: ${response.status}`); }
                     const data = await response.json();
                     const pages = data.query?.pages;
                     if (pages) {
                         const pageId = Object.keys(pages)[0];
                         const page = pages[pageId];
-                        if (page.missing) {
-                            console.log(`Wikipedia page for "${animalName}" not found.`);
-                            return null;
-                        }
-                        if (page.thumbnail?.source) {
-                            console.log(`Found single image on Wikipedia for ${animalName}: ${page.thumbnail.source}`);
-                            return page.thumbnail.source;
+                        if (!page.missing && page.thumbnail?.source) {
+                            imageUrl = page.thumbnail.source;
+                            console.log(`Found single image on Wikipedia for ${animalName} (page thumbnail): ${imageUrl}`);
+                        } else {
+                            console.log(`Wikipedia page for "${animalName}" not found or no thumbnail.`);
                         }
                     }
                 } catch (error) {
                     console.error('Error fetching single image from Wikipedia:', error);
                 }
-                return null;
+
+                // Fallback to Wikimedia Commons search if no thumbnail found from Wikipedia page
+                if (!imageUrl) {
+                    console.log('Wikipedia page thumbnail not found, trying Wikimedia Commons for single image...');
+                    // Increased srlimit to get more candidates for strict filtering
+                    const searchUrl = `${commonsApiUrl}&list=search&srsearch=${queryTitle}&srnamespace=6&srlimit=20&srwhat=text&srprop=snippet`; 
+                    try {
+                        const searchResponse = await fetch(searchUrl);
+                        if (!searchResponse.ok) { console.warn(`Wikimedia Commons search failed for single image: ${searchResponse.status}`); return null; }
+                        const searchData = await searchResponse.json();
+                        const searchResults = searchData.query?.search;
+
+                        if (searchResults && searchResults.length > 0) {
+                            const lowerCaseAnimalName = animalName.toLowerCase();
+                            const keywords = lowerCaseAnimalName.split(' ').filter(k => k.length > 0);
+
+                            const filteredResults = searchResults.filter(result => {
+                                const title = result.title.toLowerCase();
+                                const snippet = result.snippet ? result.snippet.toLowerCase() : '';
+                                const isImage = /\.(jpg|jpeg|png|gif|svg|webp)$/i.test(result.title);
+                                
+                                // Ensure all keywords from the animal name are present in the title or snippet
+                                const containsAllKeywords = keywords.every(keyword => 
+                                    title.includes(keyword) || snippet.includes(keyword)
+                                );
+                                return isImage && containsAllKeywords;
+                            });
+
+                            if (filteredResults.length > 0) {
+                                // Get the URL of the first (most relevant) filtered result
+                                const bestMatchTitle = encodeURIComponent(filteredResults[0].title);
+                                const infoUrl = `${commonsApiUrl}&prop=imageinfo&iiprop=url&titles=${bestMatchTitle}&redirects=1`;
+                                const infoResponse = await fetch(infoUrl);
+                                const infoData = await infoResponse.json();
+                                const infoPages = infoData.query?.pages;
+                                if (infoPages) {
+                                    const infoPageId = Object.keys(infoPages)[0];
+                                    const infoPage = infoPages[infoPageId];
+                                    if (infoPage.imageinfo && infoPage.imageinfo[0]?.url) {
+                                        imageUrl = infoPage.imageinfo[0].url;
+                                        console.log(`Found single image on Wikimedia Commons for ${animalName}: ${imageUrl}`);
+                                    }
+                                }
+                            }
+                        }
+                    } catch (error) {
+                        console.error('Error fetching single image from Wikimedia Commons:', error);
+                    }
+                }
+                return imageUrl;
+
             } else {
                 // For multiple gallery images, search Wikimedia Commons directly for relevant files
-                // Use 'text' search to include descriptions, and then filter strictly.
-                const searchUrl = `${commonsApiUrl}&list=search&srsearch=${queryTitle}&srnamespace=6&srlimit=${count * 2}&srwhat=text&srprop=snippet`; // Get more results to filter down, and get snippets
+                const searchUrl = `${commonsApiUrl}&list=search&srsearch=${queryTitle}&srnamespace=6&srlimit=${count * 3}&srwhat=text&srprop=snippet`; // Get more results to filter down, and get snippets
                 
                 try {
                     const searchResponse = await fetch(searchUrl);
