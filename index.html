@@ -101,8 +101,8 @@
         /* Complementary colors for Math card text and shadow */
         .category-card.math .category-title,
         .category-card.math .category-description {
-            color: white;
-            text-shadow: -1px -1px 0 #FF00FF, 1px -1px 0 #FF00FF, -1px 1px 0 #FF00FF, 1px 1px 0 #FF00FF, 3px 3px 6px rgba(0,0,0,0.4);
+            color: black; /* Changed to black */
+            text-shadow: -1px -1px 0 #FF00FF, 1px -1px 0 #FF00FF, -1px 1px 0 #FF00FF, 1px 1px 0 #FF00FF, 2px 2px 4px #8B008B; /* Darker magenta shadow */
         }
 
         .category-card.science {
@@ -112,8 +112,8 @@
         /* Complementary colors for Science card text and shadow */
         .category-card.science .category-title,
         .category-card.science .category-description {
-            color: white;
-            text-shadow: -1px -1px 0 #FFA500, 1px -1px 0 #FFA500, -1px 1px 0 #FFA500, 1px 1px 0 #FFA500, 3px 3px 6px rgba(0,0,0,0.4);
+            color: black; /* Changed to black */
+            text-shadow: -1px -1px 0 #FFA500, 1px -1px 0 #FFA500, -1px 1px 0 #FFA500, 1px 1px 0 #FFA500, 2px 2px 4px #CD853F; /* Darker orange shadow */
         }
 
         .category-card.ela {
@@ -123,8 +123,8 @@
         /* Complementary colors for ELA card text and shadow */
         .category-card.ela .category-title,
         .category-card.ela .category-description {
-            color: white;
-            text-shadow: -1px -1px 0 #00FFFF, 1px -1px 0 #00FFFF, -1px 1px 0 #00FFFF, 1px 1px 0 #00FFFF, 3px 3px 6px rgba(0,0,0,0.4);
+            color: black; /* Changed to black */
+            text-shadow: -1px -1px 0 #00FFFF, 1px -1px 0 #00FFFF, -1px 1px 0 #00FFFF, 1px 1px 0 #00FFFF, 2px 2px 4px #008B8B; /* Darker cyan shadow */
         }
 
         /* New styles for Social Studies card */
@@ -135,8 +135,8 @@
         /* Complementary colors for Social Studies card text and shadow */
         .category-card.social-studies .category-title,
         .category-card.social-studies .category-description {
-            color: white;
-            text-shadow: -1px -1px 0 #4169E1, 1px -1px 0 #4169E1, -1px 1px 0 #4169E1, 1px 1px 0 #4169E1, 3px 3px 6px rgba(0,0,0,0.4);
+            color: black; /* Changed to black */
+            text-shadow: -1px -1px 0 #4169E1, 1px -1px 0 #4169E1, -1px 1px 0 #4169E1, 1px 1px 0 #4169E1, 2px 2px 4px #191970; /* Darker royal blue shadow */
         }
 
 
@@ -148,17 +148,15 @@
             filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.2));
         }
 
-        /* Removed general text-shadow from here as it's now specific per category */
         .category-title {
             font-size: 2.25rem;
-            font-weight: 700;
+            font-weight: normal; /* Changed to normal to make it not bold */
             margin-bottom: 0.5rem;
         }
 
-        /* Removed general text-shadow from here as it's now specific per category */
         .category-description {
             font-size: 1.25rem;
-            font-weight: 400;
+            font-weight: normal; /* Changed to normal to make it not bold */
             flex-grow: 1;
             margin-bottom: 1rem;
         }
