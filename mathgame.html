@@ -38,22 +38,22 @@
         /* IMPORTANT: Ensure these image files are present in the same directory (or correct relative path)
             on your GitHub Pages server. File names are case-sensitive on GitHub! */
         .body-theme-underwater {
-            background-image: url('underwaterBG.png'); 
+            background-image: url('underwaterBG.png');
         }
         .body-theme-undergroundcity {
-            background-image: url('undergroundcityBG.png'); 
+            background-image: url('undergroundcityBG.png');
         }
         .body-theme-ice {
-            background-image: url('iceBG.png'); 
+            background-image: url('iceBG.png');
         }
         .body-theme-rainforest {
-            background-image: url('rainforestBG.png'); 
+            background-image: url('rainforestBG.png');
         }
         .body-theme-cybercity {
-            background-image: url('cybercityBG.png'); 
+            background-image: url('cybercityBG.png');
         }
         .body-theme-lava {
-            background-image: url('lavaBG.png'); 
+            background-image: url('lavaBG.png');
         }
 
         /* Elements that were inside the game-container now styled individually */
@@ -199,18 +199,24 @@
             background: linear-gradient(45deg, #aaffff, #e7feff);
             border-radius: 20px;
             padding: 30px;
-            font-family: 'Fredoka One', cursive;
+            font-family: 'Cambria Math', 'Times New Roman', serif; /* Set font to Cambria Math */
             font-size: 2.8rem;
             font-weight: 400;
             color: #007bff;
-            box-shadow: inset 0 3px 8px rgba(0, 0, 0, 0.1);
+            /* Enhanced box-shadow for the container */
+            box-shadow: 0 15px 25px rgba(0, 0, 0, 0.3), inset 0 3px 8px rgba(0, 0, 0, 0.1);
             min-height: 120px;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            border: 2px dashed #00c8ff;
+            /* Stronger, solid border */
+            border: 4px solid #00aaff; /* Changed from dashed to solid, thicker */
             animation: scaleIn 0.8s ease-out 0.4s backwards; /* Delayed animation */
+        }
+
+        .problem-area span { /* Target the span inside problem-area for text shadow */
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3); /* Added text shadow */
         }
 
         #perQuestionTimerDisplay {
@@ -851,7 +857,7 @@
                         getFireHeat(x - 1, y + 1) + // Bottom-left
                         getFireHeat(x, y + 1) +    // Directly below
                         getFireHeat(x + 1, y + 1) + // Bottom-right
-                        getFireHeat(x, y + 2)         // Two steps below (to give more upward momentum)
+                        getFireHeat(x, y + 2)       // Two steps below (to give more upward momentum)
                     ) / 4.1;
                     
                     setFireHeat(x, y, c); // Update the current pixel's heat
@@ -874,9 +880,9 @@
             inputGroup.classList.add('input-group-on-fire'); // Apply fire glow to the input group
             // Ensure initFireCanvas is called before starting the animation frame
             // so fireCanvas has correct dimensions relative to its parent inputGroup
-            initFireCanvas(); 
+            initFireCanvas();
             fireCanvas.style.display = 'block'; // Show the fire canvas
-            feedbackMessage.textContent = "YOU'RE ON FIRE! �"; // Update the feedback message
+            feedbackMessage.textContent = "YOU'RE ON FIRE! 🔥"; // Update the feedback message
             fireAnimationId = window.requestAnimationFrame(fireFrame); // Start fire animation
         }
 
@@ -982,7 +988,7 @@
                     feedback.className = "feedback-area feedback-incorrect";
                     consecutiveCorrectAnswers = 0; // Reset consecutive answers on time out
                     deactivateFireEffect(); // Deactivate fire if time runs out
-                    playWrongSound(); 
+                    playWrongSound();
                     questionsAnsweredInRound++;
                     updateProgressDisplay();
                     setTimeout(nextQuestionOrRound, 1000);
@@ -1207,7 +1213,7 @@
                 feedback.className = "feedback-area feedback-incorrect";
                 consecutiveCorrectAnswers = 0; // Reset consecutive answers on invalid input
                 deactivateFireEffect(); // Deactivate fire on invalid input
-                playWrongSound(); 
+                playWrongSound();
                 return;
             }
 
@@ -1219,7 +1225,7 @@
                 consecutiveCorrectAnswers++; // Increment consecutive correct answers
                 feedbackMessage.textContent = "Correct! ✅";
                 feedback.className = "feedback-area feedback-correct";
-                playCorrectSound(); 
+                playCorrectSound();
 
                 // Animate score display (Anime.js)
                 anime({
@@ -1236,9 +1242,9 @@
             } else {
                 consecutiveCorrectAnswers = 0; // Reset consecutive correct answers on incorrect answer
                 deactivateFireEffect(); // Deactivate fire effect
-                feedbackMessage.textContent = `Incorrect. The answer was ${currentProblem.answer}. 🙁`; 
+                feedbackMessage.textContent = `Incorrect. The answer was ${currentProblem.answer}. 🙁`;
                 feedback.className = "feedback-area feedback-incorrect";
-                playWrongSound(); 
+                playWrongSound();
             }
             scoreDisplay.textContent = `Score: ${score}`;
             updateProgressDisplay();
@@ -1267,7 +1273,7 @@
                     console.warn("Confetti animation object is not loaded or null. Cannot play.");
                 }
                 // Play clap and horn sounds along with confetti
-                playClapSound(); 
+                playClapSound();
                 playHornSound();
                 // --- End Lottie Confetti Trigger ---
 
@@ -1322,8 +1328,8 @@
         const correctSoundElement = document.getElementById('correctSoundElement');
         const wrongSoundElement = document.getElementById('wrongSoundElement');
         const clickSoundElement = document.getElementById('clickSoundElement');
-        const clapSoundElement = document.getElementById('clapSoundElement'); 
-        const hornSoundElement = document.getElementById('hornSoundElement'); 
+        const clapSoundElement = document.getElementById('clapSoundElement');
+        const hornSoundElement = document.getElementById('hornSoundElement');
 
         /**
          * Generic play sound function to handle multiple audio elements
@@ -1443,9 +1449,9 @@
                 confettiAnimation = lottie.loadAnimation({
                     container: confettiContainer, // the dom element that will contain the animation
                     renderer: 'svg', // Use 'svg' for better scalability and transparency handling
-                    loop: false,      // Do not loop the confetti animation
+                    loop: false,     // Do not loop the confetti animation
                     autoplay: false, // Do not autoplay, we will control it programmatically
-                    path: 'Confetti.json' // the path to your animation json file
+                    path: 'https://lottie.host/1715457a-939e-4361-871d-531e21b069b2/h0311K63uL.json' // the path to your animation json file
                 });
 
                 // Add event listeners for Lottie animation loading status/errors
@@ -1480,9 +1486,9 @@
                 winnerAnimation = lottie.loadAnimation({
                     container: winnerAnimationContainer, // the dom element that will contain the animation
                     renderer: 'svg', // Use 'svg' for better scalability and transparency handling
-                    loop: false,      // Do not loop the winner animation
+                    loop: false,     // Do not loop the winner animation
                     autoplay: false, // Do not autoplay, we will control it programmatically
-                    path: 'winner.lottie' // the path to your animation json file
+                    path: 'https://lottie.host/88169c9b-648b-4999-9f79-40e9089201a0/m8m2n0Vj7m.json' // the path to your animation json file
                 });
 
                 // Add event listeners for Lottie winner animation loading status/errors
@@ -1529,4 +1535,3 @@
     </script>
 </body>
 </html>
-�
