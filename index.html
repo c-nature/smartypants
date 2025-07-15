@@ -278,22 +278,22 @@
         /* Specific text shadow colors for game cards based on their category */
         .math .game-list-card h3,
         .math .game-list-card p {
-            text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000, 2px 2px 4px #8B008B; /* Black outline, Dark Magenta shadow */
+            text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000, 2px 2px 4px #000; /* Black outline, Black shadow */
         }
 
         .science .game-list-card h3,
         .science .game-list-card p {
-            text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000, 2px 2px 4px #FF4500; /* Black outline, Orange-Red shadow */
+            text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000, 2px 2px 4px #000; /* Black outline, Black shadow */
         }
 
         .ela .game-list-card h3,
         .ela .game-list-card p {
-            text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000, 2px 2px 4px #00CED1; /* Black outline, Dark Turquoise shadow */
+            text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000, 2px 2px 4px #000; /* Black outline, Black shadow */
         }
 
         .social-studies .game-list-card h3,
         .social-studies .game-list-card p {
-            text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000, 2px 2px 4px #4169E1; /* Black outline, Royal Blue shadow */
+            text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000, 2px 2px 4px #000; /* Black outline, Black shadow */
         }
 
 
@@ -1470,7 +1470,7 @@
             mouthTypeSelect.addEventListener('change', (event) => { currentAvatarConfig.mouthType = event.target.value; updateAvatarPreview(currentAvatarConfig); });
             skinColorSelect.addEventListener('change', (event) => { currentAvatarConfig.skinColor = event.target.value; updateAvatarPreview(currentAvatarConfig); });
             clotheTypeSelect.addEventListener('change', (event) => { currentAvatarConfig.clotheType = event.target.value; handleConditionalAvatarFields(); });
-            clotheColorSelect.addEventListener('change', (event) => { currentAvatarConfig.clotheColor = event.target.value; updateAvatarPreview(currentAvatarConfig); });
+            clotheColorSelect.addEventListener('change', (event) => { currentAvatarConfig.clocheColor = event.target.value; updateAvatarPreview(currentAvatarConfig); });
             graphicTypeSelect.addEventListener('change', (event) => { currentAvatarConfig.graphicType = event.target.value; updateAvatarPreview(currentAvatarConfig); });
             accessoriesTypeSelect.addEventListener('change', (event) => { currentAvatarConfig.accessoriesType = event.target.value; updateAvatarPreview(currentAvatarConfig); });
         }
