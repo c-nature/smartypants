@@ -254,7 +254,8 @@
                 return null;
             } else {
                 // For multiple gallery images, search Wikimedia Commons directly for relevant files
-                const searchUrl = `${commonsApiUrl}&list=search&srsearch=${queryTitle}&srnamespace=6&srlimit=${count}&srwhat=text`; // Search file namespace for text content
+                // Use 'text' search to include descriptions, and then filter strictly.
+                const searchUrl = `${commonsApiUrl}&list=search&srsearch=${queryTitle}&srnamespace=6&srlimit=${count * 2}&srwhat=text&srprop=snippet`; // Get more results to filter down, and get snippets
                 
                 try {
                     const searchResponse = await fetch(searchUrl);
@@ -263,9 +264,26 @@
                     const searchResults = searchData.query?.search;
 
                     if (searchResults && searchResults.length > 0) {
-                        // Filter for common image extensions and construct titles for imageinfo query
-                        const imageTitlesToFetch = searchResults
-                            .filter(result => /\.(jpg|jpeg|png|gif|svg|webp)$/i.test(result.title)) // Filter by extension
+                        const lowerCaseAnimalName = animalName.toLowerCase();
+                        // Split animal name into keywords for stricter matching
+                        const keywords = lowerCaseAnimalName.split(' ').filter(k => k.length > 0);
+
+                        // Filter for common image extensions AND strict keyword presence in title or snippet
+                        const filteredResults = searchResults.filter(result => {
+                            const title = result.title.toLowerCase();
+                            const snippet = result.snippet ? result.snippet.toLowerCase() : '';
+                            const isImage = /\.(jpg|jpeg|png|gif|svg|webp)$/i.test(result.title);
+                            
+                            // Ensure all keywords from the animal name are present in the title or snippet
+                            const containsAllKeywords = keywords.every(keyword => 
+                                title.includes(keyword) || snippet.includes(keyword)
+                            );
+
+                            return isImage && containsAllKeywords;
+                        });
+
+                        const imageTitlesToFetch = filteredResults
+                            .slice(0, count) // Take only the desired 'count' after strict filtering
                             .map(result => encodeURIComponent(result.title))
                             .join('|');
 
