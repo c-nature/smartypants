@@ -264,36 +264,36 @@
 
         .game-list-card h3 {
             font-size: 1.8rem;
-            font-weight: 700;
-            color: white; /* Changed to white for better contrast with new shadows */
+            font-weight: normal; /* Changed to normal */
+            color: black; /* Changed to black */
             margin-bottom: 0.5rem;
         }
 
         .game-list-card p {
             font-size: 1.1rem;
-            color: white; /* Changed to white for better contrast with new shadows */
+            color: black; /* Changed to black */
             margin-bottom: 1.5rem;
-            font-weight: 400;
+            font-weight: normal; /* Ensured normal */
         }
         /* Specific text shadow colors for game cards based on their category */
         .math .game-list-card h3,
         .math .game-list-card p {
-            text-shadow: 2px 2px 4px #8B008B; /* Dark Magenta/Purple for Math */
+            text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000, 2px 2px 4px #8B008B; /* Black outline, Dark Magenta shadow */
         }
 
         .science .game-list-card h3,
         .science .game-list-card p {
-            text-shadow: 2px 2px 4px #FF4500; /* Orange-Red for Science */
+            text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000, 2px 2px 4px #FF4500; /* Black outline, Orange-Red shadow */
         }
 
         .ela .game-list-card h3,
         .ela .game-list-card p {
-            text-shadow: 2px 2px 4px #00CED1; /* Dark Turquoise for ELA */
+            text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000, 2px 2px 4px #00CED1; /* Black outline, Dark Turquoise shadow */
         }
 
         .social-studies .game-list-card h3,
         .social-studies .game-list-card p {
-            text-shadow: 2px 2px 4px #4169E1; /* Royal Blue for Social Studies */
+            text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000, 2px 2px 4px #4169E1; /* Black outline, Royal Blue shadow */
         }
 
 
@@ -1663,7 +1663,6 @@
                 avatarMessage.style.color = 'red';
             } finally {
                 saveAvatarBtn.disabled = false;
-                console.log('Save Avatar: Save button re-enabled.');
             }
         });
 
