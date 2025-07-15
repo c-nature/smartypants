@@ -248,6 +248,8 @@
             font-weight: normal; /* Changed to normal */
             color: white; /* Changed to white */
             margin-bottom: 0.5rem;
+            /* Added text-shadow for black outline and pop effect */
+            text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000, 2px 2px 4px #000;
         }
 
         .game-list-card p {
@@ -255,6 +257,8 @@
             color: white; /* Changed to white */
             margin-bottom: 1.5rem;
             font-weight: normal; /* Ensured normal */
+            /* Added text-shadow for black outline and pop effect */
+            text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000, 2px 2px 4px #000;
         }
         /* Specific text shadow colors for game cards based on their category */
         .math .game-list-card h3,
@@ -1143,7 +1147,7 @@
         const avatarModal = document.getElementById('avatarModal');
         const avatarPreview = document.getElementById('avatarPreview');
         const generateRandomAvatarBtn = document.getElementById('generateRandomAvatarBtn');
-        const saveAvatarBtn = document = document.getElementById('saveAvatarBtn');
+        const saveAvatarBtn = document.getElementById('saveAvatarBtn');
         const closeAvatarModalBtn = document.getElementById('closeAvatarModalBtn');
         const avatarMessage = document.getElementById('avatarMessage');
         const avatarOptionsContainer = document.getElementById('avatarOptionsContainer');
@@ -1151,12 +1155,12 @@
         const topTypeSelect = document.getElementById('topTypeSelect');
         const topColorSelect = document.getElementById('topColorSelect');
         const hairColorSelect = document.getElementById('hairColorSelect');
-        const facialHairTypeSelect = document = document.getElementById('facialHairTypeSelect');
+        const facialHairTypeSelect = document.getElementById('facialHairTypeSelect');
         const facialHairColorSelect = document.getElementById('facialHairColorSelect');
         const eyeTypeSelect = document.getElementById('eyeTypeSelect');
         const eyebrowTypeSelect = document.getElementById('eyebrowTypeSelect');
         const mouthTypeSelect = document.getElementById('mouthTypeSelect');
-        const skinColorSelect = document = document.getElementById('skinColorSelect');
+        const skinColorSelect = document.getElementById('skinColorSelect');
         const clotheTypeSelect = document.getElementById('clotheTypeSelect');
         const clotheColorSelect = document.getElementById('clotheColorSelect');
         const graphicTypeSelect = document.getElementById('graphicTypeSelect');
@@ -1450,7 +1454,7 @@
             mouthTypeSelect.addEventListener('change', (event) => { currentAvatarConfig.mouthType = event.target.value; updateAvatarPreview(currentAvatarConfig); });
             skinColorSelect.addEventListener('change', (event) => { currentAvatarConfig.skinColor = event.target.value; updateAvatarPreview(currentAvatarConfig); });
             clotheTypeSelect.addEventListener('change', (event) => { currentAvatarConfig.clotheType = event.target.value; handleConditionalAvatarFields(); });
-            clotheColorSelect.addEventListener('change', (event) => { currentAvatarConfig.clocheColor = event.target.value; updateAvatarPreview(currentAvatarConfig); });
+            clotheColorSelect.addEventListener('change', (event) => { currentAvatarConfig.clotheColor = event.target.value; updateAvatarPreview(currentAvatarConfig); });
             graphicTypeSelect.addEventListener('change', (event) => { currentAvatarConfig.graphicType = event.target.value; updateAvatarPreview(currentAvatarConfig); });
             accessoriesTypeSelect.addEventListener('change', (event) => { currentAvatarConfig.accessoriesType = event.target.value; updateAvatarPreview(currentAvatarConfig); });
         }
