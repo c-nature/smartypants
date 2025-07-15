@@ -951,7 +951,7 @@
             if (adjustedSettings.multiplyRange.max1 > 0 && adjustedSettings.multiplyRange.min1 > adjustedSettings.multiplyRange.max1) adjustedSettings.multiplyRange.min1 = adjustedSettings.multiplyRange.max1 - 1;
             if (adjustedSettings.multiplyRange.max2 > 0 && adjustedSettings.multiplyRange.min2 > adjustedSettings.multiplyRange.max2) adjustedSettings.multiplyRange.min2 = adjustedSettings.multiplyRange.max2 - 1;
             if (adjustedSettings.divideRange.divisorMax > 0 && adjustedSettings.divideRange.divisorMin > adjustedSettings.divideRange.divisorMax) adjustedSettings.divideRange.divisorMin = adjustedSettings.divideRange.divisorMax - 1;
-            if (adjustedSettings.divideRange.quotientMax > 0 && adjustedSettings.divideRange.quotientMin > adjustedSettings.divideRange.quotientMax) adjustedSettings.divideRange.quotientMin = adjustedSettings.divideRange.quotientMax - 1;
+            if (adjustedSettings.divideRange.quotientMax > 0 && adjustedSettings.divideRange.quotientMin > adjustedSettings.divideRange.quotientMax) adjustedSettings.divideRange.quotientMin = adjustedSettings.quotientMax - 1;
 
             return adjustedSettings;
         }
@@ -1444,14 +1444,14 @@
 
                 // Initialize Lottie Confetti Animation
                 // IMPORTANT: 'Confetti.json' must be accessible in the same directory as this HTML file
-                // on your GitHub Pages server for the animation to load.
+                // on your GitHub Pages server. If not, replace with a publicly hosted URL.
                 console.log("Attempting to load Lottie animation from 'Confetti.json'");
                 confettiAnimation = lottie.loadAnimation({
                     container: confettiContainer, // the dom element that will contain the animation
                     renderer: 'svg', // Use 'svg' for better scalability and transparency handling
                     loop: false,     // Do not loop the confetti animation
                     autoplay: false, // Do not autoplay, we will control it programmatically
-                    path: 'https://lottie.host/1715457a-939e-4361-871d-531e21b069b2/h0311K63uL.json' // the path to your animation json file
+                    path: 'Confetti.json' // Reverted to local path
                 });
 
                 // Add event listeners for Lottie animation loading status/errors
@@ -1488,7 +1488,7 @@
                     renderer: 'svg', // Use 'svg' for better scalability and transparency handling
                     loop: false,     // Do not loop the winner animation
                     autoplay: false, // Do not autoplay, we will control it programmatically
-                    path: 'https://lottie.host/88169c9b-648b-4999-9f79-40e9089201a0/m8m2n0Vj7m.json' // the path to your animation json file
+                    path: 'winner.lottie' // Reverted to local path
                 });
 
                 // Add event listeners for Lottie winner animation loading status/errors
@@ -1504,7 +1504,7 @@
                     console.log("Winner Lottie animation DOM loaded successfully.");
                 });
                 winnerAnimation.addEventListener('loaded_ready', () => {
-                    console.log("Winner Lottie animation loaded and ready.");
+                    console.log("Winner animation loaded and ready.");
                 });
 
                 // Event listener for when the winner animation completes
