@@ -671,7 +671,7 @@
                 <p>Solve linear and quadratic equations!</p>
                 <div class="game-card-buttons">
                     <button class="play-game-button" onclick="playClickSound(); showAlgebraGame();">Play Here</button>
-                    <button class="play-game-button-new-window" onclick="playClickSound(); openGameInNewWindow('https://github.com/c-nature/algebrachallenge.git');">Open in New Window</button>
+                    <button class="play-game-button-new-window" onclick="playClickSound(); openGameInNewWindow('https://c-nature.github.io/algebrachallenge/');">Open in New Window</button>
                 </div>
             </div>
         </div>
@@ -803,7 +803,7 @@
         <button onclick="playClickSound(); showMathCategoryView();" class="back-button">
             &larr; Back to Math Menu
         </button>
-        <iframe id="algebra-game-iframe" src="algebragame.html" title="Multi-Grade Math Challenge" class="game-iframe"></iframe>
+        <iframe id="algebra-game-iframe" src="" title="Multi-Grade Math Challenge" class="game-iframe"></iframe>
     </div>
 
     <!-- NEW: Subnet Calculator Game Iframe Container -->
@@ -1074,7 +1074,8 @@
         function showAlgebraGame() {
             hideAllViews();
             algebraGameView.style.display = 'flex';
-            algebraGameIframe.src = 'algebragame.html'; // Path to the algebra game HTML file
+            // UPDATED: Use the full GitHub Pages URL for the Algebra Challenge game
+            algebraGameIframe.src = 'https://c-nature.github.io/algebrachallenge/'; 
             document.body.style.overflow = 'hidden';
         }
 
@@ -1141,7 +1142,7 @@
         const avatarModal = document.getElementById('avatarModal');
         const avatarPreview = document.getElementById('avatarPreview');
         const generateRandomAvatarBtn = document.getElementById('generateRandomAvatarBtn');
-        const saveAvatarBtn = document.getElementById('saveAvatarBtn');
+        const saveAvatarBtn = document = document.getElementById('saveAvatarBtn');
         const closeAvatarModalBtn = document.getElementById('closeAvatarModalBtn');
         const avatarMessage = document.getElementById('avatarMessage');
         const avatarOptionsContainer = document.getElementById('avatarOptionsContainer');
