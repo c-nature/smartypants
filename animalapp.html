@@ -139,6 +139,9 @@
         const pexelsApiUrl = 'https://api.pexels.com/v1/search?query=';
         // Wikipedia API endpoint for MediaWiki queries
         const wikipediaApiUrl = 'https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*';
+        // Wikimedia Commons API endpoint for direct media searches
+        const commonsApiUrl = 'https://commons.wikimedia.org/w/api.php?action=query&format=json&origin=*';
+
 
         // --- Event Listeners ---
         searchBtn.addEventListener('click', searchForAnimal);
@@ -180,7 +183,7 @@
             // Fallback to Wikipedia if Pexels didn't find a good match or API key is missing
             if (!imageUrl) {
                 console.log('Pexels image not found or API key missing, trying Wikipedia...');
-                imageUrl = await fetchWikipediaImages(animalName, 1, true);
+                imageUrl = await fetchWikipediaImages(animalName, 1, true); // findOne = true
             }
             return imageUrl;
         }
@@ -188,7 +191,7 @@
         /** Fetches multiple images for the gallery view from both Pexels and Wikipedia. */
         async function fetchAllGalleryImages(animalName) {
             const pexelsImagesPromise = isApiKeyAvailable(pexelsApiKey) ? fetchPexelsImages(animalName, 10, false) : Promise.resolve([]);
-            const wikipediaImagesPromise = fetchWikipediaImages(animalName, 10, false);
+            const wikipediaImagesPromise = fetchWikipediaImages(animalName, 10, false); // findOne = false
 
             const [pexelsImages, wikipediaImages] = await Promise.all([
                 pexelsImagesPromise,
@@ -226,7 +229,7 @@
             let imageUrls = [];
 
             if (findOne) {
-                // For a single image (thumbnail) using pageimages property
+                // For a single image (thumbnail) using pageimages property from Wikipedia
                 const url = `${wikipediaApiUrl}&prop=pageimages&pithumbsize=400&titles=${queryTitle}&redirects=1`;
                 try {
                     const response = await fetch(url);
@@ -236,6 +239,10 @@
                     if (pages) {
                         const pageId = Object.keys(pages)[0];
                         const page = pages[pageId];
+                        if (page.missing) {
+                            console.log(`Wikipedia page for "${animalName}" not found.`);
+                            return null;
+                        }
                         if (page.thumbnail?.source) {
                             console.log(`Found single image on Wikipedia for ${animalName}: ${page.thumbnail.source}`);
                             return page.thumbnail.source;
@@ -246,48 +253,44 @@
                 }
                 return null;
             } else {
-                // For multiple gallery images using images and imageinfo properties
-                const url = `${wikipediaApiUrl}&prop=images&imlimit=${count}&titles=${queryTitle}&redirects=1`;
+                // For multiple gallery images, search Wikimedia Commons directly for relevant files
+                const searchUrl = `${commonsApiUrl}&list=search&srsearch=${queryTitle}&srnamespace=6&srlimit=${count}&srwhat=text`; // Search file namespace for text content
+                
                 try {
-                    const response = await fetch(url);
-                    if (!response.ok) { console.warn(`Wikipedia API (gallery images) failed: ${response.status}`); return []; }
-                    const data = await response.json();
-                    const pages = data.query?.pages;
-                    if (pages) {
-                        const pageId = Object.keys(pages)[0];
-                        const page = pages[pageId];
-                        const images = page.images; // This gives image titles like "File:Lion.jpg"
+                    const searchResponse = await fetch(searchUrl);
+                    if (!searchResponse.ok) { console.warn(`Wikimedia Commons search failed: ${searchResponse.status}`); return []; }
+                    const searchData = await searchResponse.json();
+                    const searchResults = searchData.query?.search;
 
-                        if (images && images.length > 0) {
-                            // Filter for common image extensions and construct titles for imageinfo query
-                            const imageTitlesToFetch = images
-                                .filter(img => /\.(jpg|jpeg|png|gif|svg)$/i.test(img.title))
-                                .map(img => encodeURIComponent(img.title))
-                                .join('|');
-                            
-                            if (imageTitlesToFetch) {
-                                // Batch query for imageinfo to get URLs for all filtered image titles
-                                const infoUrl = `${wikipediaApiUrl}&prop=imageinfo&iiprop=url&titles=${imageTitlesToFetch}&redirects=1`;
-                                const infoResponse = await fetch(infoUrl);
-                                if (!infoResponse.ok) { console.warn(`Wikipedia imageinfo failed: ${infoResponse.status}`); return []; }
-                                const infoData = await infoResponse.json();
-                                const infoPages = infoData.query?.pages;
+                    if (searchResults && searchResults.length > 0) {
+                        // Filter for common image extensions and construct titles for imageinfo query
+                        const imageTitlesToFetch = searchResults
+                            .filter(result => /\.(jpg|jpeg|png|gif|svg|webp)$/i.test(result.title)) // Filter by extension
+                            .map(result => encodeURIComponent(result.title))
+                            .join('|');
 
-                                if (infoPages) {
-                                    for (const infoPageId in infoPages) {
-                                        const infoPage = infoPages[infoPageId];
-                                        if (infoPage.imageinfo && infoPage.imageinfo[0]?.url) {
-                                            imageUrls.push(infoPage.imageinfo[0].url);
-                                        }
+                        if (imageTitlesToFetch) {
+                            // Batch query for imageinfo to get URLs for all filtered image titles
+                            const infoUrl = `${commonsApiUrl}&prop=imageinfo&iiprop=url&titles=${imageTitlesToFetch}&redirects=1`;
+                            const infoResponse = await fetch(infoUrl);
+                            if (!infoResponse.ok) { console.warn(`Wikimedia Commons imageinfo failed: ${infoResponse.status}`); return []; }
+                            const infoData = await infoResponse.json();
+                            const infoPages = infoData.query?.pages;
+
+                            if (infoPages) {
+                                for (const infoPageId in infoPages) {
+                                    const infoPage = infoPages[infoPageId];
+                                    if (infoPage.imageinfo && infoPage.imageinfo[0]?.url) {
+                                        imageUrls.push(infoPage.imageinfo[0].url);
                                     }
                                 }
                             }
                         }
                     }
                 } catch (error) {
-                    console.error('Error fetching gallery images from Wikipedia:', error);
+                    console.error('Error fetching gallery images from Wikimedia Commons:', error);
                 }
-                console.log(`Found ${imageUrls.length} gallery images from Wikipedia for ${animalName}.`);
+                console.log(`Found ${imageUrls.length} gallery images from Wikimedia Commons for ${animalName}.`);
                 return imageUrls;
             }
         }
