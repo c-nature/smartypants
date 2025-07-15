@@ -38,19 +38,19 @@
         /* IMPORTANT: Ensure these image files are present in the same directory (or correct relative path)
             on your GitHub Pages server. File names are case-sensitive on GitHub! */
         .body-theme-forest {
-            background-image: url('https://placehold.co/1920x1080/4CAF50/FFFFFF?text=Forest+Theme+BG'); /* Placeholder for 7th grade */
+            background-image: url('forestBG.png'); /* Original local path */
         }
         .body-theme-desert {
-            background-image: url('https://placehold.co/1920x1080/FFC107/000000?text=Desert+Theme+BG'); /* Placeholder for 8th grade */
+            background-image: url('desertBG.png'); /* Original local path */
         }
         .body-theme-mountain {
-            background-image: url('https://placehold.co/1920x1080/607D8B/FFFFFF?text=Mountain+Theme+BG'); /* Placeholder for 9th grade */
+            background-image: url('mountainBG.png'); /* Original local path */
         }
         .body-theme-space {
-            background-image: url('https://placehold.co/1920x1080/212121/FFFFFF?text=Space+Theme+BG'); /* Placeholder for 10th grade */
+            background-image: url('galaxyBG.png'); /* Original local path */
         }
         .body-theme-galaxy {
-            background-image: url('https://placehold.co/1920x1080/673AB7/FFFFFF?text=Galaxy+Theme+BG'); /* Placeholder for 11th grade */
+            background-image: url('oceanBG.png'); /* Original local path */
         }
 
         /* Elements that were inside the game-container now styled individually */
@@ -577,27 +577,27 @@
             in the same directory (or correct relative path) on your GitHub Pages server.
             File names are case-sensitive on GitHub! -->
     <audio id="correctSoundElement" preload="auto">
-        <source src="https://www.soundjay.com/buttons/beep-07a.mp3" type="audio/mpeg">
         <source src="correct.wav" type="audio/wav">
+        <source src="correct.mp3" type="audio/mpeg">
         <source src="correct.ogg" type="audio/ogg">
     </audio>
     <audio id="wrongSoundElement" preload="auto">
-        <source src="https://www.soundjay.com/buttons/beep-08a.mp3" type="audio/mpeg">
         <source src="wrong.wav" type="audio/wav">
+        <source src="wrong.mp3" type="audio/mpeg">
         <source src="wrong.ogg" type="audio/ogg">
     </audio>
     <audio id="clickSoundElement" preload="auto">
-        <source src="https://www.soundjay.com/buttons/button-2.mp3" type="audio/mpeg">
+        <source src="click.mp3" type="audio/mpeg">
         <source src="click.ogg" type="audio/ogg">
         <source src="click.wav" type="audio/wav">
     </audio>
     <audio id="clapSoundElement" preload="auto">
-        <source src="https://www.soundjay.com/human/clapping-1.mp3" type="audio/mpeg">
+        <source src="clap.mp3" type="audio/mpeg">
         <source src="clap.ogg" type="audio/ogg">
         <source src="clap.wav" type="audio/wav">
     </audio>
     <audio id="hornSoundElement" preload="auto">
-        <source src="https://www.soundjay.com/misc/car-horn-2.mp3" type="audio/mpeg">
+        <source src="horn.mp3" type="audio/mpeg">
         <source src="horn.ogg" type="audio/ogg">
         <source src="horn.wav" type="audio/wav">
     </audio>
@@ -760,7 +760,7 @@
             // Define a color palette for the fire effect
             // This maps heat values (0-255) to RGB colors
             fireColors = []; // Clear previous colors if any
-            for (let i = 0; i < 0; i++) { // Changed 256 to 0 to disable fire colors for now
+            for (let i = 0; i < 256; i++) { // Reverted to 256 for fire colors
                 let r = 0, g = 0, b = 0;
                 if (i < 85) { // Dark to red
                     r = i * 3;
@@ -983,7 +983,7 @@
 
                 if (currentQuestionTimeLeft <= 0) {
                     clearInterval(perQuestionTimerInterval);
-                    feedbackMessage.textContent = `Time's up! The answer was ${currentProblem.answer}. �`;
+                    feedbackMessage.textContent = `Time's up! The answer was ${currentProblem.answer}. 🙁`;
                     feedback.className = "feedback-area feedback-incorrect";
                     consecutiveCorrectAnswers = 0; // Reset consecutive answers on time out
                     deactivateFireEffect(); // Deactivate fire if time runs out
@@ -1554,4 +1554,3 @@
     </script>
 </body>
 </html>
-�
