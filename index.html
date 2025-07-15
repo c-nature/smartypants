@@ -74,7 +74,7 @@
 
         .category-card {
             background-color: rgba(255, 255, 255, 0.95);
-            border-radius: 1.5rem;
+            border-radius: 1.5rem; /* Main menu cards remain rounded */
             padding: 2rem;
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
             display: flex;
@@ -228,7 +228,7 @@
 
         .game-list-card {
             background-color: rgba(255, 255, 255, 0.9);
-            border-radius: 1.5rem;
+            border-radius: 0; /* Changed to sharp corners */
             padding: 2rem;
             box-shadow: 0 8px 12px -3px rgba(0, 0, 0, 0.1);
             display: flex;
@@ -693,8 +693,8 @@
                 <h3 style="color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);">Subnet Calculator</h3>
                 <p style="color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);">Calculate IP subnets easily!</p>
                 <div class="game-card-buttons">
-                    <button class="play-game-button" onclick="playClickSound(); showSubnetCalculatorGame('subcalc.html');">Open Here</button>
-                    <button class="play-game-button-new-window" onclick="playClickSound(); openGameInNewWindow('subcalc.html');">Open in New Window</button>
+                    <button class="play-game-button" onclick="playClickSound(); showSubnetCalculatorGame();">Open Here</button>
+                    <button class="play-game-button-new-window" onclick="playClickSound(); openGameInNewWindow('subnetcalculator.html');">Open in New Window</button>
                 </div>
             </div>
         </div>
