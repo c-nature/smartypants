@@ -733,6 +733,15 @@
                     <button class="play-game-button-new-window" onclick="playClickSound(); openGameInNewWindow('WordWarrior.html');">Open in New Window</button>
                 </div>
             </div>
+            <!-- NEW: WordWise Dictionary & Thesaurus Game Card -->
+            <div class="game-list-card" style="background-image: url('dictionary.png'); background-size: cover; background-position: center;">
+                <h3 style="color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);">WordWise Dictionary</h3>
+                <p style="color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);">Look up words and play quizzes!</p>
+                <div class="game-card-buttons">
+                    <button class="play-game-button" onclick="playClickSound(); showWordWiseGame();">Open Here</button>
+                    <button class="play-game-button-new-window" onclick="playClickSound(); openGameInNewWindow('dictionary.html');">Open in New Window</button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -793,6 +802,14 @@
             &larr; Back to Science Menu
         </button>
         <iframe id="subnet-calculator-game-iframe" src="" title="Subnet Calculator Game" class="game-iframe"></iframe>
+    </div>
+
+    <!-- NEW: WordWise Game Iframe Container -->
+    <div id="wordwise-game-view" class="game-iframe-container">
+        <button onclick="playClickSound(); showElaCategoryView();" class="back-button">
+            &larr; Back to ELA Menu
+        </button>
+        <iframe id="wordwise-game-iframe" src="" title="WordWise Dictionary & Thesaurus" class="game-iframe"></iframe>
     </div>
 
 
@@ -932,6 +949,7 @@
         const nasaGameView = document.getElementById('nasa-game-view'); // NASA game view
         const algebraGameView = document.getElementById('algebra-game-view'); // NEW Algebra game view
         const subnetCalculatorGameView = document.getElementById('subnet-calculator-game-view'); // NEW Subnet Calculator game view
+        const wordwiseGameView = document.getElementById('wordwise-game-view'); // NEW WordWise game view
 
         // Game Iframes
         const mathGameIframe = document.getElementById('math-game-iframe');
@@ -940,6 +958,7 @@
         const nasaGameIframe = document.getElementById('nasa-game-iframe'); // NASA game iframe
         const algebraGameIframe = document.getElementById('algebra-game-iframe'); // NEW Algebra game iframe
         const subnetCalculatorGameIframe = document.getElementById('subnet-calculator-game-iframe'); // NEW Subnet Calculator game iframe
+        const wordwiseGameIframe = document.getElementById('wordwise-game-iframe'); // NEW WordWise game iframe
 
         const mainClickSoundElement = document.getElementById('mainClickSoundElement');
 
@@ -968,6 +987,7 @@
             nasaGameView.style.display = 'none'; // Hide NASA game view
             algebraGameView.style.display = 'none'; // Hide Algebra game view
             subnetCalculatorGameView.style.display = 'none'; // Hide Subnet Calculator game view
+            wordwiseGameView.style.display = 'none'; // Hide WordWise game view
         }
 
         function showMainMenu() {
@@ -980,6 +1000,7 @@
             nasaGameIframe.src = '';
             algebraGameIframe.src = ''; // Clear Algebra game iframe source
             subnetCalculatorGameIframe.src = ''; // Clear Subnet Calculator game iframe source
+            wordwiseGameIframe.src = ''; // Clear WordWise game iframe source
             document.body.style.overflow = 'auto';
         }
 
@@ -1051,6 +1072,14 @@
             hideAllViews();
             subnetCalculatorGameView.style.display = 'flex';
             subnetCalculatorGameIframe.src = 'subnetcalculator.html'; // Path to the subnet calculator HTML file
+            document.body.style.overflow = 'hidden';
+        }
+
+        // NEW: Function to show WordWise game
+        function showWordWiseGame() {
+            hideAllViews();
+            wordwiseGameView.style.display = 'flex';
+            wordwiseGameIframe.src = 'dictionary.html'; // Path to the dictionary HTML file
             document.body.style.overflow = 'hidden';
         }
 
@@ -1577,7 +1606,7 @@
                     // Merge the updates from the server response into the existing user object
                     const updatedUser = {
                         ...existingUser, // Keeps old avatar_config if not explicitly returned
-                        ...data.data     // Overwrites with fresh data from the avatar save response
+                        ...data.data       // Overwrites with fresh data from the avatar save response
                     };
 
                     // Save the complete, merged user object back to localStorage
@@ -1782,10 +1811,10 @@
             }
         }
 
-        // NEW: Event listener for the Donate button
+
         donateBtn.addEventListener('click', () => {
             playClickSound();
-            // IMPORTANT: Replace 'YOUR_PAYPAL_DONATION_LINK_HERE' with your actual PayPal donation URL
+
             const donationUrl = 'https://www.paypal.com/donate/?hosted_button_id=RSG7WDB322VBC';
             window.open(donationUrl, '_blank'); // Open in a new tab
         });

@@ -175,6 +175,17 @@
             </div>
         </div>
 
+        <!-- Quiz Type Selection Section (Initially hidden) -->
+        <div id="quizTypeSelection" class="w-full space-y-4 text-center hidden">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Choose Quiz Type</h2>
+            <button id="startDictionaryQuizButton" class="quiz-button text-lg font-semibold w-full mb-2">
+                Dictionary Quiz (Definition Match)
+            </button>
+            <button id="startThesaurusQuizButton" class="quiz-button text-lg font-semibold w-full">
+                Thesaurus Quiz (Synonym/Antonym Match)
+            </button>
+        </div>
+
         <!-- Quiz Section (Initially hidden) -->
         <div id="quizSection" class="w-full space-y-6 hidden">
             <h2 class="text-3xl font-bold text-gray-800 mb-4 text-center">Quiz Time!</h2>
@@ -202,7 +213,7 @@
         const messageBox = document.getElementById('messageBox');
         const loadingSpinner = document.getElementById('loadingSpinner');
         const quizModeButton = document.getElementById('quizModeButton');
-        const dictionaryThesaurusSection = document.getElementById('dictionaryThesaurusSection'); // Renamed for clarity
+        const dictionaryThesaurusSection = document.getElementById('dictionaryThesaurusSection');
         const quizSection = document.getElementById('quizSection');
         const quizDefinition = document.getElementById('quizDefinition');
         const quizOptionsDiv = document.getElementById('quizOptions');
@@ -219,6 +230,11 @@
         const normalDifficultyButton = document.getElementById('normalDifficulty');
         const hardDifficultyButton = document.getElementById('hardDifficulty');
 
+        // Quiz Type Selection elements
+        const quizTypeSelection = document.getElementById('quizTypeSelection');
+        const startDictionaryQuizButton = document.getElementById('startDictionaryQuizButton');
+        const startThesaurusQuizButton = document.getElementById('startThesaurusQuizButton');
+
         // Base URL for the DictionaryAPI.dev
         const API_BASE_URL = 'https://api.dictionaryapi.dev/api/v2/entries/en/';
 
@@ -226,9 +242,8 @@
         let currentQuizWord = '';
         let quizScore = 0;
         let currentDifficulty = 'normal'; // Default difficulty
-
-        // Mode variable: 'dictionary', 'thesaurus', or 'quiz'
-        let currentMode = 'dictionary'; // Default mode
+        let currentQuizType = ''; // 'dictionary' or 'thesaurus'
+        let currentQuestionType = ''; // 'synonym' or 'antonym' for thesaurus quiz
 
         const quizWords = [
             "apple", "banana", "cat", "dog", "house", "tree", "water", "sun", "moon", "star",
@@ -267,6 +282,8 @@
             quizModeButton.disabled = show; // Disable quiz button during loading
             dictionaryTabButton.disabled = show; // Disable tab buttons during loading
             thesaurusTabButton.disabled = show; // Disable tab buttons during loading
+            startDictionaryQuizButton.disabled = show; // Disable quiz type buttons
+            startThesaurusQuizButton.disabled = show; // Disable quiz type buttons
             easyDifficultyButton.disabled = show;
             normalDifficultyButton.disabled = show;
             hardDifficultyButton.disabled = show;
@@ -297,9 +314,10 @@
                 thesaurusTabButton.classList.add('active-tab');
             }
 
-            // Ensure dictionary/thesaurus section is visible and quiz section is hidden
+            // Ensure dictionary/thesaurus section is visible and quiz sections are hidden
             dictionaryThesaurusSection.classList.remove('hidden');
             quizSection.classList.add('hidden');
+            quizTypeSelection.classList.add('hidden');
             wordInput.focus(); // Focus on input field after switching mode
         }
 
@@ -318,6 +336,7 @@
             // Ensure we are in dictionary/thesaurus view, not quiz
             dictionaryThesaurusSection.classList.remove('hidden');
             quizSection.classList.add('hidden');
+            quizTypeSelection.classList.add('hidden');
 
             try {
                 const response = await fetch(`${API_BASE_URL}${word}`);
@@ -482,28 +501,41 @@
             } else { // hard
                 hardDifficultyButton.classList.add('active');
             }
-            // Restart quiz with new difficulty
-            startQuiz();
+            // Restart quiz with new difficulty, maintaining current quiz type
+            if (currentQuizType) {
+                startQuiz(currentQuizType);
+            }
         }
 
-        // Function to start the quiz
-        function startQuiz() {
-            // Hide dictionary/thesaurus section and show quiz section
-            dictionaryThesaurusSection.classList.add('hidden');
-            quizSection.classList.remove('hidden');
+        // Function to start the quiz (either dictionary or thesaurus)
+        function startQuiz(type) {
+            currentQuizType = type;
+            quizTypeSelection.classList.add('hidden'); // Hide quiz type selection
+            dictionaryThesaurusSection.classList.add('hidden'); // Hide dictionary/thesaurus section
+            quizSection.classList.remove('hidden'); // Show the main quiz section
             hideMessage();
             quizScore = 0;
             quizScoreSpan.textContent = quizScore;
             generateQuestion();
         }
 
-        // Function to generate a new quiz question
+        // Function to generate a new quiz question based on currentQuizType
         async function generateQuestion() {
             quizOptionsDiv.innerHTML = '';
             quizFeedback.classList.add('hidden');
             nextQuestionButton.classList.add('hidden');
             toggleLoading(true);
 
+            if (currentQuizType === 'dictionary') {
+                await generateDictionaryQuestion();
+            } else if (currentQuizType === 'thesaurus') {
+                await generateThesaurusQuestion();
+            }
+            toggleLoading(false);
+        }
+
+        // Function to generate a dictionary quiz question
+        async function generateDictionaryQuestion() {
             let selectedWordData = null;
             let attempts = 0;
             const maxAttempts = 5;
@@ -524,20 +556,18 @@
                         }
                     }
                 } catch (error) {
-                    console.error(`Error fetching word "${word}" for quiz:`, error);
+                    console.error(`Error fetching word "${word}" for dictionary quiz:`, error);
                 }
                 attempts++;
             }
 
             if (!selectedWordData) {
-                showMessage("Could not generate a quiz question. Please try again later.", 'error');
-                toggleLoading(false);
+                showMessage("Could not generate a dictionary quiz question. Please try again later.", 'error');
                 return;
             }
 
-            // Get the FIRST definition from the selected word
             const firstDefinition = selectedWordData.meanings[0].definitions[0].definition;
-            quizDefinition.textContent = `"${firstDefinition}"`; // Use the first definition
+            quizDefinition.textContent = `"${firstDefinition}"`;
 
             // Determine number of incorrect options based on difficulty
             let numIncorrectOptions;
@@ -549,7 +579,6 @@
                 numIncorrectOptions = 5;
             }
 
-            // Generate multiple-choice options
             let options = [currentQuizWord];
             let incorrectWords = [];
             while (incorrectWords.length < numIncorrectOptions) {
@@ -561,8 +590,6 @@
                     options.push(incorrectWord);
                 }
             }
-
-            // Shuffle options
             options.sort(() => Math.random() - 0.5);
 
             options.forEach(optionWord => {
@@ -572,30 +599,167 @@
                 button.onclick = () => checkAnswer(button, optionWord);
                 quizOptionsDiv.appendChild(button);
             });
-
-            toggleLoading(false);
         }
 
-        // Function to check the selected answer
-        function checkAnswer(selectedButton, chosenWord) {
+        // Function to generate a thesaurus quiz question
+        async function generateThesaurusQuestion() {
+            let selectedWordData = null;
+            let attempts = 0;
+            const maxAttempts = 10; // More attempts for thesaurus as synonym/antonym might be sparse
+
+            let allSynonyms = [];
+            let allAntonyms = [];
+
+            while (!selectedWordData && attempts < maxAttempts) {
+                const randomIndex = Math.floor(Math.random() * quizWords.length);
+                const word = quizWords[randomIndex];
+                try {
+                    const response = await fetch(`${API_BASE_URL}${word}`);
+                    if (response.ok) {
+                        const data = await response.json();
+                        if (data[0] && data[0].meanings) {
+                            // Aggregate synonyms and antonyms
+                            let tempSynonyms = new Set();
+                            let tempAntonyms = new Set();
+                            data[0].meanings.forEach(m => {
+                                if (m.synonyms) m.synonyms.forEach(s => tempSynonyms.add(s));
+                                if (m.antonyms) m.antonyms.forEach(a => tempAntonyms.add(a));
+                            });
+
+                            // Ensure we have at least one synonym OR one antonym to make a question
+                            if (tempSynonyms.size > 0 || tempAntonyms.size > 0) {
+                                selectedWordData = data[0];
+                                currentQuizWord = word;
+                                allSynonyms = Array.from(tempSynonyms);
+                                allAntonyms = Array.from(tempAntonyms);
+                            }
+                        }
+                    }
+                } catch (error) {
+                    console.error(`Error fetching word "${word}" for thesaurus quiz:`, error);
+                }
+                attempts++;
+            }
+
+            if (!selectedWordData) {
+                showMessage("Could not generate a thesaurus quiz question. Please try again later.", 'error');
+                return;
+            }
+
+            // Decide if it's a synonym or antonym question
+            const hasSynonyms = allSynonyms.length > 0;
+            const hasAntonyms = allAntonyms.length > 0;
+
+            if (hasSynonyms && (!hasAntonyms || Math.random() < 0.5)) { // Prioritize synonyms if both exist or only synonyms
+                currentQuestionType = 'synonym';
+                quizDefinition.textContent = `Which word is a synonym for "${currentQuizWord}"?`;
+            } else if (hasAntonyms) {
+                currentQuestionType = 'antonym';
+                quizDefinition.textContent = `Which word is an antonym for "${currentQuizWord}"?`;
+            } else {
+                // Fallback if somehow no synonyms/antonyms were found after all attempts
+                showMessage("No suitable correct answer found for the thesaurus quiz. Retrying...", 'info');
+                await generateThesaurusQuestion(); // Retry
+                return;
+            }
+
+            let correctWordPool = currentQuestionType === 'synonym' ? allSynonyms : allAntonyms;
+            let incorrectWordPool = currentQuestionType === 'synonym' ? allAntonyms : allSynonyms;
+
+            // Ensure we have at least one correct answer
+            if (correctWordPool.length === 0) {
+                // This should ideally not happen if selectedWordData was found, but as a safeguard
+                showMessage("No suitable correct answer found for the thesaurus quiz. Retrying...", 'info');
+                await generateThesaurusQuestion(); // Retry
+                return;
+            }
+
+            const correctAnswer = correctWordPool[Math.floor(Math.random() * correctWordPool.length)];
+            let options = [correctAnswer];
+
+            let numIncorrectOptions;
+            if (currentDifficulty === 'easy') {
+                numIncorrectOptions = 1; // 1 correct, 1 incorrect (total 2 options)
+            } else if (currentDifficulty === 'normal') {
+                numIncorrectOptions = 3; // 1 correct, 3 incorrect (total 4 options)
+            } else { // hard
+                numIncorrectOptions = 5; // 1 correct, 5 incorrect (total 6 options)
+            }
+
+            let distractors = [];
+            let allPossibleDistractors = [...incorrectWordPool]; // Start with opposite type words
+            // Add other random words from quizWords that are not the current word or already in options
+            const tempQuizWords = quizWords.filter(w => w !== currentQuizWord && !correctWordPool.includes(w) && !incorrectWordPool.includes(w));
+            allPossibleDistractors = [...new Set([...allPossibleDistractors, ...tempQuizWords])]; // Use Set to avoid duplicates
+
+            while (distractors.length < numIncorrectOptions && allPossibleDistractors.length > 0) {
+                const randomIndex = Math.floor(Math.random() * allPossibleDistractors.length);
+                const distractor = allPossibleDistractors[randomIndex];
+                if (!options.includes(distractor)) { // Ensure distractor isn't already an option
+                    distractors.push(distractor);
+                    options.push(distractor);
+                }
+                allPossibleDistractors.splice(randomIndex, 1); // Remove to avoid re-picking
+            }
+
+            // If we couldn't get enough distractors from the opposite pool or random words, fill with more random words
+            while (options.length < (numIncorrectOptions + 1)) {
+                const randomWordIndex = Math.floor(Math.random() * quizWords.length);
+                const randomWord = quizWords[randomWordIndex];
+                if (!options.includes(randomWord) && randomWord !== currentQuizWord) {
+                    options.push(randomWord);
+                }
+            }
+
+            options.sort(() => Math.random() - 0.5); // Shuffle options
+
+            options.forEach(optionWord => {
+                const button = document.createElement('button');
+                button.className = 'quiz-option-button';
+                button.textContent = optionWord;
+                button.onclick = () => checkAnswer(button, optionWord, correctAnswer); // Pass correctAnswer
+                quizOptionsDiv.appendChild(button);
+            });
+        }
+
+        // Function to check the selected answer for both quiz types
+        function checkAnswer(selectedButton, chosenWord, thesaurusCorrectAnswer = null) {
             // Disable all option buttons after selection
             Array.from(quizOptionsDiv.children).forEach(button => {
                 button.disabled = true;
-                if (button.textContent === currentQuizWord) {
-                    button.classList.add('correct'); // Highlight correct answer
+            });
+
+            let isCorrect = false;
+            let actualCorrectAnswer = '';
+
+            if (currentQuizType === 'dictionary') {
+                isCorrect = (chosenWord === currentQuizWord);
+                actualCorrectAnswer = currentQuizWord;
+            } else if (currentQuizType === 'thesaurus') {
+                // For thesaurus, chosenWord is the option, thesaurusCorrectAnswer is the specific correct synonym/antonym
+                isCorrect = (chosenWord === thesaurusCorrectAnswer);
+                actualCorrectAnswer = thesaurusCorrectAnswer; // The specific word that was the correct option
+            }
+
+            // Apply styling based on correctness
+            Array.from(quizOptionsDiv.children).forEach(button => {
+                if (currentQuizType === 'dictionary' && button.textContent === currentQuizWord) {
+                    button.classList.add('correct');
+                } else if (currentQuizType === 'thesaurus' && button.textContent === actualCorrectAnswer) {
+                     button.classList.add('correct');
                 } else {
-                    button.classList.add('opacity-50'); // Dim incorrect options
+                    button.classList.add('opacity-50');
                 }
             });
 
-            if (chosenWord === currentQuizWord) {
+            if (isCorrect) {
                 quizFeedback.textContent = "Correct!";
                 quizFeedback.className = 'quiz-feedback correct-feedback';
                 quizScore++;
             } else {
-                quizFeedback.textContent = `Incorrect. The correct word was "${currentQuizWord}".`;
+                quizFeedback.textContent = `Incorrect. The correct word was "${actualCorrectAnswer}".`;
                 quizFeedback.className = 'quiz-feedback incorrect-feedback';
-                selectedButton.classList.add('incorrect'); // Highlight user's incorrect choice
+                selectedButton.classList.add('incorrect');
             }
             quizFeedback.classList.remove('hidden');
             quizScoreSpan.textContent = quizScore;
@@ -609,7 +773,24 @@
                 searchWord();
             }
         });
-        quizModeButton.addEventListener('click', startQuiz);
+
+        // Main Quiz button now shows quiz type selection
+        quizModeButton.addEventListener('click', () => {
+            dictionaryThesaurusSection.classList.add('hidden');
+            quizSection.classList.add('hidden'); // Hide the main quiz section initially
+            quizTypeSelection.classList.remove('hidden'); // Show quiz type selection
+            hideMessage(); // Clear any previous messages
+        });
+
+        // Quiz Type Selection button listeners
+        startDictionaryQuizButton.addEventListener('click', () => {
+            startQuiz('dictionary');
+        });
+
+        startThesaurusQuizButton.addEventListener('click', () => {
+            startQuiz('thesaurus');
+        });
+
         nextQuestionButton.addEventListener('click', generateQuestion);
 
         // Tab button event listeners

@@ -84,8 +84,9 @@
         const wordTypeText = document.getElementById('wordTypeText');
 
         // API configuration
-        const rapidApiHost = 'wordsapi.p.rapidapi.com';
-        const rapidApiKey = 'd00a17ba11m92938ee3d3f99c5f93a478b8c8273b9a6e93'; // Ensure this key is correct
+        // Corrected API host and headers based on the provided JavaScript snippet
+        const rapidApiHost = 'wordsapiv1.p.rapidapi.com'; 
+        const rapidApiKey = 'd00a32ab1mshfb938eed3f395d5epfea978jsn827f3de6a6b3'; 
 
         // Function to show/hide elements
         const showElement = (element) => element.classList.remove('hidden');
@@ -128,29 +129,31 @@
                 const definitionResponse = await fetch(`https://${rapidApiHost}/words/${word}/definitions`, {
                     method: 'GET',
                     headers: {
-                        'x-rapidapi-host': rapidApiHost,
-                        'x-rapidapi-key': rapidApiKey,
+                        'x-rapidapi-host': rapidApiHost, // Use x-rapidapi-host
+                        'x-rapidapi-key': rapidApiKey,   // Use x-rapidapi-key
                     },
+                    mode: 'cors' 
                 });
 
                 if (!definitionResponse.ok) {
                     const errorStatus = definitionResponse.status;
-                    const errorText = await definitionResponse.text(); // Get raw error text from API
+                    const errorText = await definitionResponse.text(); 
                     console.error(`Definition API Error: Status ${errorStatus}, Response: ${errorText}`);
                     displayError(`Failed to get definition. API Error: ${errorStatus}. Please check your API key or rate limits.`);
-                    return; // Stop execution if API call failed
+                    return; 
                 }
                 const definitionData = await definitionResponse.json();
-                console.log('Definition API Response:', definitionData); // Log definition data
+                console.log('Definition API Response:', definitionData); 
 
 
                 // Fetch Synonyms
                 const synonymsResponse = await fetch(`https://${rapidApiHost}/words/${word}/synonyms`, {
                     method: 'GET',
                     headers: {
-                        'x-rapidapi-host': rapidApiHost,
-                        'x-rapidapi-key': rapidApiKey,
+                        'x-rapidapi-host': rapidApiHost, // Use x-rapidapi-host
+                        'x-rapidapi-key': rapidApiKey,   // Use x-rapidapi-key
                     },
+                    mode: 'cors' 
                 });
 
                 if (!synonymsResponse.ok) {
@@ -161,16 +164,17 @@
                     return;
                 }
                 const synonymsData = await synonymsResponse.json();
-                console.log('Synonyms API Response:', synonymsData); // Log synonyms data
+                console.log('Synonyms API Response:', synonymsData); 
 
 
                 // Fetch Word Type
                 const typeResponse = await fetch(`https://${rapidApiHost}/words/${word}/typeOf`, {
                     method: 'GET',
                     headers: {
-                        'x-rapidapi-host': rapidApiHost,
-                        'x-rapidapi-key': rapidApiKey,
+                        'x-rapidapi-host': rapidApiHost, // Use x-rapidapi-host
+                        'x-rapidapi-key': rapidApiKey,   // Use x-rapidapi-key  
                     },
+                    mode: 'cors' 
                 });
 
                 if (!typeResponse.ok) {
@@ -181,7 +185,7 @@
                     return;
                 }
                 const typeData = await typeResponse.json();
-                console.log('Word Type API Response:', typeData); // Log word type data
+                console.log('Word Type API Response:', typeData); 
 
 
                 // Display results
