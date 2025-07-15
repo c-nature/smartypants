@@ -98,30 +98,46 @@
             background-color: rgba(59, 255, 131, 0.9);
             border-color:rgb(22, 189, 122);
         }
-        .category-card.math .title { color:rgb(200, 103, 51); }
-        .category-card.math .description { color: #fbc02d; }
+        /* Complementary colors for Math card text and shadow */
+        .category-card.math .category-title,
+        .category-card.math .category-description {
+            color: white;
+            text-shadow: -1px -1px 0 #FF00FF, 1px -1px 0 #FF00FF, -1px 1px 0 #FF00FF, 1px 1px 0 #FF00FF, 3px 3px 6px rgba(0,0,0,0.4);
+        }
 
         .category-card.science {
             background-color: rgba(21, 178, 235, 0.9);
             border-color:rgb(67, 144, 160);
         }
-        .category-card.science .title { color: #004d40; }
-        .category-card.science .description { color: #43a047; }
+        /* Complementary colors for Science card text and shadow */
+        .category-card.science .category-title,
+        .category-card.science .category-description {
+            color: white;
+            text-shadow: -1px -1px 0 #FFA500, 1px -1px 0 #FFA500, -1px 1px 0 #FFA500, 1px 1px 0 #FFA500, 3px 3px 6px rgba(0,0,0,0.4);
+        }
 
         .category-card.ela {
             background-color: rgba(240, 60, 60, 0.9);
             border-color:rgb(189, 37, 37);
         }
-        .category-card.ela .title { color: #880e4f; }
-        .category-card.ela .description { color: #d32f2f; }
+        /* Complementary colors for ELA card text and shadow */
+        .category-card.ela .category-title,
+        .category-card.ela .category-description {
+            color: white;
+            text-shadow: -1px -1px 0 #00FFFF, 1px -1px 0 #00FFFF, -1px 1px 0 #00FFFF, 1px 1px 0 #00FFFF, 3px 3px 6px rgba(0,0,0,0.4);
+        }
 
         /* New styles for Social Studies card */
         .category-card.social-studies {
             background-color: rgba(255, 165, 0, 0.9); /* Orange background */
             border-color: rgb(204, 132, 0); /* Darker orange border */
         }
-        .category-card.social-studies .title { color: #a0522d; } /* Sienna title color */
-        .category-card.social-studies .description { color: #8b4513; } /* SaddleBrown description color */
+        /* Complementary colors for Social Studies card text and shadow */
+        .category-card.social-studies .category-title,
+        .category-card.social-studies .category-description {
+            color: white;
+            text-shadow: -1px -1px 0 #4169E1, 1px -1px 0 #4169E1, -1px 1px 0 #4169E1, 1px 1px 0 #4169E1, 3px 3px 6px rgba(0,0,0,0.4);
+        }
 
 
         .category-icon {
@@ -132,21 +148,19 @@
             filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.2));
         }
 
+        /* Removed general text-shadow from here as it's now specific per category */
         .category-title {
             font-size: 2.25rem;
             font-weight: 700;
             margin-bottom: 0.5rem;
-            /* Added text-shadow for pop effect and outline */
-            text-shadow: -0.5px -0.5px 0 #333, 0.5px -0.5px 0 #333, -0.5px 0.5px 0 #333, 0.5px 0.5px 0 #333, 1px 1px 3px rgba(0,0,0,0.3);
         }
 
+        /* Removed general text-shadow from here as it's now specific per category */
         .category-description {
             font-size: 1.25rem;
             font-weight: 400;
             flex-grow: 1;
             margin-bottom: 1rem;
-            /* Added text-shadow for subtle pop effect */
-            text-shadow: 0.5px 0.5px 1px rgba(0,0,0,0.2);
         }
 
         .explore-button {
@@ -1702,7 +1716,7 @@
                 // --- NEW: Updated password validation ---
                 const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
 
-                if (!requestBody.email || !/^[\w-\.]+@([\w-]+\.)+[\w-\.]{2,4}$/.test(requestularly requestBody.email)) {
+                if (!requestBody.email || !/^[\w-\.]+@([\w-]+\.)+[\w-\.]{2,4}$/.test(requestBody.email)) {
                     authMessage.textContent = 'Please enter a valid email address.';
                     authMessage.style.color = 'red';
                     submitAuthBtn.disabled = false;
