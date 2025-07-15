@@ -1066,7 +1066,7 @@
         function showNasaGame() {
             hideAllViews();
             nasaGameView.style.display = 'flex';
-            nasaGameIframe.src = 'nasaexplorer.html';
+            nasaGameIframe.src = 'nasaexplorer.html'; // This was already correct from previous updates
             document.body.style.overflow = 'hidden';
         }
 
@@ -1083,7 +1083,8 @@
         function showSubnetCalculatorGame() {
             hideAllViews();
             subnetCalculatorGameView.style.display = 'flex';
-            subnetCalculatorGameIframe.src = 'subnetcalculator.html'; // Path to the subnet calculator HTML file
+            // FIX: Use the full GitHub Pages URL for the Subnet Calculator game
+            subnetCalculatorGameIframe.src = 'https://c-nature.github.io/subnetcalculator/'; 
             document.body.style.overflow = 'hidden';
         }
 
