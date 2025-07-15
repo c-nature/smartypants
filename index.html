@@ -584,19 +584,6 @@
             opacity: 1;
             pointer-events: auto;
         }
-        
-        /* --- NEW: Styles for the badge notification pop-up --- */
-        #badge-notification {
-            transition: opacity 0.5s, transform 0.5s;
-            transform: translate(-50%, -50%) scale(0.5);
-            opacity: 0;
-            pointer-events: none;
-        }
-        #badge-notification.show {
-            transform: translate(-50%, -50%) scale(1);
-            opacity: 1;
-            pointer-events: auto;
-        }
 
         @media (max-width: 768px) {
             .auth-modal-content {
@@ -966,13 +953,6 @@
 
     <!-- Message Box for Copy Confirmation -->
     <div id="messageBox" class="message-box"></div>
-    
-    <!-- --- NEW: Badge Notification Pop-up --- -->
-    <div id="badge-notification" class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-black bg-opacity-75 p-8 rounded-2xl shadow-2xl text-center z-[2000] hidden flex-col items-center">
-        <h2 class="text-3xl font-bold text-yellow-300 mb-4" style="text-shadow: 2px 2px 4px #000;">New Badge Unlocked!</h2>
-        <img id="badge-notification-img" src="" alt="New Badge" class="w-48 h-48 mb-4">
-        <p id="badge-notification-name" class="text-2xl text-white font-semibold" style="text-shadow: 1px 1px 2px #000;"></p>
-    </div>
 
 
     <script>
@@ -1206,9 +1186,6 @@
         // --- NEW: Badge display elements ---
         const badgeDisplayContainer = document.getElementById('badgeDisplayContainer');
         const badgeGrid = document.getElementById('badgeGrid');
-        const badgeNotification = document.getElementById('badge-notification');
-        const badgeNotificationImg = document.getElementById('badge-notification-img');
-        const badgeNotificationName = document.getElementById('badge-notification-name');
 
         const BACKEND_URL = 'https://smartypantsbe.onrender.com/api/user';
 
@@ -1223,33 +1200,6 @@
             setTimeout(() => {
                 messageBox.classList.remove('show');
             }, duration);
-        }
-        
-        /**
-         * --- NEW: Shows the badge notification pop-up ---
-         * @param {string} badgeName - The name of the badge (e.g., 'smartystarter3').
-         * @param {string} badgeDisplayName - The display-friendly name (e.g., 'Smarty Starter').
-         */
-        function showBadgeNotification(badgeName, badgeDisplayName) {
-            badgeNotificationImg.src = `badges/${badgeName}.png`;
-            badgeNotificationName.textContent = badgeDisplayName;
-            badgeNotification.classList.remove('hidden');
-            badgeNotification.classList.add('flex'); // Use flex to center content
-            
-            // Trigger the animation
-            setTimeout(() => {
-                badgeNotification.classList.add('show');
-            }, 10); // A small delay ensures the transition triggers
-
-            // Hide the notification after a few seconds
-            setTimeout(() => {
-                badgeNotification.classList.remove('show');
-                // Wait for the animation to finish before hiding it completely
-                setTimeout(() => {
-                    badgeNotification.classList.add('hidden');
-                    badgeNotification.classList.remove('flex');
-                }, 500);
-            }, 4000); // Show for 4 seconds
         }
 
         function updateAuthButtons() {
@@ -1833,12 +1783,6 @@
                             authModal.classList.add('hidden');
                             updateAuthButtons();
                             const user = JSON.parse(localStorage.getItem('user'));
-                            
-                            // --- AWARD BADGE ON SIGNUP ---
-                            if (action === 'signup') {
-                                awardBadge('smartystarter3', 'Smarty Starter');
-                            }
-                            
                             if (action === 'signup' || (user && !user.has_created_avatar)) {
                                 showAvatarCreatorModal(user.avatar_config || {});
                             }
@@ -1921,11 +1865,10 @@
         // --- NEW: Badge Awarding Function ---
         /**
          * Awards a badge to the current user and shows a message.
-         * This function should be called from your game iframes or other parts of the app.
-         * @param {string} badgeName - The filename of the badge (e.g., 'smartystarter3').
-         * @param {string} badgeDisplayName - The display-friendly name (e.g., 'Smarty Starter').
+         * This function should be called from your game iframes.
+         * @param {string} badgeName - A unique name for the badge (e.g., 'math_master_level1').
          */
-        async function awardBadge(badgeName, badgeDisplayName) {
+        async function awardBadge(badgeName) {
             const user = JSON.parse(localStorage.getItem('user'));
             const token = localStorage.getItem('token');
 
@@ -1958,7 +1901,7 @@
                     localStorage.setItem('user', JSON.stringify(user));
 
                     // Show a notification
-                    showBadgeNotification(badgeName, badgeDisplayName);
+                    showMessageBox(`Congratulations! You've earned the ${badgeName.replace(/_/g, ' ')} badge!`);
                     
                     // Optionally, update the profile view if it's open
                     updateAuthButtons(); 
