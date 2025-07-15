@@ -38,19 +38,19 @@
         /* IMPORTANT: Ensure these image files are present in the same directory (or correct relative path)
             on your GitHub Pages server. File names are case-sensitive on GitHub! */
         .body-theme-forest {
-            background-image: url('forestBG.png'); /* Placeholder for 7th grade */
+            background-image: url('https://placehold.co/1920x1080/4CAF50/FFFFFF?text=Forest+Theme+BG'); /* Placeholder for 7th grade */
         }
         .body-theme-desert {
-            background-image: url('desertBG.png'); /* Placeholder for 8th grade */
+            background-image: url('https://placehold.co/1920x1080/FFC107/000000?text=Desert+Theme+BG'); /* Placeholder for 8th grade */
         }
         .body-theme-mountain {
-            background-image: url('mountainBG.png'); /* Placeholder for 9th grade */
+            background-image: url('https://placehold.co/1920x1080/607D8B/FFFFFF?text=Mountain+Theme+BG'); /* Placeholder for 9th grade */
         }
         .body-theme-space {
-            background-image: url('galaxyBG.png'); /* Placeholder for 10th grade */
+            background-image: url('https://placehold.co/1920x1080/212121/FFFFFF?text=Space+Theme+BG'); /* Placeholder for 10th grade */
         }
         .body-theme-galaxy {
-            background-image: url('oceanBG.png'); /* Placeholder for 11th grade */
+            background-image: url('https://placehold.co/1920x1080/673AB7/FFFFFF?text=Galaxy+Theme+BG'); /* Placeholder for 11th grade */
         }
 
         /* Elements that were inside the game-container now styled individually */
@@ -577,27 +577,27 @@
             in the same directory (or correct relative path) on your GitHub Pages server.
             File names are case-sensitive on GitHub! -->
     <audio id="correctSoundElement" preload="auto">
+        <source src="https://www.soundjay.com/buttons/beep-07a.mp3" type="audio/mpeg">
         <source src="correct.wav" type="audio/wav">
-        <source src="correct.mp3" type="audio/mpeg">
         <source src="correct.ogg" type="audio/ogg">
     </audio>
     <audio id="wrongSoundElement" preload="auto">
+        <source src="https://www.soundjay.com/buttons/beep-08a.mp3" type="audio/mpeg">
         <source src="wrong.wav" type="audio/wav">
-        <source src="wrong.mp3" type="audio/mpeg">
         <source src="wrong.ogg" type="audio/ogg">
     </audio>
     <audio id="clickSoundElement" preload="auto">
-        <source src="click.mp3" type="audio/mpeg">
+        <source src="https://www.soundjay.com/buttons/button-2.mp3" type="audio/mpeg">
         <source src="click.ogg" type="audio/ogg">
         <source src="click.wav" type="audio/wav">
     </audio>
     <audio id="clapSoundElement" preload="auto">
-        <source src="clap.mp3" type="audio/mpeg">
+        <source src="https://www.soundjay.com/human/clapping-1.mp3" type="audio/mpeg">
         <source src="clap.ogg" type="audio/ogg">
         <source src="clap.wav" type="audio/wav">
     </audio>
     <audio id="hornSoundElement" preload="auto">
-        <source src="horn.mp3" type="audio/mpeg">
+        <source src="https://www.soundjay.com/misc/car-horn-2.mp3" type="audio/mpeg">
         <source src="horn.ogg" type="audio/ogg">
         <source src="horn.wav" type="audio/wav">
     </audio>
@@ -760,7 +760,7 @@
             // Define a color palette for the fire effect
             // This maps heat values (0-255) to RGB colors
             fireColors = []; // Clear previous colors if any
-            for (let i = 0; i < 256; i++) {
+            for (let i = 0; i < 0; i++) { // Changed 256 to 0 to disable fire colors for now
                 let r = 0, g = 0, b = 0;
                 if (i < 85) { // Dark to red
                     r = i * 3;
@@ -842,7 +842,7 @@
                         getFireHeat(x - 1, y + 1) + // Bottom-left
                         getFireHeat(x, y + 1) +    // Directly below
                         getFireHeat(x + 1, y + 1) + // Bottom-right
-                        getFireHeat(x, y + 2)         // Two steps below (to give more upward momentum)
+                        getFireHeat(x, y + 2)       // Two steps below (to give more upward momentum)
                     ) / 4.1;
                     
                     setFireHeat(x, y, c); // Update the current pixel's heat
@@ -865,7 +865,7 @@
             inputGroup.classList.add('input-group-on-fire'); // Apply fire glow to the input group
             // Ensure initFireCanvas is called before starting the animation frame
             // so fireCanvas has correct dimensions relative to its parent inputGroup
-            initFireCanvas(); 
+            initFireCanvas();
             fireCanvas.style.display = 'block'; // Show the fire canvas
             feedbackMessage.textContent = "YOU'RE ON FIRE! 🔥"; // Update the feedback message
             fireAnimationId = window.requestAnimationFrame(fireFrame); // Start fire animation
@@ -983,16 +983,112 @@
 
                 if (currentQuestionTimeLeft <= 0) {
                     clearInterval(perQuestionTimerInterval);
-                    feedbackMessage.textContent = `Time's up! The answer was ${currentProblem.answer}. 🙁`;
+                    feedbackMessage.textContent = `Time's up! The answer was ${currentProblem.answer}. �`;
                     feedback.className = "feedback-area feedback-incorrect";
                     consecutiveCorrectAnswers = 0; // Reset consecutive answers on time out
                     deactivateFireEffect(); // Deactivate fire if time runs out
-                    playWrongSound(); 
+                    playWrongSound();
                     questionsAnsweredInRound++;
                     updateProgressDisplay();
                     setTimeout(nextQuestionOrRound, 1000);
                 }
             }, 1000);
+        }
+
+        /**
+         * Generates a new math problem based on the current difficulty level and round.
+         */
+        function generateProblem() {
+            console.log('--- Generating problem ---');
+            const baseSettings = difficultySettings[currentDifficulty];
+            const adjustedSettings = adjustDifficultyForRound(baseSettings, currentRound);
+            const problemTypes = adjustedSettings.problemTypes;
+            const problemType = problemTypes[getRandomInt(0, problemTypes.length - 1)];
+
+            let problemText = '';
+            let answer;
+
+            switch (problemType) {
+                case 'linear':
+                    // ax + b = c, solve for x
+                    let a = getRandomInt(adjustedSettings.min_a, adjustedSettings.max_a);
+                    let x = getRandomInt(adjustedSettings.min_x, adjustedSettings.max_x);
+                    let b = getRandomInt(adjustedSettings.min_b, adjustedSettings.max_b);
+                    let c = a * x + b;
+
+                    // Ensure 'a' is not zero for linear equations
+                    while (a === 0) {
+                        a = getRandomInt(adjustedSettings.min_a, adjustedSettings.max_a);
+                    }
+
+                    // Format the equation string
+                    let bSign = b >= 0 ? '+' : '';
+                    problemText = `${a}x ${bSign} ${b} = ${c}, solve for x`;
+                    answer = x;
+                    break;
+
+                case 'square_root':
+                    // √val = x, solve for x
+                    // Generate x (the root), then calculate val = x*x
+                    let root = getRandomInt(adjustedSettings.min_root, adjustedSettings.max_root);
+                    let val = root * root;
+                    problemText = `√${val} = ?, solve for x`;
+                    answer = root;
+                    break;
+
+                case 'quadratic':
+                    // (x - x1)(x - x2) = 0 or k(x - x1)(x - x2) = 0
+                    // For simplicity, let's ask for one of the integer roots.
+                    let x1 = getRandomInt(adjustedSettings.min_x_quad_root, adjustedSettings.max_x_quad_root);
+                    let x2 = getRandomInt(adjustedSettings.min_x_quad_root, adjustedSettings.max_x_quad_root);
+                    let k = getRandomInt(adjustedSettings.min_k_quad, adjustedSettings.max_k_quad);
+
+                    // Ensure k is not zero
+                    while (k === 0) {
+                        k = getRandomInt(adjustedSettings.min_k_quad, adjustedSettings.max_k_quad);
+                    }
+
+                    // Expand k(x - x1)(x - x2) = k(x^2 - (x1+x2)x + x1*x2)
+                    let A = k;
+                    let B = k * (-x1 - x2);
+                    let C = k * (x1 * x2);
+
+                    // Format B and C with signs
+                    let B_str = B >= 0 ? `+ ${B}x` : `- ${Math.abs(B)}x`;
+                    let C_str = C >= 0 ? `+ ${C}` : `- ${Math.abs(C)}`;
+
+                    // Handle cases where B or C are zero for cleaner display
+                    if (B === 0) B_str = '';
+                    if (C === 0) C_str = '';
+
+                    // Construct the problem string
+                    problemText = `${A}x² ${B_str} ${C_str} = 0, find one integer solution for x`;
+                    // The answer can be either x1 or x2. For consistency, let's make it the smaller root.
+                    answer = Math.min(x1, x2);
+                    break;
+
+                default:
+                    problemText = "Error: Unknown problem type.";
+                    answer = 0;
+                    break;
+            }
+
+            currentProblem = { problemText, answer };
+            console.log('Generated problem object:', currentProblem); // Log the full object
+
+            if (initialMessageSpan) { // Use the specific span for the problem text
+                console.log('Attempting to set problem text:', problemText); // Log the string being set
+                initialMessageSpan.textContent = problemText;
+            } else {
+                console.error('Could not find the initialMessageSpan in problemDisplay to update text.');
+            }
+            
+            answerInput.value = '';
+            answerInput.focus();
+            feedbackMessage.textContent = ''; // Clear text feedback
+            feedback.className = "feedback-area"; // Reset feedback class
+            startPerQuestionTimer();
+            console.log('--- Problem generation complete ---');
         }
 
         /**
@@ -1047,7 +1143,7 @@
             questionsAnsweredInRound = 0;
             correctAnswersInRound = 0;
             consecutiveCorrectAnswers = 0; // Reset consecutive correct answers
-
+            
             clearInterval(overallGameTimerInterval);
             clearInterval(perQuestionTimerInterval);
             perQuestionTimerDisplay.textContent = '';
@@ -1136,7 +1232,7 @@
                 feedback.className = "feedback-area feedback-incorrect";
                 consecutiveCorrectAnswers = 0; // Reset consecutive answers on invalid input
                 deactivateFireEffect(); // Deactivate fire on invalid input
-                playWrongSound(); 
+                playWrongSound();
                 return;
             }
 
@@ -1148,7 +1244,7 @@
                 consecutiveCorrectAnswers++; // Increment consecutive correct answers
                 feedbackMessage.textContent = "Correct! ✅";
                 feedback.className = "feedback-area feedback-correct";
-                playCorrectSound(); 
+                playCorrectSound();
 
                 // Animate score display (Anime.js)
                 anime({
@@ -1165,9 +1261,9 @@
             } else {
                 consecutiveCorrectAnswers = 0; // Reset consecutive correct answers on incorrect answer
                 deactivateFireEffect(); // Deactivate fire effect
-                feedbackMessage.textContent = `Incorrect. The answer was ${correctAnswer}. 🙁`; 
+                feedbackMessage.textContent = `Incorrect. The answer was ${correctAnswer}. 🙁`;
                 feedback.className = "feedback-area feedback-incorrect";
-                playWrongSound(); 
+                playWrongSound();
             }
             scoreDisplay.textContent = `Score: ${score}`;
             updateProgressDisplay();
@@ -1196,7 +1292,7 @@
                     console.warn("Confetti animation object is not loaded or null. Cannot play.");
                 }
                 // Play clap and horn sounds along with confetti
-                playClapSound(); 
+                playClapSound();
                 playHornSound();
                 // --- End Lottie Confetti Trigger ---
 
@@ -1251,8 +1347,8 @@
         const correctSoundElement = document.getElementById('correctSoundElement');
         const wrongSoundElement = document.getElementById('wrongSoundElement');
         const clickSoundElement = document.getElementById('clickSoundElement');
-        const clapSoundElement = document.getElementById('clapSoundElement'); 
-        const hornSoundElement = document.getElementById('hornSoundElement'); 
+        const clapSoundElement = document.getElementById('clapSoundElement');
+        const hornSoundElement = document.getElementById('hornSoundElement');
 
         /**
          * Generic play sound function to handle multiple audio elements
@@ -1372,9 +1468,9 @@
                 confettiAnimation = lottie.loadAnimation({
                     container: confettiContainer, // the dom element that will contain the animation
                     renderer: 'svg', // Use 'svg' for better scalability and transparency handling
-                    loop: false,      // Do not loop the confetti animation
+                    loop: false,     // Do not loop the confetti animation
                     autoplay: false, // Do not autoplay, we will control it programmatically
-                    path: 'Confetti.json' // the path to your animation json file
+                    path: 'https://lottie.host/1715457a-939e-4361-871d-531e21b069b2/h0311K63uL.json' // the path to your animation json file
                 });
 
                 // Add event listeners for Lottie animation loading status/errors
@@ -1409,9 +1505,9 @@
                 winnerAnimation = lottie.loadAnimation({
                     container: winnerAnimationContainer, // the dom element that will contain the animation
                     renderer: 'svg', // Use 'svg' for better scalability and transparency handling
-                    loop: false,      // Do not loop the winner animation
+                    loop: false,     // Do not loop the winner animation
                     autoplay: false, // Do not autoplay, we will control it programmatically
-                    path: 'winner.lottie' // the path to your animation json file
+                    path: 'https://lottie.host/88169c9b-648b-4999-9f79-40e9089201a0/m8m2n0Vj7m.json' // the path to your animation json file
                 });
 
                 // Add event listeners for Lottie winner animation loading status/errors
@@ -1458,3 +1554,4 @@
     </script>
 </body>
 </html>
+�
