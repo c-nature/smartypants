@@ -865,15 +865,6 @@
                 <button type="button" id="submitAuth" class="auth-submit-btn"></button>
             </form>
             <p id="authMessage" class="auth-message"></p>
-            
-            <!-- --- NEW BADGE CONTAINER --- -->
-            <div id="badgeDisplayContainer" class="mt-4 hidden">
-                <h3 class="text-lg font-semibold text-gray-700 text-center">Your Badges</h3>
-                <div id="badgeGrid" class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-4 mt-2 p-2 bg-gray-100 rounded-lg">
-                    <!-- Badges will be inserted here by JavaScript -->
-                </div>
-            </div>
-
             <a href="#" id="forgotPasswordLink" class="text-blue-500 hover:text-blue-700 text-sm mt-2 block text-center">Forgot password?</a>
             <button id="changeAvatarProfileBtn" class="auth-submit-btn mt-4 bg-purple-500 hover:bg-purple-600 hidden">Change Avatar</button>
             <button id="logoutBtn" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-full font-semibold shadow-md mt-4 hidden">Logout</button>
@@ -1182,11 +1173,8 @@
         const profileAvatarImg = document.getElementById('profileAvatarImg');
         const headerAvatarContainer = document.getElementById('header-avatar-container');
         const messageBox = document.getElementById('messageBox'); // Get the message box element
-        
-        // --- NEW: Badge display elements ---
-        const badgeDisplayContainer = document.getElementById('badgeDisplayContainer');
-        const badgeGrid = document.getElementById('badgeGrid');
 
+        // FIX: The backend URL now correctly includes /api
         const BACKEND_URL = 'https://smartypantsbe.onrender.com/api/user';
 
         /**
@@ -1328,7 +1316,7 @@
             if (hatTypes.includes(randomConfig.topType)) {
                 delete randomConfig.topColor; // Use hatColor instead
             } else if (randomConfig.topType === 'Hijab') {
-                delete randomConfig.hatColor; // Use topColor instead
+                delete randomConfig.topColor; // Use topColor instead
             } else {
                 // It's regular hair, so delete both hat and top colors
                 delete randomConfig.hatColor;
@@ -1386,7 +1374,7 @@
 
             // Clean up config object based on topType
             if (hatTypes.includes(topType)) {
-                delete currentAvatarConfig.topColor; // Remove incorrect property
+                delete currentAvatarConfig.hatColor; // Remove incorrect property
                 if (!currentAvatarConfig.hatColor) {
                     currentAvatarConfig.hatColor = topColorSelect.value;
                 }
@@ -1525,7 +1513,6 @@
             if (changeAvatarProfileBtn) changeAvatarProfileBtn.classList.add('hidden');
             profileAvatarDisplay.classList.add('hidden');
             logoutBtn.classList.add('hidden');
-            badgeDisplayContainer.classList.add('hidden'); // Hide badges by default
 
             if (!user) {
                 authMessage.textContent = 'Please log in to view your profile.';
@@ -1539,7 +1526,8 @@
                 showAvatarCreatorModal(user.avatar_config || {});
             } else {
                 authTitle.textContent = 'User Profile';
-                authMessage.textContent = `Welcome, ${user.username}!`;
+                // Updated line to remove "Coins" and "Avatar saved", and use "Welcome (username)"
+                authMessage.textContent = `Welcome, ${user.username}!\nBadges: ${user.badges && user.badges.length > 0 ? user.badges.join(', ') : 'None'}`;
                 authModal.classList.remove('hidden');
 
                 if (changeAvatarProfileBtn) changeAvatarProfileBtn.classList.remove('hidden');
@@ -1549,21 +1537,6 @@
                     const avatarUrl = `https://avataaars.io/?${new URLSearchParams(user.avatar_config).toString()}`;
                     profileAvatarImg.src = avatarUrl;
                     profileAvatarDisplay.classList.remove('hidden');
-                }
-                
-                // --- NEW: LOGIC TO DISPLAY BADGES ---
-                if (user.badges && user.badges.length > 0) {
-                    badgeGrid.innerHTML = ''; // Clear old badges
-                    user.badges.forEach(badgeName => {
-                        const badgeElement = document.createElement('div');
-                        badgeElement.className = 'flex flex-col items-center';
-                        badgeElement.innerHTML = `
-                            <img src="badges/${badgeName}.png" alt="${badgeName}" class="w-16 h-16" onerror="this.onerror=null; this.src='https://placehold.co/64x64/cccccc/000000?text=B';">
-                            <span class="text-xs text-gray-600 mt-1">${badgeName.replace(/_/g, ' ')}</span>
-                        `;
-                        badgeGrid.appendChild(badgeElement);
-                    });
-                    badgeDisplayContainer.classList.remove('hidden');
                 }
             }
         });
@@ -1861,55 +1834,6 @@
             const donationUrl = 'https://www.paypal.com/donate/?hosted_button_id=RSG7WDB322VBC';
             window.open(donationUrl, '_blank'); // Open in a new tab
         });
-        
-        // --- NEW: Badge Awarding Function ---
-        /**
-         * Awards a badge to the current user and shows a message.
-         * This function should be called from your game iframes.
-         * @param {string} badgeName - A unique name for the badge (e.g., 'math_master_level1').
-         */
-        async function awardBadge(badgeName) {
-            const user = JSON.parse(localStorage.getItem('user'));
-            const token = localStorage.getItem('token');
-
-            if (!user || !token) {
-                console.log("Badge Award: No user logged in.");
-                return;
-            }
-
-            // Check if user already has the badge in localStorage to prevent unnecessary API calls
-            if (user.badges && user.badges.includes(badgeName)) {
-                console.log(`Badge '${badgeName}' already awarded.`);
-                return;
-            }
-
-            try {
-                const response = await fetch(`${BACKEND_URL}/award-badge`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}` // Assuming you might add auth middleware later
-                    },
-                    body: JSON.stringify({ userId: user._id, badgeName: badgeName })
-                });
-
-                const result = await response.json();
-
-                if (result.status === "Success" && !result.alreadyAwarded) {
-                    // Update the user object in localStorage with the new badge list
-                    user.badges = result.data.badges;
-                    localStorage.setItem('user', JSON.stringify(user));
-
-                    // Show a notification
-                    showMessageBox(`Congratulations! You've earned the ${badgeName.replace(/_/g, ' ')} badge!`);
-                    
-                    // Optionally, update the profile view if it's open
-                    updateAuthButtons(); 
-                }
-            } catch (error) {
-                console.error("Error awarding badge:", error);
-            }
-        }
     </script>
 </body>
 </html>
