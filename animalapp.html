@@ -136,11 +136,9 @@
         const pexelsApiKey = 'rNeFMYzKsFyZy2B9fv0M9dXHQariKslYt7kSJhD8KezlzTEPYdc1u9dQ';
         
         const animalsApiUrl = 'https://api.api-ninjas.com/v1/animals?name=';
-        const pexelsApiUrl = 'https://api.pexels.com/v1/search?query=';
-        // Wikipedia API endpoint for MediaWiki queries
         const wikipediaApiUrl = 'https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*';
-        // Wikimedia Commons API endpoint for direct media searches
         const commonsApiUrl = 'https://commons.wikimedia.org/w/api.php?action=query&format=json&origin=*';
+        const pexelsApiUrl = 'https://api.pexels.com/v1/search?query=';
 
 
         // --- Event Listeners ---
@@ -384,8 +382,37 @@
                 const response = await fetch(animalsApiUrl + animalName, { headers: { 'X-Api-Key': ninjasApiKey } });
                 if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
                 const data = await response.json();
-                lastSearchResults = data; // Cache the results
-                await displayResults(data);
+                
+                // If API-Ninjas returns no data, try Wikipedia for basic info
+                if (data.length === 0) {
+                    console.log(`API-Ninjas found no data for "${animalName}". Attempting Wikipedia fallback.`);
+                    const wikipediaAnimal = await fetchWikipediaAnimalDetails(animalName);
+                    if (wikipediaAnimal) {
+                        lastSearchResults = [wikipediaAnimal]; // Use Wikipedia data as the result
+                        await displayResults(lastSearchResults);
+                    } else {
+                        displayMessage('No animals found with that name from either API-Ninjas or Wikipedia. Try another one!');
+                    }
+                } else {
+                    // For API-Ninjas data, enrich with Wikipedia details if available and missing
+                    const enrichedData = await Promise.all(data.map(async (animal) => {
+                        const wikipediaDetails = await fetchWikipediaAnimalDetails(animal.name);
+                        if (wikipediaDetails) {
+                            return {
+                                ...animal,
+                                characteristics: {
+                                    ...wikipediaDetails.characteristics, // Wikipedia parsed characteristics
+                                    ...animal.characteristics, // API-Ninjas characteristics (override if present)
+                                },
+                                locations: (animal.locations && animal.locations.length > 0 && animal.locations[0] !== 'Not specified') ? animal.locations : wikipediaDetails.locations,
+                                wikipedia_url: wikipediaDetails.wikipedia_url // Add Wikipedia URL
+                            };
+                        }
+                        return animal;
+                    }));
+                    lastSearchResults = enrichedData;
+                    await displayResults(enrichedData);
+                }
             } catch (error) {
                 console.error('Error fetching animal data:', error);
                 displayMessage('Oops! Couldn\'t fetch data. Please try again.');
@@ -393,6 +420,108 @@
                 loader.classList.add('hidden');
             }
         }
+
+        /** Fetches basic animal details from Wikipedia (summary, scientific name, and attempts to parse characteristics). */
+        async function fetchWikipediaAnimalDetails(animalName) {
+            const queryTitle = encodeURIComponent(animalName);
+            const url = `${wikipediaApiUrl}&prop=extracts|pageprops|info&exintro=1&explaintext=1&redirects=1&titles=${queryTitle}&inprop=url`; // Add inprop=url to get fullurl
+            try {
+                const response = await fetch(url);
+                if (!response.ok) {
+                    console.warn(`Wikipedia API (animal details) failed: ${response.status}`);
+                    return null;
+                }
+                const data = await response.json();
+                const pages = data.query?.pages;
+
+                if (pages) {
+                    const pageId = Object.keys(pages)[0];
+                    const page = pages[pageId];
+
+                    if (!page.missing) {
+                        const description = page.extract || 'No detailed description available from Wikipedia.';
+                        const wikipediaUrl = page.fullurl || `https://en.wikipedia.org/wiki/${queryTitle}`; // Get the full URL
+                        let scientificName = 'N/A';
+                        let diet = 'Not specified';
+                        let lifespan = 'Not specified';
+                        let habitat = 'Not specified';
+                        let locations = ['Not specified'];
+
+                        // Attempt to extract scientific name from the first sentence of the extract
+                        const scientificNameMatch = description.match(/\b([A-Z][a-z]+)\s([a-z]+)\b/);
+                        if (scientificNameMatch && scientificNameMatch[0]) {
+                            scientificName = scientificNameMatch[0];
+                        }
+
+                        // --- Heuristic parsing for characteristics from the description ---
+                        const lowerCaseDescription = description.toLowerCase();
+
+                        // Diet
+                        let dietMatch = lowerCaseDescription.match(/(diet|eats|feeds on|prey on)( is)?\s*(.*?)(?:\.|\n|;|,|$)/i);
+                        if (dietMatch && dietMatch[3]) {
+                            diet = dietMatch[3].trim();
+                            diet = diet.replace(/^(a |an |the )/, '').replace(/^(typically |primarily |mainly )/, '');
+                            if (diet.length > 50) diet = diet.substring(0, 50) + '...'; 
+                        }
+
+                        // Lifespan
+                        let lifespanMatch = lowerCaseDescription.match(/(lifespan|life span|lives for|longevity)( is)?\s*(.*?)(?:years|year|months|month|days|day)/i);
+                        if (lifespanMatch && lifespanMatch[3]) {
+                            lifespan = lifespanMatch[3].trim() + (lifespanMatch[4] || '');
+                            if (lifespan.length > 30) lifespan = lifespan.substring(0, 30) + '...'; 
+                        } else {
+                            lifespanMatch = lowerCaseDescription.match(/live up to (\d+ (?:years|year))/i);
+                            if (lifespanMatch && lifespanMatch[1]) {
+                                lifespan = lifespanMatch[1];
+                            }
+                        }
+
+                        // Habitat
+                        let habitatMatch = lowerCaseDescription.match(/(habitat|found in|lives in|inhabits)( is)?\s*(.*?)(?:\.|\n|;|,|$)/i);
+                        if (habitatMatch && habitatMatch[3]) {
+                            habitat = habitatMatch[3].trim();
+                             if (habitat.length > 70) habitat = habitat.substring(0, 70) + '...'; 
+                        } else {
+                            habitatMatch = lowerCaseDescription.match(/inhabits (.*?)(?:\.|\n|;|,|$)/i);
+                            if (habitatMatch && habitatMatch[1]) {
+                                habitat = habitatMatch[1].trim();
+                                if (habitat.length > 70) habitat = habitat.substring(0, 70) + '...'; 
+                            }
+                        }
+
+                        // Locations (simple parsing, often complex in text)
+                        let locationMatch = lowerCaseDescription.match(/(native to|found across|distributed throughout|inhabits|occurs in|range includes)(.*?)(?:\.|\n|;|,|$)/i);
+                        if (locationMatch && locationMatch[2]) {
+                            let extractedLocations = locationMatch[2].trim().split(/,\s*|\s*and\s*/).map(loc => loc.trim()).filter(loc => loc.length > 0);
+                            if (extractedLocations.length > 0) {
+                                locations = extractedLocations.slice(0, 3);
+                                if (extractedLocations.length > 3) locations.push('...');
+                            }
+                        }
+
+                        // Construct a basic animal object similar to API-Ninjas structure
+                        return {
+                            name: animalName,
+                            taxonomy: {
+                                scientific_name: scientificName,
+                            },
+                            characteristics: {
+                                description: description,
+                                diet: diet,
+                                lifespan: lifespan,
+                                habitat: habitat
+                            },
+                            locations: locations,
+                            wikipedia_url: wikipediaUrl // Add the Wikipedia URL here
+                        };
+                    }
+                }
+            } catch (error) {
+                console.error('Error fetching animal details from Wikipedia:', error);
+            }
+            return null;
+        }
+
 
         /** Displays the fetched animal data on the page. */
         async function displayResults(animals) {
@@ -407,16 +536,20 @@
                 
                 const name = animal.name || 'N/A';
                 const scientificName = animal.taxonomy?.scientific_name || 'N/A';
-                const diet = animal.characteristics?.diet || 'N/A';
-                const locations = (animal.locations && animal.locations.length > 0) ? animal.locations.join(', ') : 'Not specified';
+                // Prioritize API-Ninjas data, then Wikipedia parsed data, then 'Not specified'
+                const diet = animal.characteristics?.diet || 'Not specified';
+                const lifespan = animal.characteristics?.lifespan || 'Not specified';
+                const habitat = animal.characteristics?.habitat || 'Not specified';
+                const locations = (animal.locations && animal.locations.length > 0 && animal.locations[0] !== 'Not specified') ? animal.locations.join(', ') : 'Not specified';
+                const wikipediaUrl = animal.wikipedia_url || `https://en.wikipedia.org/wiki/${encodeURIComponent(name)}`;
+
 
                 const imageUrl = await fetchAnimalImage(name);
                 let imageContainer;
                 if (imageUrl) {
-                    imageContainer = document.createElement('a');
-                    imageContainer.href = '#';
-                    imageContainer.className = 'cursor-pointer block';
-                    imageContainer.setAttribute('data-animal-name', name);
+                    // Removed <a> tag around image
+                    imageContainer = document.createElement('div'); 
+                    imageContainer.className = 'block'; // Keep block display for image
                     imageContainer.innerHTML = `<img src="${imageUrl}" alt="Photo of a ${name}" class="w-full h-48 object-cover" onerror="this.onerror=null;this.src='https://placehold.co/400x300/e0e0e0/555555?text=Image+Not+Found';">`;
                 } else {
                     imageContainer = document.createElement('div'); // Placeholder
@@ -434,7 +567,10 @@
                     <div class="space-y-4 text-gray-800 dark:text-gray-200">
                         <p><i class="fas fa-utensils w-6 text-yellow-500"></i> <strong class="font-semibold">Diet:</strong> ${diet}</p>
                         <p><i class="fas fa-map-marker-alt w-6 text-red-500"></i> <strong class="font-semibold">Locations:</strong> ${locations}</p>
+                        <p><i class="fas fa-heartbeat w-6 text-green-500"></i> <strong class="font-semibold">Lifespan:</strong> ${lifespan}</p>
+                        <p><i class="fas fa-home w-6 text-indigo-500"></i> <strong class="font-semibold">Habitat:</strong> ${habitat}</p>
                     </div>
+                    <!-- Wikipedia link removed from here, now only in detail view -->
                 `;
                 
                 card.appendChild(imageContainer);
@@ -479,17 +615,24 @@
             let characteristicsHtml = '';
             if (animal.characteristics && Object.keys(animal.characteristics).length > 0) {
                 characteristicsHtml += '<div class="space-y-4 text-gray-800 dark:text-gray-200">';
-                if (animal.locations && animal.locations.length > 0) {
+                if (animal.locations && animal.locations.length > 0 && animal.locations[0] !== 'Not specified') {
                     const iconInfo = iconMap['locations'] || iconMap['default'];
                     characteristicsHtml += `<p><i class="fas ${iconInfo.icon} w-6 ${iconInfo.color}"></i> <strong class="font-semibold">Locations:</strong> ${animal.locations.join(', ')}</p>`;
                 }
-                for (const [key, value] of Object.entries(animal.characteristics)) {
-                    if (value && value.trim() !== '') {
+                // Display description if available from Wikipedia fallback
+                if (animal.characteristics.description) {
+                    characteristicsHtml += `<p><i class="fas fa-info-circle w-6 text-gray-500"></i> <strong class="font-semibold">Description:</strong> ${animal.characteristics.description}</p>`;
+                }
+                // Dynamically add other characteristics, prioritizing parsed ones
+                const characteristicsToDisplay = ['diet', 'lifespan', 'habitat', 'skin_type', 'top_speed', 'weight', 'height'];
+                characteristicsToDisplay.forEach(key => {
+                    const value = animal.characteristics[key];
+                    if (value && value.trim() !== '' && value !== 'Not specified' && key !== 'description') {
                         const label = key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
                         const iconInfo = iconMap[key] || iconMap['default'];
                         characteristicsHtml += `<p><i class="fas ${iconInfo.icon} w-6 ${iconInfo.color}"></i> <strong class="font-semibold">${label}:</strong> ${value}</p>`;
                     }
-                }
+                });
                 characteristicsHtml += '</div>';
             }
 
@@ -517,6 +660,18 @@
                     ${taxonomyHtml || '<p>No classification data available.</p>'}
                 </div>
             `;
+
+            // Add Wikipedia link to detail view ONLY
+            if (animal.wikipedia_url) {
+                detailContent.insertAdjacentHTML('beforeend', `
+                    <div class="col-span-full mt-8 text-center">
+                        <a href="${animal.wikipedia_url}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-lg hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-500/50 transition">
+                            Read Full Wikipedia Article <i class="fas fa-external-link-alt ml-2"></i>
+                        </a>
+                    </div>
+                `);
+            }
+
 
             // Fetch and display gallery images
             const images = await fetchAllGalleryImages(animal.name);
