@@ -662,7 +662,7 @@
                 <p>Test your arithmetic skills!</p>
                 <div class="game-card-buttons">
                     <button class="play-game-button" onclick="playClickSound(); showMathGame();">Play Here</button>
-                    <button class="play-game-button-new-window" onclick="playClickSound(); openGameInNewWindow('mathgame.html');">Open in New Window</button>
+                    <button class="play-game-button-new-window" onclick="playClickSound(); openGameInNewWindow('https://c-nature.github.io/mathchallenge/');">Open in New Window</button>
                 </div>
             </div>
             <!-- NEW: Multi-Grade Math Challenge Game Card -->
@@ -1043,7 +1043,8 @@
         function showMathGame() {
             hideAllViews();
             mathGameView.style.display = 'flex';
-            mathGameIframe.src = 'mathgame.html';
+            // UPDATED: Use the full GitHub Pages URL for the Math Challenge game
+            mathGameIframe.src = 'https://c-nature.github.io/mathchallenge/'; 
             document.body.style.overflow = 'hidden';
         }
 
