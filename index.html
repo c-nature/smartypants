@@ -253,16 +253,37 @@
         .game-list-card h3 {
             font-size: 1.8rem;
             font-weight: 700;
-            color: #333;
+            color: white; /* Changed to white for better contrast with new shadows */
             margin-bottom: 0.5rem;
         }
 
         .game-list-card p {
             font-size: 1.1rem;
-            color: #555;
+            color: white; /* Changed to white for better contrast with new shadows */
             margin-bottom: 1.5rem;
             font-weight: 400;
         }
+        /* Specific text shadow colors for game cards based on their category */
+        .math .game-list-card h3,
+        .math .game-list-card p {
+            text-shadow: 2px 2px 4px #8B008B; /* Dark Magenta/Purple for Math */
+        }
+
+        .science .game-list-card h3,
+        .science .game-list-card p {
+            text-shadow: 2px 2px 4px #FF4500; /* Orange-Red for Science */
+        }
+
+        .ela .game-list-card h3,
+        .ela .game-list-card p {
+            text-shadow: 2px 2px 4px #00CED1; /* Dark Turquoise for ELA */
+        }
+
+        .social-studies .game-list-card h3,
+        .social-studies .game-list-card p {
+            text-shadow: 2px 2px 4px #4169E1; /* Royal Blue for Social Studies */
+        }
+
 
         .game-card-buttons {
             display: flex;
@@ -648,8 +669,8 @@
         <h1 class="header-title">MATH</h1>
         <div class="game-list-layout">
             <div class="game-list-card" style="background-image: url('mathland.png'); background-size: cover; background-position: center;">
-                <h3 style="color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);">Math Challenge</h3>
-                <p style="color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);">Test your arithmetic skills!</p>
+                <h3>Math Challenge</h3>
+                <p>Test your arithmetic skills!</p>
                 <div class="game-card-buttons">
                     <button class="play-game-button" onclick="playClickSound(); showMathGame();">Play Here</button>
                     <button class="play-game-button-new-window" onclick="playClickSound(); openGameInNewWindow('mathgame.html');">Open in New Window</button>
@@ -657,8 +678,8 @@
             </div>
             <!-- NEW: Multi-Grade Math Challenge Game Card -->
             <div class="game-list-card" style="background-image: url('algebraland.png'); background-size: cover; background-position: center;">
-                <h3 style="color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);">Algebra Challenge</h3>
-                <p style="color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);">Solve linear and quadratic equations!</p>
+                <h3>Algebra Challenge</h3>
+                <p>Solve linear and quadratic equations!</p>
                 <div class="game-card-buttons">
                     <button class="play-game-button" onclick="playClickSound(); showAlgebraGame();">Play Here</button>
                     <button class="play-game-button-new-window" onclick="playClickSound(); openGameInNewWindow('algebragame.html');">Open in New Window</button>
@@ -675,8 +696,8 @@
         <h2 class="text-3xl font-bold text-gray-800 mt-8 mb-4 text-center">Earth Science</h2>
         <div class="game-list-layout">
             <div class="game-list-card" style="background-image: url('akexplorer.png'); background-size: cover; background-position: center;">
-                <h3 style="color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);">Animal Kingdom Explorer</h3>
-                <p style="color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);">Learn about amazing animals!</p>
+                <h3>Animal Kingdom Explorer</h3>
+                <p>Learn about amazing animals!</p>
                 <div class="game-card-buttons">
                     <button class="play-game-button" onclick="playClickSound(); showScienceGame();">Open Here</button>
                     <button class="play-game-button-new-window" onclick="playClickSound(); openGameInNewWindow('animalapp.html');">Open in New Window</button>
@@ -684,8 +705,8 @@
             </div>
             <!-- Plant Explorer Game Card -->
             <div class="game-list-card" style="background-image: url('https://placehold.co/400x200/4A6B5B/FFFFFF?text=Plant+Explorer'); background-size: cover; background-position: center;">
-                <h3 style="color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);">Plant Explorer</h3>
-                <p style="color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);">Discover the world of plants!</p>
+                <h3>Plant Explorer</h3>
+                <p>Discover the world of plants!</p>
                 <div class="game-card-buttons">
                     <button class="play-game-button" onclick="playClickSound(); openGameInNewWindow('plantexplorer.html');">Open Here</button>
                     <button class="play-game-button-new-window" onclick="playClickSound(); openGameInNewWindow('plantexplorer.html');">Open in New Window</button>
@@ -697,8 +718,8 @@
         <h2 class="text-3xl font-bold text-gray-800 mt-8 mb-4 text-center">Computer Science</h2>
         <div class="game-list-layout">
             <div class="game-list-card" style="background-image: url('subcalcicon.png'); background-size: cover; background-position: center;">
-                <h3 style="color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);">Subnet Calculator</h3>
-                <p style="color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);">Calculate IP subnets easily!</p>
+                <h3>Subnet Calculator</h3>
+                <p>Calculate IP subnets easily!</p>
                 <div class="game-card-buttons">
                     <button class="play-game-button" onclick="playClickSound(); showSubnetCalculatorGame();">Open Here</button>
                     <button class="play-game-button-new-window" onclick="playClickSound(); openGameInNewWindow('subnetcalculator.html');">Open in New Window</button>
@@ -711,8 +732,8 @@
         <div class="game-list-layout">
             <!-- NASA Explorer Game Card -->
             <div class="game-list-card" style="background-image: url('space.png'); background-size: cover; background-position: center;">
-                <h3 style="color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);">Space Explorer</h3>
-                <p style="color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);">Explore photos from space!</p>
+                <h3>Space Explorer</h3>
+                <p>Explore photos from space!</p>
                 <div class="game-card-buttons">
                     <button class="play-game-button" onclick="playClickSound(); showNasaGame();">Open Here</button>
                     <button class="play-game-button-new-window" onclick="playClickSound(); openGameInNewWindow('nasaexplorer.html');">Open in New Window</button>
@@ -726,8 +747,8 @@
         <h1 class="header-title">ELA</h1>
         <div class="game-list-layout">
             <div class="game-list-card" style="background-image: url('wordweaver.png'); background-size: cover; background-position: center;">
-                <h3 style="color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);">Word Weaver</h3>
-                <p style="color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);">A fun adventure in vocabulary!</p>
+                <h3>Word Weaver</h3>
+                <p>A fun adventure in vocabulary!</p>
                 <div class="game-card-buttons">
                     <button class="play-game-button" onclick="playClickSound(); showElaGame();">Play Here</button>
                     <button class="play-game-button-new-window" onclick="playClickSound(); openGameInNewWindow('WordWarrior.html');">Open in New Window</button>
@@ -735,8 +756,8 @@
             </div>
             <!-- NEW: WordWise Dictionary & Thesaurus Game Card -->
             <div class="game-list-card" style="background-image: url('dictionary.png'); background-size: cover; background-position: center;">
-                <h3 style="color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);">WordWise Dictionary</h3>
-                <p style="color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);">Look up words and play quizzes!</p>
+                <h3>WordWise Dictionary</h3>
+                <p>Look up words and play quizzes!</p>
                 <div class="game-card-buttons">
                     <button class="play-game-button" onclick="playClickSound(); showWordWiseGame();">Open Here</button>
                     <button class="play-game-button-new-window" onclick="playClickSound(); openGameInNewWindow('dictionary.html');">Open in New Window</button>
@@ -750,8 +771,8 @@
         <h1 class="header-title">SOCIAL STUDIES</h1>
         <div class="game-list-layout">
             <div class="game-list-card" style="background-image: url('modeSelectScreen.png'); background-size: cover; background-position: center;">
-                <h3 style="color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);">Presidential Pong</h3>
-                <p style="color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);">A historic twist on a classic!</p>
+                <h3>Presidential Pong</h3>
+                <p>A historic twist on a classic!</p>
                 <div class="game-card-buttons">
                     <button class="play-game-button" onclick="playClickSound(); openGameInNewWindow('https://presidentialpong.vercel.app/');">Play Now</button>
                 </div>
@@ -1681,7 +1702,7 @@
                 // --- NEW: Updated password validation ---
                 const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
 
-                if (!requestBody.email || !/^[\w-\.]+@([\w-]+\.)+[\w-\.]{2,4}$/.test(requestBody.email)) {
+                if (!requestBody.email || !/^[\w-\.]+@([\w-]+\.)+[\w-\.]{2,4}$/.test(requestularly requestBody.email)) {
                     authMessage.textContent = 'Please enter a valid email address.';
                     authMessage.style.color = 'red';
                     submitAuthBtn.disabled = false;
@@ -1811,10 +1832,10 @@
             }
         }
 
-
+        // NEW: Event listener for the Donate button
         donateBtn.addEventListener('click', () => {
             playClickSound();
-
+            // IMPORTANT: Replace 'YOUR_PAYPAL_DONATION_LINK_HERE' with your actual PayPal donation URL
             const donationUrl = 'https://www.paypal.com/donate/?hosted_button_id=RSG7WDB322VBC';
             window.open(donationUrl, '_blank'); // Open in a new tab
         });
