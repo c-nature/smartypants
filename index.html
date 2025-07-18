@@ -1244,8 +1244,10 @@
 
         // --- NEW: Badge Details Map ---
         const badgeDetails = {
-            'smartystarter3': 'Smarty Starter'
-            // Add future badges here, e.g.: 'math_whiz': 'Math Whiz'
+            'smartystarter3': 'Smarty Starter',
+            '1ststep1stgrademath': '1st Step 1st Grade Math', // New badge
+            'halfwayhero1stgrademath': 'Halfway Hero 1st Grade Math', // New badge
+            '1stgrademathwinner': '1st Grade Math Winner' // New badge
         };
 
         /**
@@ -1417,7 +1419,7 @@
             if (hatTypes.includes(randomConfig.topType)) {
                 delete randomConfig.topColor; // Use hatColor instead
             } else if (randomConfig.topType === 'Hijab') {
-                delete randomConfig.hatColor; // Use topColor instead
+                delete randomConfig.topColor; // Use topColor instead
             } else {
                 // It's regular hair, so delete both hat and top colors
                 delete randomConfig.hatColor;
