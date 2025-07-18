@@ -1649,7 +1649,8 @@
                     badgeGrid.innerHTML = ''; // Clear old badges
                     user.badges.forEach(badgeName => {
                         const badgeElement = document.createElement('div');
-                        badgeElement.className = 'flex flex-col items-center';
+                        // ADDED: text-center class to ensure text is centered
+                        badgeElement.className = 'flex flex-col items-center text-center'; 
                         const displayName = badgeDetails[badgeName] || badgeName.replace(/_/g, ' ');
                         badgeElement.innerHTML = `
                             <img src="Badges/${badgeName}.png" alt="${displayName}" class="w-16 h-16" onerror="this.onerror=null; this.src='https://placehold.co/64x64/cccccc/000000?text=B';">
