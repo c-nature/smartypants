@@ -949,6 +949,10 @@
                     <select id="facialHairColorSelect" class="avatar-option-select"></select>
                 </div>
                 <div class="avatar-option-group">
+                    <label for="noseTypeSelect" class="avatar-option-label">Nose:</label>
+                    <select id="noseTypeSelect" class="avatar-option-select"></select>
+                </div>
+                <div class="avatar-option-group">
                     <label for="eyeTypeSelect" class="avatar-option-label">Eyes:</label>
                     <select id="eyeTypeSelect" class="avatar-option-select"></select>
                 </div>
@@ -1218,6 +1222,7 @@
         const clotheColorSelect = document.getElementById('clotheColorSelect');
         const graphicTypeSelect = document.getElementById('graphicTypeSelect');
         const accessoriesTypeSelect = document.getElementById('accessoriesTypeSelect');
+        const noseTypeSelect = document.getElementById('noseTypeSelect'); // Added noseTypeSelect
 
         const topColorGroup = document.getElementById('topColorGroup');
         const facialHairColorGroup = document.getElementById('facialHairColorGroup');
@@ -1247,7 +1252,12 @@
             'smartystarter3': 'Smarty Starter',
             '1ststep1stgrademath': '1st Step 1st Grade Math', 
             'halfwayhero1stgrademath': 'Halfway Hero 1st Grade Math', 
-            '1stgrademathwinner': '1st Grade Math Winner' 
+            '1stgrademathwinner': '1st Grade Math Winner',
+            '2ndgrademathwinner': '2nd Grade Math Winner', // New badge
+            '3rdgrademathwinner': '3rd Grade Math Winner', // New badge
+            '4thgrademathwinner': '4th Grade Math Winner', // New badge
+            '5thgrademathwinner': '5th Grade Math Winner', // New badge
+            '6thgrademathwinner': '6th Grade Math Winner'  // New badge
         };
 
         /**
@@ -1525,6 +1535,7 @@
             populateSelect(hairColorSelect, avatarFeatures.hairColor);
             populateSelect(facialHairTypeSelect, avatarFeatures.facialHairType);
             populateSelect(facialHairColorSelect, avatarFeatures.facialHairColor);
+            populateSelect(noseTypeSelect, avatarFeatures.noseType); // Populate noseTypeSelect
             populateSelect(eyeTypeSelect, avatarFeatures.eyeType);
             populateSelect(eyebrowTypeSelect, avatarFeatures.eyebrowType);
             populateSelect(mouthTypeSelect, avatarFeatures.mouthType);
@@ -1552,6 +1563,7 @@
             hairColorSelect.addEventListener('change', (event) => { currentAvatarConfig.hairColor = event.target.value; updateAvatarPreview(currentAvatarConfig); });
             facialHairTypeSelect.addEventListener('change', (event) => { currentAvatarConfig.facialHairType = event.target.value; handleConditionalAvatarFields(); });
             facialHairColorSelect.addEventListener('change', (event) => { currentAvatarConfig.facialHairColor = event.target.value; updateAvatarPreview(currentAvatarConfig); });
+            noseTypeSelect.addEventListener('change', (event) => { currentAvatarConfig.noseType = event.target.value; updateAvatarPreview(currentAvatarConfig); }); // Add noseType listener
             eyeTypeSelect.addEventListener('change', (event) => { currentAvatarConfig.eyeType = event.target.value; updateAvatarPreview(currentAvatarConfig); });
             eyebrowTypeSelect.addEventListener('change', (event) => { currentAvatarConfig.eyebrowType = event.target.value; updateAvatarPreview(currentAvatarConfig); });
             mouthTypeSelect.addEventListener('change', (event) => { currentAvatarConfig.mouthType = event.target.value; updateAvatarPreview(currentAvatarConfig); });
@@ -1577,6 +1589,7 @@
             hairColorSelect.value = config.hairColor || avatarFeatures.hairColor[0];
             facialHairTypeSelect.value = config.facialHairType || avatarFeatures.facialHairType[0];
             facialHairColorSelect.value = config.facialHairColor || avatarFeatures.facialHairColor[0];
+            noseTypeSelect.value = config.noseType || avatarFeatures.noseType[0]; // Set noseType
             eyeTypeSelect.value = config.eyeType || avatarFeatures.eyeType[0];
             eyebrowTypeSelect.value = config.eyebrowType || avatarFeatures.eyebrowType[0];
             mouthTypeSelect.value = config.mouthType || avatarFeatures.mouthType[0];
@@ -1746,7 +1759,7 @@
                     // Merge the updates from the server response into the existing user object
                     const updatedUser = {
                         ...existingUser, // Keeps old avatar_config if not explicitly returned
-                        ...data.data       // Overwrites with fresh data from the avatar save response
+                        ...data.data        // Overwrites with fresh data from the avatar save response
                     };
 
                     // Save the complete, merged user object back to localStorage
