@@ -725,8 +725,10 @@
                 <h3>Plant Explorer</h3>
                 <p>Discover the world of plants!</p>
                 <div class="game-card-buttons">
-                    <button class="play-game-button" onclick="playClickSound(); openGameInNewWindow('https://c-nature.github.io/plantexplorer/');">Open Here</button>
-                    <button class="play-game-button-new-window" onclick="playClickSound(); openGameInNewWindow('plantexplorer.html');">Open in New Window</button>
+                    <!-- UPDATED: "Open Here" now calls showPlantExplorerGame() -->
+                    <button class="play-game-button" onclick="playClickSound(); showPlantExplorerGame();">Open Here</button>
+                    <!-- UPDATED: "Open in New Window" now uses the correct full URL -->
+                    <button class="play-game-button-new-window" onclick="playClickSound(); openGameInNewWindow('https://c-nature.github.io/plantexplorer/');">Open in New Window</button>
                 </div>
             </div>
         </div>
@@ -848,6 +850,14 @@
             &larr; Back to ELA Menu
         </button>
         <iframe id="wordwise-game-iframe" src="" title="WordWise Dictionary & Thesaurus" class="game-iframe"></iframe>
+    </div>
+
+    <!-- NEW: Plant Explorer Game Iframe Container -->
+    <div id="plant-explorer-game-view" class="game-iframe-container">
+        <button onclick="playClickSound(); showScienceCategoryView();" class="back-button">
+            &larr; Back to Science Menu
+        </button>
+        <iframe id="plant-explorer-game-iframe" src="" title="Plant Explorer Game" class="game-iframe"></iframe>
     </div>
 
 
@@ -1018,6 +1028,7 @@
         const algebraGameView = document.getElementById('algebra-game-view'); // NEW Algebra game view
         const subnetCalculatorGameView = document.getElementById('subnet-calculator-game-view'); // NEW Subnet Calculator game view
         const wordwiseGameView = document.getElementById('wordwise-game-view'); // NEW WordWise game view
+        const plantExplorerGameView = document.getElementById('plant-explorer-game-view'); // NEW Plant Explorer game view
 
         // Game Iframes
         const mathGameIframe = document.getElementById('math-game-iframe');
@@ -1027,6 +1038,7 @@
         const algebraGameIframe = document.getElementById('algebra-game-iframe'); // NEW Algebra game iframe
         const subnetCalculatorGameIframe = document.getElementById('subnet-calculator-game-iframe'); // NEW Subnet Calculator game iframe
         const wordwiseGameIframe = document.getElementById('wordwise-game-iframe'); // NEW WordWise game iframe
+        const plantExplorerGameIframe = document.getElementById('plant-explorer-game-iframe'); // NEW Plant Explorer game iframe
 
         const mainClickSoundElement = document.getElementById('mainClickSoundElement');
 
@@ -1056,6 +1068,7 @@
             algebraGameView.style.display = 'none'; // Hide Algebra game view
             subnetCalculatorGameView.style.display = 'none'; // Hide Subnet Calculator game view
             wordwiseGameView.style.display = 'none'; // Hide WordWise game view
+            plantExplorerGameView.style.display = 'none'; // Hide Plant Explorer game view
         }
 
         function showMainMenu() {
@@ -1069,6 +1082,7 @@
             algebraGameIframe.src = ''; // Clear Algebra game iframe source
             subnetCalculatorGameIframe.src = ''; // Clear Subnet Calculator game iframe source
             wordwiseGameIframe.src = ''; // Clear WordWise game iframe source
+            plantExplorerGameIframe.src = ''; // Clear Plant Explorer game iframe source
             document.body.style.overflow = 'auto';
         }
 
@@ -1151,6 +1165,14 @@
             hideAllViews();
             wordwiseGameView.style.display = 'flex';
             wordwiseGameIframe.src = 'https://c-nature.github.io/dictionary/'; // Path to the dictionary HTML file
+            document.body.style.overflow = 'hidden';
+        }
+
+        // NEW: Function to show Plant Explorer game
+        function showPlantExplorerGame() {
+            hideAllViews();
+            plantExplorerGameView.style.display = 'flex';
+            plantExplorerGameIframe.src = 'https://c-nature.github.io/plantexplorer/';
             document.body.style.overflow = 'hidden';
         }
 
@@ -1766,7 +1788,7 @@
                     // Merge the updates from the server response into the existing user object
                     const updatedUser = {
                         ...existingUser, // Keeps old avatar_config if not explicitly returned
-                        ...data.data        // Overwrites with fresh data from the avatar save response
+                        ...data.data      // Overwrites with fresh data from the avatar save response
                     };
 
                     // Save the complete, merged user object back to localStorage
