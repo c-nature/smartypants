@@ -1286,7 +1286,13 @@
             '3rdgrademathwinner': '3rd Grade Math Winner', 
             '4thgrademathwinner': '4th Grade Math Winner', 
             '5thgrademathwinner': '5th Grade Math Winner', 
-            '6thgrademathwinner': '6th Grade Math Winner'  
+            '6thgrademathwinner': '6th Grade Math Winner',
+            // NEW Algebra Badges
+            '7thgradealgebrawinner': '7th Grade Algebra Winner',
+            '8thgradealgebrawinner': '8th Grade Algebra Winner',
+            '9thgradealgebrawinner': '9th Grade Algebra Winner',
+            '10thgradealgebrawinner': '10th Grade Algebra Winner',
+            '11thgradealgebrawinner': '11th Grade Algebra Winner'
         };
 
         /**
@@ -1788,7 +1794,7 @@
                     // Merge the updates from the server response into the existing user object
                     const updatedUser = {
                         ...existingUser, // Keeps old avatar_config if not explicitly returned
-                        ...data.data      // Overwrites with fresh data from the avatar save response
+                        ...data.data     // Overwrites with fresh data from the avatar save response
                     };
 
                     // Save the complete, merged user object back to localStorage
