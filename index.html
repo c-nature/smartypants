@@ -1194,6 +1194,9 @@
         // --- DOMContentLoaded and Auth Logic ---
         document.addEventListener('DOMContentLoaded', () => {
             showMainMenu();
+            // IMPORTANT FIX: Initialize the avatar creator options on page load
+            // so the dropdowns are populated correctly before the modal is opened.
+            initializeAvatarCreatorOptions(); 
             updateAuthButtons();
 
             const changeAvatarProfileBtn = document.getElementById('changeAvatarProfileBtn');
@@ -1205,7 +1208,6 @@
                     showAvatarCreatorModal(user.avatar_config || {});
                 });
             }
-            initializeAvatarCreatorOptions();
             
             // Moved event listeners inside DOMContentLoaded
             const deleteAccountBtn = document.getElementById('deleteAccountBtn');
@@ -1660,10 +1662,15 @@
             populateSelect(graphicTypeSelect, avatarFeatures.graphicType);
             populateSelect(accessoriesTypeSelect, avatarFeatures.accessoriesType);
 
-            avatarStyleSelect.addEventListener('change', (event) => { currentAvatarConfig.avatarStyle = event.target.value; handleConditionalAvatarFields(); });
-            topTypeSelect.addEventListener('change', (event) => { currentAvatarConfig.topType = event.target.value; handleConditionalAvatarFields(); });
-
-            // This listener now handles both hat and top colors
+            // Add event listeners for the dropdowns
+            avatarStyleSelect.addEventListener('change', (event) => { 
+                currentAvatarConfig.avatarStyle = event.target.value; 
+                handleConditionalAvatarFields(); 
+            });
+            topTypeSelect.addEventListener('change', (event) => { 
+                currentAvatarConfig.topType = event.target.value; 
+                handleConditionalAvatarFields(); 
+            });
             topColorSelect.addEventListener('change', (event) => {
                 const selectedColor = event.target.value;
                 const hatTypes = ['Hat', 'Turban', 'WinterHat1', 'WinterHat2', 'WinterHat3', 'WinterHat4'];
@@ -1674,19 +1681,50 @@
                 }
                 updateAvatarPreview(currentAvatarConfig);
             });
-
-            hairColorSelect.addEventListener('change', (event) => { currentAvatarConfig.hairColor = event.target.value; updateAvatarPreview(currentAvatarConfig); });
-            facialHairTypeSelect.addEventListener('change', (event) => { currentAvatarConfig.facialHairType = event.target.value; handleConditionalAvatarFields(); });
-            facialHairColorSelect.addEventListener('change', (event) => { currentAvatarConfig.facialHairColor = event.target.value; updateAvatarPreview(currentAvatarConfig); });
-            // Removed noseTypeSelect listener from here
-            eyeTypeSelect.addEventListener('change', (event) => { currentAvatarConfig.eyeType = event.target.value; updateAvatarPreview(currentAvatarConfig); });
-            eyebrowTypeSelect.addEventListener('change', (event) => { currentAvatarConfig.eyebrowType = event.target.value; updateAvatarPreview(currentAvatarConfig); });
-            mouthTypeSelect.addEventListener('change', (event) => { currentAvatarConfig.mouthType = event.target.value; updateAvatarPreview(currentAvatarConfig); });
-            skinColorSelect.addEventListener('change', (event) => { currentAvatarConfig.skinColor = event.target.value; updateAvatarPreview(currentAvatarConfig); });
-            clotheTypeSelect.addEventListener('change', (event) => { currentAvatarConfig.clotheType = event.target.value; handleConditionalAvatarFields(); });
-            clotheColorSelect.addEventListener('change', (event) => { currentAvatarConfig.clotheColor = event.target.value; updateAvatarPreview(currentAvatarConfig); });
-            graphicTypeSelect.addEventListener('change', (event) => { currentAvatarConfig.graphicType = event.target.value; updateAvatarPreview(currentAvatarConfig); });
-            accessoriesTypeSelect.addEventListener('change', (event) => { currentAvatarConfig.accessoriesType = event.target.value; updateAvatarPreview(currentAvatarConfig); });
+            hairColorSelect.addEventListener('change', (event) => { 
+                currentAvatarConfig.hairColor = event.target.value; 
+                updateAvatarPreview(currentAvatarConfig); 
+            });
+            facialHairTypeSelect.addEventListener('change', (event) => { 
+                currentAvatarConfig.facialHairType = event.target.value; 
+                handleConditionalAvatarFields(); 
+            });
+            facialHairColorSelect.addEventListener('change', (event) => { 
+                currentAvatarConfig.facialHairColor = event.target.value; 
+                updateAvatarPreview(currentAvatarConfig); 
+            });
+            eyeTypeSelect.addEventListener('change', (event) => { 
+                currentAvatarConfig.eyeType = event.target.value; 
+                updateAvatarPreview(currentAvatarConfig); 
+            });
+            eyebrowTypeSelect.addEventListener('change', (event) => { 
+                currentAvatarConfig.eyebrowType = event.target.value; 
+                updateAvatarPreview(currentAvatarConfig); 
+            });
+            mouthTypeSelect.addEventListener('change', (event) => { 
+                currentAvatarConfig.mouthType = event.target.value; 
+                updateAvatarPreview(currentAvatarConfig); 
+            });
+            skinColorSelect.addEventListener('change', (event) => { 
+                currentAvatarConfig.skinColor = event.target.value; 
+                updateAvatarPreview(currentAvatarConfig); 
+            });
+            clotheTypeSelect.addEventListener('change', (event) => { 
+                currentAvatarConfig.clotheType = event.target.value; 
+                handleConditionalAvatarFields(); 
+            });
+            clotheColorSelect.addEventListener('change', (event) => { 
+                currentAvatarConfig.clotheColor = event.target.value; 
+                updateAvatarPreview(currentAvatarConfig); 
+            });
+            graphicTypeSelect.addEventListener('change', (event) => { 
+                currentAvatarConfig.graphicType = event.target.value; 
+                updateAvatarPreview(currentAvatarConfig); 
+            });
+            accessoriesTypeSelect.addEventListener('change', (event) => { 
+                currentAvatarConfig.accessoriesType = event.target.value; 
+                updateAvatarPreview(currentAvatarConfig); 
+            });
         }
 
         function setAvatarCreatorOptions(config) {
@@ -1874,7 +1912,7 @@
                     // Merge the updates from the server response into the existing user object
                     const updatedUser = {
                         ...existingUser, // Keeps old avatar_config if not explicitly returned
-                        ...data.data     // Overwrites with fresh data from the avatar save response
+                        ...data.data    // Overwrites with fresh data from the avatar save response
                     };
 
                     // Save the complete, merged user object back to localStorage
