@@ -6,6 +6,8 @@
     <title>SMARTY PANTS Online</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap" rel="stylesheet">
+    <!-- Confetti.js library -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
     <style>
         body {
             margin: 0;
@@ -299,17 +301,9 @@
             text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000, 2px 2px 4px #000; /* Black outline, Black shadow */
         }
 
-        .play-game-button {
-            background-color: #ff4081;
-        }
-
         .play-game-button:hover {
             background-color: #f50057;
             transform: scale(1.05);
-        }
-
-        .play-game-button-new-window {
-            background-color: #0288d1;
         }
 
         .play-game-button-new-window:hover {
@@ -1326,10 +1320,17 @@
          * @param {string} badgeDisplayName - The display-friendly name (e.g., 'Smarty Starter').
          */
         function showBadgeNotification(badgeName, badgeDisplayName) {
+            // Trigger confetti effect
+            confetti({
+                particleCount: 100,
+                spread: 70,
+                origin: { y: 0.6 }
+            });
+
             badgeNotificationImg.src = `Badges/${badgeName}.png`;
             badgeNotificationName.textContent = badgeDisplayName;
             badgeNotification.classList.remove('hidden');
-            badgeNotification.classList.add('flex'); // Use flex to center content
+            badgeNotification.classList.add('flex');
             
             // Trigger the animation
             setTimeout(() => {
