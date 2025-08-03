@@ -6,8 +6,6 @@
     <title>SMARTY PANTS Online</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap" rel="stylesheet">
-    <!-- Font Awesome for icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <!-- Confetti.js library -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
     <style>
@@ -127,14 +125,7 @@
         }
 
 
-        .category-icon-fa {
-            font-size: 5rem; /* Match the size of the old image */
-            margin-bottom: 1rem;
-            color: white;
-            filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.2));
-            text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000, 2px 2px 4px #000;
-        }
-        .category-icon { /* Keeping this style for the game list images, but removing image-specific properties */
+        .category-icon {
             width: 5rem;
             height: 5rem;
             margin-bottom: 1rem;
@@ -357,9 +348,6 @@
             .category-card {
                 padding: 1.5rem;
                 min-height: 10rem;
-            }
-            .category-icon-fa {
-                font-size: 4rem;
             }
             .category-icon {
                 width: 4rem;
@@ -648,8 +636,7 @@
 
         <div class="grid-layout">
             <div class="category-card math">
-                <!-- Replaced the image with a Font Awesome icon -->
-                <i class="fa-solid fa-calculator category-icon-fa"></i>
+                <img src="math.png" alt="Math Icon" class="category-icon" onerror="this.onerror=null; this.src='https://placehold.co/80x80/FFD700/000000?text=Math';" />
                 <h2 class="category-title">Math Games</h2>
                 <p class="category-description">Fun with numbers & logic!</p>
                 <button class="explore-button" onclick="playClickSound(); showMathCategoryView();">
@@ -657,8 +644,7 @@
             </div>
 
             <div class="category-card science">
-                <!-- Replaced the image with a Font Awesome icon -->
-                <i class="fa-solid fa-flask category-icon-fa"></i>
+                <img src="science.png" alt="Science Icon" class="category-icon" onerror="this.onerror=null; this.src='https://placehold.co/80x80/81C784/000000?text=Science';" />
                 <h2 class="category-title">Science Games</h2>
                 <p class="category-description">Discover the world around you!</p>
                 <button class="explore-button" onclick="playClickSound(); showScienceCategoryView();">
@@ -666,16 +652,14 @@
             </div>
 
             <div class="category-card ela">
-                <!-- Replaced the image with a Font Awesome icon -->
-                <i class="fa-solid fa-book-open category-icon-fa"></i>
+                <img src="abc.png" alt="ELA Icon" class="category-icon" onerror="this.onerror=null; this.src='https://placehold.co/80x80/EF9A9A/000000?text=ABC';" />
                 <h2 class="category-title">ELA Games</h2>
                 <p class="category-description">Read, write, and communicate!</p>
                 <button class="explore-button" onclick="playClickSound(); showElaCategoryView();"> Explore <span style="margin-left: 0.5rem;">&#x276F;</span> </button>
             </div>
 
             <div class="category-card social-studies">
-                <!-- Replaced the image with a Font Awesome icon -->
-                <i class="fa-solid fa-globe-americas category-icon-fa"></i>
+                <img src="socialstudies.png" alt="Social Studies Icon" class="category-icon" onerror="this.onerror=null; this.src='https://placehold.co/80x80/FFA500/000000?text=History';" />
                 <h2 class="category-title">Social Studies</h2>
                 <p class="category-description">Explore history and cultures!</p>
                 <button class="explore-button" onclick="playClickSound(); showSocialStudiesCategoryView();"> Explore <span style="margin-left: 0.5rem;">&#x276F;</span> </button>
@@ -740,7 +724,7 @@
         </div>
 
         <!-- Computer Science Section -->
-        <h2 class="text-3xl font-bold text-gray-800 mt-8 mb-4 text-center">Computer Science </h2>
+        <h2 class="text-3xl font-bold text-gray-800 mt-8 mb-4 text-center">Computer Science</h2>
         <div class="game-list-layout">
             <div class="game-list-card" style="background-image: url('subcalcicon.png'); background-size: cover; background-position: center;">
                 <h3>Subnet Calculator</h3>
@@ -1075,7 +1059,6 @@
             subnetCalculatorGameView.style.display = 'none'; // Hide Subnet Calculator game view
             wordwiseGameView.style.display = 'none'; // Hide WordWise game view
             plantExplorerGameView.style.display = 'none'; // Hide Plant Explorer game view
-            document.body.style.overflow = 'auto';
         }
 
         function showMainMenu() {
@@ -1203,935 +1186,983 @@
                 });
             }
             initializeAvatarCreatorOptions();
-            handleConditionalAvatarFields();
             
-            // Delete Account Logic
+            // Moved event listeners inside DOMContentLoaded
             const deleteAccountBtn = document.getElementById('deleteAccountBtn');
             const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
             const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
-            const deleteConfirmationModal = document.getElementById('deleteConfirmationModal');
 
+            // Open confirmation modal when delete button is clicked
             deleteAccountBtn.addEventListener('click', () => {
-                playClickSound();
                 authModal.classList.add('hidden'); // Hide the profile modal
                 deleteConfirmationModal.classList.remove('hidden');
             });
 
+            // Close confirmation modal
             cancelDeleteBtn.addEventListener('click', () => {
-                playClickSound();
                 deleteConfirmationModal.classList.add('hidden');
             });
 
+            // Handle the final deletion
             confirmDeleteBtn.addEventListener('click', async () => {
                 const user = JSON.parse(localStorage.getItem('user'));
                 if (!user) {
                     console.error("No user found in localStorage for delete request.");
-                    showMessageBox("No user logged in. Please log in and try again.");
                     return;
                 }
                 const token = localStorage.getItem('token');
                 if (!token) {
-                    console.error("No token found in localStorage for delete request.");
-                    showMessageBox("Authentication token missing. Please log in again.");
-                    return;
+                     console.error("No token found in localStorage for delete request.");
+                     return;
                 }
 
                 try {
                     const response = await fetch(`${BACKEND_URL}/delete/${user._id}`, {
                         method: 'DELETE',
                         headers: {
-                            'Authorization': `Bearer ${token}`
+                            'Authorization': `Bearer ${token}` // Correctly format the Authorization header
                         }
                     });
 
                     const result = await response.json();
 
                     if (response.ok && result.status === "Success") {
+                        // Log the user out completely
                         logoutUser("Account deleted successfully.");
-                        deleteConfirmationModal.classList.add('hidden');
                     } else {
                         showMessageBox(result.message || "Failed to delete account. Please try again.");
                     }
                 } catch (error) {
                     console.error("Error deleting account:", error);
-                    showMessageBox("An error occurred while deleting the account. Please try again.");
+                    showMessageBox("An error occurred. Please try again.");
                 }
             });
-            const loginBtn = document.getElementById('loginBtn');
-            const signupBtn = document.getElementById('signupBtn');
-            const profileBtn = document.getElementById('profileBtn');
-            const logoutBtn = document.getElementById('logoutBtn');
-            const contactBtn = document.getElementById('contactBtn'); // Get the new contact button
-            const donateBtn = document.getElementById('donateBtn'); // NEW: Get the new donate button
-            const authModal = document.getElementById('authModal');
-            const authTitle = document.getElementById('authTitle');
-            const authForm = document.getElementById('authForm');
-            const usernameInput = document.getElementById('username');
-            const emailInput = document.getElementById('email');
-            const passwordInput = document.getElementById('password');
-            const submitAuthBtn = document.getElementById('submitAuth');
-            const authMessage = document.getElementById('authMessage');
-            const closeModalBtn = document.getElementById('closeModalBtn');
-            const emailGroup = document.getElementById('emailGroup');
-            const loginSignupFields = document.getElementById('loginSignupFields');
-            const forgotPasswordFields = document.getElementById('forgotPasswordFields');
-            const forgotPasswordEmailInput = document.getElementById('forgotPasswordEmail');
-            const forgotPasswordLink = document.getElementById('forgotPasswordLink');
-            const changeAvatarProfileBtn = document.getElementById('changeAvatarProfileBtn');
+        });
 
-            const avatarModal = document.getElementById('avatarModal');
-            const avatarPreview = document.getElementById('avatarPreview');
-            const generateRandomAvatarBtn = document.getElementById('generateRandomAvatarBtn');
-            const saveAvatarBtn = document.getElementById('saveAvatarBtn');
-            const closeAvatarModalBtn = document.getElementById('closeAvatarModalBtn');
-            const avatarMessage = document.getElementById('avatarMessage');
-            const avatarOptionsContainer = document.getElementById('avatarOptionsContainer');
-            const avatarStyleSelect = document.getElementById('avatarStyleSelect');
-            const topTypeSelect = document.getElementById('topTypeSelect');
-            const topColorSelect = document.getElementById('topColorSelect');
-            const hairColorSelect = document.getElementById('hairColorSelect');
-            const facialHairTypeSelect = document.getElementById('facialHairTypeSelect');
-            const facialHairColorSelect = document.getElementById('facialHairColorSelect');
-            const eyeTypeSelect = document.getElementById('eyeTypeSelect');
-            const eyebrowTypeSelect = document.getElementById('eyebrowTypeSelect');
-            const mouthTypeSelect = document.getElementById('mouthTypeSelect');
-            const skinColorSelect = document.getElementById('skinColorSelect');
-            const clotheTypeSelect = document.getElementById('clotheTypeSelect');
-            const clotheColorSelect = document.getElementById('clotheColorSelect');
-            const graphicTypeSelect = document.getElementById('graphicTypeSelect');
-            const accessoriesTypeSelect = document.getElementById('accessoriesTypeSelect');
-            // Removed noseTypeSelect from here
+        const loginBtn = document.getElementById('loginBtn');
+        const signupBtn = document.getElementById('signupBtn');
+        const profileBtn = document.getElementById('profileBtn');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const contactBtn = document.getElementById('contactBtn'); // Get the new contact button
+        const donateBtn = document.getElementById('donateBtn'); // NEW: Get the new donate button
+        const authModal = document.getElementById('authModal');
+        const authTitle = document.getElementById('authTitle');
+        const authForm = document.getElementById('authForm');
+        const usernameInput = document.getElementById('username');
+        const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
+        const submitAuthBtn = document.getElementById('submitAuth');
+        const authMessage = document.getElementById('authMessage');
+        const closeModalBtn = document.getElementById('closeModalBtn');
+        const emailGroup = document.getElementById('emailGroup');
+        const loginSignupFields = document.getElementById('loginSignupFields');
+        const forgotPasswordFields = document.getElementById('forgotPasswordFields');
+        const forgotPasswordEmailInput = document.getElementById('forgotPasswordEmail');
+        const forgotPasswordLink = document.getElementById('forgotPasswordLink');
+        const changeAvatarProfileBtn = document.getElementById('changeAvatarProfileBtn');
 
-            const topColorGroup = document.getElementById('topColorGroup');
-            const facialHairColorGroup = document.getElementById('facialHairColorGroup');
-            const graphicTypeGroup = document.getElementById('graphicTypeGroup');
-            const profileAvatarDisplay = document.getElementById('profileAvatarDisplay');
-            const profileAvatarImg = document.getElementById('profileAvatarImg');
-            const headerAvatarContainer = document.getElementById('header-avatar-container');
-            const messageBox = document.getElementById('messageBox'); // Get the message box element
+        const avatarModal = document.getElementById('avatarModal');
+        const avatarPreview = document.getElementById('avatarPreview');
+        const generateRandomAvatarBtn = document.getElementById('generateRandomAvatarBtn');
+        const saveAvatarBtn = document.getElementById('saveAvatarBtn');
+        const closeAvatarModalBtn = document.getElementById('closeAvatarModalBtn');
+        const avatarMessage = document.getElementById('avatarMessage');
+        const avatarOptionsContainer = document.getElementById('avatarOptionsContainer');
+        const avatarStyleSelect = document.getElementById('avatarStyleSelect');
+        const topTypeSelect = document.getElementById('topTypeSelect');
+        const topColorSelect = document.getElementById('topColorSelect');
+        const hairColorSelect = document.getElementById('hairColorSelect');
+        const facialHairTypeSelect = document.getElementById('facialHairTypeSelect');
+        const facialHairColorSelect = document.getElementById('facialHairColorSelect');
+        const eyeTypeSelect = document.getElementById('eyeTypeSelect');
+        const eyebrowTypeSelect = document.getElementById('eyebrowTypeSelect');
+        const mouthTypeSelect = document.getElementById('mouthTypeSelect');
+        const skinColorSelect = document.getElementById('skinColorSelect');
+        const clotheTypeSelect = document.getElementById('clotheTypeSelect');
+        const clotheColorSelect = document.getElementById('clotheColorSelect');
+        const graphicTypeSelect = document.getElementById('graphicTypeSelect');
+        const accessoriesTypeSelect = document.getElementById('accessoriesTypeSelect');
+        // Removed noseTypeSelect from here
+
+        const topColorGroup = document.getElementById('topColorGroup');
+        const facialHairColorGroup = document.getElementById('facialHairColorGroup');
+        const graphicTypeGroup = document.getElementById('graphicTypeGroup');
+        const profileAvatarDisplay = document.getElementById('profileAvatarDisplay');
+        const profileAvatarImg = document.getElementById('profileAvatarImg');
+        const headerAvatarContainer = document.getElementById('header-avatar-container');
+        const messageBox = document.getElementById('messageBox'); // Get the message box element
+        
+        // --- NEW: Badge display elements ---
+        const badgeDisplayContainer = document.getElementById('badgeDisplayContainer');
+        const badgeGrid = document.getElementById('badgeGrid');
+        const badgeNotification = document.getElementById('badge-notification');
+        const badgeNotificationImg = document.getElementById('badge-notification-img');
+        const badgeNotificationName = document.getElementById('badge-notification-name');
+        
+        const BACKEND_URL = 'https://smartypantsbe.onrender.com/api/user';
+
+        // --- NEW: Badge Details Map ---
+        const badgeDetails = {
+            'smartystarter3': 'Smarty Starter',
+            '1ststep1stgrademath': '1st Step 1st Grade Math', 
+            'halfwayhero1stgrademath': 'Halfway Hero 1st Grade Math', 
+            '1stgrademathwinner': '1st Grade Math Winner',
+            '1ststep2ndgrademath': '1st Step 2nd Grade Math', // New badge
+            '1ststep3rdgrademath': '1st Step 3rd Grade Math', // New badge
+            '1ststep4thgrademath': '1st Step 4th Grade Math', // New badge
+            '1ststep5thgrademath': '1st Step 5th Grade Math', // New badge
+            '1ststep6thgrademath': '1st Step 6th Grade Math', // New badge
+            'halfwayhero2ndgrademath': 'Halfway Hero 2nd Grade Math', // New badge
+            'halfwayhero3rdgrademath': 'Halfway Hero 3rd Grade Math', // New badge
+            'halfwayhero4thgrademath': 'Halfway Hero 4th Grade Math', // New badge
+            'halfwayhero5thgrademath': 'Halfway Hero 5th Grade Math', // New badge
+            'halfwayhero6thgrademath': 'Halfway Hero 6th Grade Math', // New badge
+            '2ndgrademathwinner': '2nd Grade Math Winner', 
+            '3rdgrademathwinner': '3rd Grade Math Winner', 
+            '4thgrademathwinner': '4th Grade Math Winner', 
+            '5thgrademathwinner': '5th Grade Math Winner', 
+            '6thgrademathwinner': '6th Grade Math Winner',
+            // Algebra Winner Badges
+            '7thgradealgebrawinner': '7th Grade Algebra Winner',
+            '8thgradealgebrawinner': '8th Grade Algebra Winner',
+            '9thgradealgebrawinner': '9th Grade Algebra Winner',
+            '10thgradealgebrawinner': '10th Grade Algebra Winner',
+            '11thgradealgebrawinner': '11th Grade Algebra Winner',
+            // NEW Algebra 1st Step Badges
+            '1ststep7thgradealgebra': '1st Step 7th Grade Algebra',
+            '1ststep8thgradealgebra': '1st Step 8th Grade Algebra',
+            '1ststep9thgradealgebra': '1st Step 9th Grade Algebra',
+            '1ststep10thgradealgebra': '1st Step 10th Grade Algebra',
+            '1ststep11thgradealgebra': '1st Step 11th Grade Algebra',
+            // NEW Algebra Halfway Hero Badges
+            'halfwayhero7thgradealgebra': 'Halfway Hero 7th Grade Algebra',
+            'halfwayhero8thgradealgebra': 'Halfway Hero 8th Grade Algebra',
+            'halfwayhero9thgradealgebra': 'Halfway Hero 9th Grade Algebra',
+            'halfwayhero10thgradealgebra': 'Halfway Hero 10th Grade Algebra',
+            'halfwayhero11thgradealgebra': 'Halfway Hero 11th Grade Algebra',
+            'wordweaver50points': 'Word Weaver 50 Points', // Existing badge
+            'wordweaver100points': 'Word Weaver 100 Points' // Existing badge
+        };
+
+        /**
+         * Displays a temporary message box with the given text.
+         * @param {string} message The message to display.
+         * @param {number} duration The duration in milliseconds for which the message should be displayed.
+         */
+        function showMessageBox(message, duration = 3000) {
+            messageBox.textContent = message;
+            messageBox.classList.add('show');
+            setTimeout(() => {
+                messageBox.classList.remove('show');
+            }, duration);
+        }
+        
+        /**
+         * --- NEW: Shows the badge notification pop-up ---
+         * @param {string} badgeName - The filename of the badge (e.g., 'smartystarter3').
+         * @param {string} badgeDisplayName - The display-friendly name (e.g., 'Smarty Starter').
+         */
+        function showBadgeNotification(badgeName, badgeDisplayName) {
+            // Trigger confetti effect
+            confetti({
+                particleCount: 100,
+                spread: 70,
+                origin: { y: 0.6 }
+            });
+
+            badgeNotificationImg.src = `Badges/${badgeName}.png`;
+            badgeNotificationName.textContent = badgeDisplayName;
+            badgeNotification.classList.remove('hidden');
+            badgeNotification.classList.add('flex');
             
-            // --- NEW: Badge display elements ---
-            const badgeDisplayContainer = document.getElementById('badgeDisplayContainer');
-            const badgeGrid = document.getElementById('badgeGrid');
-            const badgeNotification = document.getElementById('badge-notification');
-            const badgeNotificationImg = document.getElementById('badge-notification-img');
-            const badgeNotificationName = document.getElementById('badge-notification-name');
-            
-            const BACKEND_URL = 'https://smartypantsbe.onrender.com/api/user';
+            // Trigger the animation
+            setTimeout(() => {
+                badgeNotification.classList.add('show');
+            }, 10); // A small delay ensures the transition triggers
 
-            // --- NEW: Badge Details Map ---
-            const badgeDetails = {
-                'smartystarter3': 'Smarty Starter',
-                '1ststep1stgrademath': '1st Step 1st Grade Math', 
-                'halfwayhero1stgrademath': 'Halfway Hero 1st Grade Math', 
-                '1stgrademathwinner': '1st Grade Math Winner',
-                '1ststep2ndgrademath': '1st Step 2nd Grade Math', // New badge
-                '1ststep3rdgrademath': '1st Step 3rd Grade Math', // New badge
-                '1ststep4thgrademath': '1st Step 4th Grade Math', // New badge
-                '1ststep5thgrademath': '1st Step 5th Grade Math', // New badge
-                '1ststep6thgrademath': '1st Step 6th Grade Math', // New badge
-                'halfwayhero2ndgrademath': 'Halfway Hero 2nd Grade Math', // New badge
-                'halfwayhero3rdgrademath': 'Halfway Hero 3rd Grade Math', // New badge
-                'halfwayhero4thgrademath': 'Halfway Hero 4th Grade Math', // New badge
-                'halfwayhero5thgrademath': 'Halfway Hero 5th Grade Math', // New badge
-                'halfwayhero6thgrademath': 'Halfway Hero 6th Grade Math', // New badge
-                '2ndgrademathwinner': '2nd Grade Math Winner', 
-                '3rdgrademathwinner': '3rd Grade Math Winner', 
-                '4thgrademathwinner': '4th Grade Math Winner', 
-                '5thgrademathwinner': '5th Grade Math Winner', 
-                '6thgrademathwinner': '6th Grade Math Winner',
-                // Algebra Winner Badges
-                '7thgradealgebrawinner': '7th Grade Algebra Winner',
-                '8thgradealgebrawinner': '8th Grade Algebra Winner',
-                '9thgradealgebrawinner': '9th Grade Algebra Winner',
-                '10thgradealgebrawinner': '10th Grade Algebra Winner',
-                '11thgradealgebrawinner': '11th Grade Algebra Winner',
-                // NEW Algebra 1st Step Badges
-                '1ststep7thgradealgebra': '1st Step 7th Grade Algebra',
-                '1ststep8thgradealgebra': '1st Step 8th Grade Algebra',
-                '1ststep9thgradealgebra': '1st Step 9th Grade Algebra',
-                '1ststep10thgradealgebra': '1st Step 10th Grade Algebra',
-                '1ststep11thgradealgebra': '1st Step 11th Grade Algebra',
-                // NEW Algebra Halfway Hero Badges
-                'halfwayhero7thgradealgebra': 'Halfway Hero 7th Grade Algebra',
-                'halfwayhero8thgradealgebra': 'Halfway Hero 8th Grade Algebra',
-                'halfwayhero9thgradealgebra': 'Halfway Hero 9th Grade Algebra',
-                'halfwayhero10thgradealgebra': 'Halfway Hero 10th Grade Algebra',
-                'halfwayhero11thgradealgebra': 'Halfway Hero 11th Grade Algebra',
-                'wordweaver50points': 'Word Weaver 50 Points', // Existing badge
-                'wordweaver100points': 'Word Weaver 100 Points' // Existing badge
-            };
-
-            /**
-             * Displays a temporary message box with the given text.
-             * @param {string} message The message to display.
-             * @param {number} duration The duration in milliseconds for which the message should be displayed.
-             */
-            function showMessageBox(message, duration = 3000) {
-                messageBox.textContent = message;
-                messageBox.classList.add('show');
+            // Hide the notification after a few seconds
+            setTimeout(() => {
+                badgeNotification.classList.remove('show');
+                // Wait for the animation to finish before hiding it completely
                 setTimeout(() => {
-                    messageBox.classList.remove('show');
-                }, duration);
-            }
-            
-            /**
-             * --- NEW: Shows the badge notification pop-up ---
-             * @param {string} badgeName - The filename of the badge (e.g., 'smartystarter3').
-             * @param {string} badgeDisplayName - The display-friendly name (e.g., 'Smarty Starter').
-             */
-            function showBadgeNotification(badgeName, badgeDisplayName) {
-                // Trigger confetti effect
-                confetti({
-                    particleCount: 100,
-                    spread: 70,
-                    origin: { y: 0.6 }
-                });
+                    badgeNotification.classList.add('hidden');
+                    badgeNotification.classList.remove('flex');
+                }, 500);
+            }, 4000); // Show for 4 seconds
+        }
 
-                badgeNotificationImg.src = `Badges/${badgeName}.png`;
-                badgeNotificationName.textContent = badgeDisplayName;
-                badgeNotification.classList.remove('hidden');
-                badgeNotification.classList.add('flex');
-                
-                // Trigger the animation
-                setTimeout(() => {
-                    badgeNotification.classList.add('show');
-                }, 10); // A small delay ensures the transition triggers
+        function updateAuthButtons() {
+            const token = localStorage.getItem('token');
+            const user = JSON.parse(localStorage.getItem('user'));
 
-                // Hide the notification after a few seconds
-                setTimeout(() => {
-                    badgeNotification.classList.remove('show');
-                    // Wait for the animation to finish before hiding it completely
-                    setTimeout(() => {
-                        badgeNotification.classList.add('hidden');
-                        badgeNotification.classList.remove('flex');
-                    }, 500);
-                }, 4000); // Show for 4 seconds
-            }
+            loginBtn.classList.toggle('hidden', !!token);
+            signupBtn.classList.toggle('hidden', !!token);
+            profileBtn.classList.toggle('hidden', !token);
+            headerAvatarContainer.innerHTML = ''; // Clear previous avatar
 
-            function updateAuthButtons() {
-                const token = localStorage.getItem('token');
-                const user = JSON.parse(localStorage.getItem('user'));
-
-                loginBtn.classList.toggle('hidden', !!token);
-                signupBtn.classList.toggle('hidden', !!token);
-                profileBtn.classList.toggle('hidden', !token);
-                headerAvatarContainer.innerHTML = ''; // Clear previous avatar
-
-                if (token && user) {
-                    if (user.has_created_avatar && user.avatar_config && Object.keys(user.avatar_config).length > 0) {
-                        const avatarUrl = `https://avataaars.io/?${new URLSearchParams(user.avatar_config).toString()}`;
-                        headerAvatarContainer.innerHTML = `<img src="${avatarUrl}" alt="Avatar" class="h-12 w-12 rounded-full object-cover cursor-pointer border-2 border-purple-400">`;
-                        headerAvatarContainer.addEventListener('click', () => profileBtn.click());
-                        profileBtn.classList.add('hidden'); // Hide the text button if avatar is shown
-                    } else {
-                        profileBtn.classList.remove('hidden'); // Show text button if no avatar
-                    }
-                }
-            }
-
-            function showLoginForm() {
-                authTitle.textContent = 'Login';
-                submitAuthBtn.textContent = 'Login';
-                authForm.dataset.currentAction = 'login';
-                loginSignupFields.classList.remove('hidden');
-                emailGroup.classList.add('hidden');
-                forgotPasswordFields.classList.add('hidden');
-                forgotPasswordLink.classList.remove('hidden');
-                authMessage.textContent = '';
-                usernameInput.value = '';
-                emailInput.value = '';
-                passwordInput.value = '';
-                submitAuthBtn.classList.remove('hidden');
-                if (changeAvatarProfileBtn) changeAvatarProfileBtn.classList.add('hidden');
-                profileAvatarDisplay.classList.add('hidden');
-                logoutBtn.classList.add('hidden');
-                deleteAccountBtn.classList.add('hidden');
-            }
-
-            function showSignupForm() {
-                authTitle.textContent = 'Sign Up';
-                submitAuthBtn.textContent = 'Sign Up';
-                authForm.dataset.currentAction = 'signup';
-                loginSignupFields.classList.remove('hidden');
-                emailGroup.classList.remove('hidden');
-                forgotPasswordFields.classList.add('hidden');
-                forgotPasswordLink.classList.add('hidden');
-                authMessage.textContent = '';
-                usernameInput.value = '';
-                emailInput.value = '';
-                passwordInput.value = '';
-                submitAuthBtn.classList.remove('hidden');
-                if (changeAvatarProfileBtn) changeAvatarProfileBtn.classList.add('hidden');
-                profileAvatarDisplay.classList.add('hidden');
-                logoutBtn.classList.add('hidden');
-                deleteAccountBtn.classList.add('hidden');
-            }
-
-            function showForgotPasswordForm() {
-                authTitle.textContent = 'Forgot Password';
-                submitAuthBtn.textContent = 'Send Reset Link';
-                authForm.dataset.currentAction = 'forgot-password';
-                loginSignupFields.classList.add('hidden');
-                emailGroup.classList.add('hidden');
-                forgotPasswordFields.classList.remove('hidden');
-                forgotPasswordEmailInput.setAttribute('required', 'true');
-                forgotPasswordLink.classList.add('hidden');
-                authMessage.textContent = '';
-                submitAuthBtn.classList.remove('hidden');
-                if (changeAvatarProfileBtn) changeAvatarProfileBtn.classList.add('hidden');
-                profileAvatarDisplay.classList.add('hidden');
-                logoutBtn.classList.add('hidden');
-                deleteAccountBtn.classList.add('hidden');
-            }
-
-            let currentAvatarConfig = {};
-
-            function showAvatarCreatorModal(userAvatarConfig = {}) {
-                authModal.classList.add('hidden');
-                avatarModal.classList.remove('hidden');
-                avatarMessage.textContent = '';
-
-                if (userAvatarConfig && Object.keys(userAvatarConfig).length > 0) {
-                    currentAvatarConfig = { ...userAvatarConfig };
+            if (token && user) {
+                if (user.has_created_avatar && user.avatar_config && Object.keys(user.avatar_config).length > 0) {
+                    const avatarUrl = `https://avataaars.io/?${new URLSearchParams(user.avatar_config).toString()}`;
+                    headerAvatarContainer.innerHTML = `<img src="${avatarUrl}" alt="Avatar" class="h-12 w-12 rounded-full object-cover cursor-pointer border-2 border-purple-400">`;
+                    headerAvatarContainer.addEventListener('click', () => profileBtn.click());
+                    profileBtn.classList.add('hidden'); // Hide the text button if avatar is shown
                 } else {
-                    currentAvatarConfig = generateRandomAvatarConfig();
+                    profileBtn.classList.remove('hidden'); // Show text button if no avatar
                 }
-                updateAvatarPreview(currentAvatarConfig);
-                setAvatarCreatorOptions(currentAvatarConfig);
-                handleConditionalAvatarFields();
             }
+        }
 
-            function hideAvatarCreatorModal() {
-                avatarModal.classList.add('hidden');
-            }
+        function showLoginForm() {
+            authTitle.textContent = 'Login';
+            submitAuthBtn.textContent = 'Login';
+            authForm.dataset.currentAction = 'login';
+            loginSignupFields.classList.remove('hidden');
+            emailGroup.classList.add('hidden');
+            forgotPasswordFields.classList.add('hidden');
+            forgotPasswordLink.classList.remove('hidden');
+            authMessage.textContent = '';
+            usernameInput.value = '';
+            emailInput.value = '';
+            passwordInput.value = '';
+            submitAuthBtn.classList.remove('hidden');
+            if (changeAvatarProfileBtn) changeAvatarProfileBtn.classList.add('hidden');
+            profileAvatarDisplay.classList.add('hidden');
+            logoutBtn.classList.add('hidden');
+            deleteAccountBtn.classList.add('hidden');
+        }
 
-            const avatarFeatures = {
-                avatarStyle: ['Circle', 'Transparent'],
-                topType: ['NoHair', 'Eyepatch', 'Hat', 'Hijab', 'Turban', 'WinterHat1', 'WinterHat2', 'WinterHat3', 'WinterHat4', 'LongHairBigHair', 'LongHairBob', 'LongHairBun', 'LongHairCurly', 'LongHairCurvy', 'LongHairDreads', 'LongHairFrida', 'LongHairFro', 'LongHairMiaWallace', 'LongHairStraight', 'LongHairStraight2', 'LongHairStraightStrand', 'ShortHairDreads01', 'ShortHairDreads02', 'ShortHairFrizzle', 'ShortHairShaggy', 'ShortHairShaggyMullet', 'ShortHairShortCurly', 'ShortHairShortFlat', 'ShortHairShortRound', 'ShortHairShortWaved', 'ShortHairSides', 'ShortHairTheCaesar', 'ShortHairTheCaesarSidePart'],
-                hairColor: ['Auburn', 'Black', 'Blonde', 'BlondeGolden', 'Brown', 'BrownDark', 'PastelPink', 'Platinum', 'Red', 'SilverGray'],
-                hatColor: ['Black', 'Blue01', 'Blue02', 'Blue03', 'Gray01', 'Gray02', 'Heather', 'PastelBlue', 'PastelGreen', 'PastelOrange', 'PastelRed', 'PastelYellow', 'Pink', 'Red', 'White'],
-                facialHairType: ['Blank', 'BeardLight', 'BeardMajestic', 'MoustacheFancy', 'MoustacheMagnum'],
-                facialHairColor: ['Auburn', 'Black', 'Blonde', 'BlondeGolden', 'Brown', 'BrownDark', 'PastelPink', 'Platinum', 'Red', 'SilverGray'],
-                noseType: ['Default'],
-                eyeType: ['Default', 'Close', 'Cry', 'Dizzy', 'EyeRoll', 'Happy', 'Hearts', 'Side', 'Squint', 'Surprised', 'Wink', 'WinkWacky'],
-                eyebrowType: ['Default', 'Angry', 'AngryNatural', 'FlatNatural', 'FrownNatural', 'RaisedExcited', 'RaisedExcitedNatural', 'SadConcerned', 'SadConcernedNatural', 'UnibrowNatural', 'Updown', 'UpDownNatural'],
-                mouthType: ['Default', 'Smile', 'Concerned', 'Disbelief', 'Eating', 'Grimace', 'Sad', 'Twinkle'],
-                skinColor: ['Tanned', 'Yellow', 'Pale', 'Light', 'Brown', 'DarkBrown', 'Black'],
-                clotheType: ['BlazerShirt', 'BlazerSweater', 'CollarSweater', 'GraphicShirt', 'Hoodie', 'Overall', 'ShirtCrewNeck', 'ShirtScoopNeck', 'ShirtVNeck'],
-                clotheColor: ['Black', 'Blue01', 'Blue02', 'Blue03', 'Gray01', 'Gray02', 'Heather', 'PastelBlue', 'PastelGreen', 'PastelOrange', 'PastelRed', 'PastelYellow', 'Pink', 'Red', 'White'],
-                graphicType: ['Bat', 'Cumbia', 'Deer', 'Diamond', 'Hola', 'Pizza', 'Resist', 'Selena', 'Bear', 'Skull', 'SkullOutline'],
-                accessoriesType: ['Blank', 'Prescription01', 'Prescription02', 'Round', 'Sunglasses', 'Wayfarers'],
-                topColor: ['Black', 'Blue01', 'Blue02', 'Blue03', 'Gray01', 'Gray02', 'Heather', 'PastelBlue', 'PastelGreen', 'PastelOrange', 'PastelRed', 'PastelYellow', 'Pink', 'Red', 'White'],
-            };
+        function showSignupForm() {
+            authTitle.textContent = 'Sign Up';
+            submitAuthBtn.textContent = 'Sign Up';
+            authForm.dataset.currentAction = 'signup';
+            loginSignupFields.classList.remove('hidden');
+            emailGroup.classList.remove('hidden');
+            forgotPasswordFields.classList.add('hidden');
+            forgotPasswordLink.classList.add('hidden');
+            authMessage.textContent = '';
+            usernameInput.value = '';
+            emailInput.value = '';
+            passwordInput.value = '';
+            submitAuthBtn.classList.remove('hidden');
+            if (changeAvatarProfileBtn) changeAvatarProfileBtn.classList.add('hidden');
+            profileAvatarDisplay.classList.add('hidden');
+            logoutBtn.classList.add('hidden');
+            deleteAccountBtn.classList.add('hidden');
+        }
 
-            function generateRandomAvatarConfig() {
-                const randomConfig = {};
-                const hatTypes = ['Hat', 'Turban', 'WinterHat1', 'WinterHat2', 'WinterHat3', 'WinterHat4'];
+        function showForgotPasswordForm() {
+            authTitle.textContent = 'Forgot Password';
+            submitAuthBtn.textContent = 'Send Reset Link';
+            authForm.dataset.currentAction = 'forgot-password';
+            loginSignupFields.classList.add('hidden');
+            emailGroup.classList.add('hidden');
+            forgotPasswordFields.classList.remove('hidden');
+            forgotPasswordEmailInput.setAttribute('required', 'true');
+            forgotPasswordLink.classList.add('hidden');
+            authMessage.textContent = '';
+            submitAuthBtn.classList.remove('hidden');
+            if (changeAvatarProfileBtn) changeAvatarProfileBtn.classList.add('hidden');
+            profileAvatarDisplay.classList.add('hidden');
+            logoutBtn.classList.add('hidden');
+            deleteAccountBtn.classList.add('hidden');
+        }
 
-                for (const feature in avatarFeatures) {
-                    const possibleValues = avatarFeatures[feature];
-                    randomConfig[feature] = possibleValues[Math.floor(Math.random() * possibleValues.length)];
-                }
+        let currentAvatarConfig = {};
 
-                // Clean up conditional properties
-                if (hatTypes.includes(randomConfig.topType)) {
-                    delete randomConfig.topColor; // Use hatColor instead
-                } else if (randomConfig.topType === 'Hijab') {
-                    delete randomConfig.topColor; // Use topColor instead
-                } else {
-                    // It's regular hair, so delete both hat and top colors
-                    delete randomConfig.hatColor;
-                    delete randomConfig.topColor;
-                }
+        function showAvatarCreatorModal(userAvatarConfig = {}) {
+            authModal.classList.add('hidden');
+            avatarModal.classList.remove('hidden');
+            avatarMessage.textContent = '';
 
-                if (randomConfig.facialHairType === 'Blank') {
-                    delete randomConfig.facialHairColor;
-                }
-
-                if (randomConfig.clotheType !== 'GraphicShirt') {
-                    delete randomConfig.graphicType;
-                }
-                return randomConfig;
-            }
-
-
-            function updateAvatarPreview(config) {
-                const queryParams = new URLSearchParams(config).toString();
-                avatarPreview.src = `https://avataaars.io/?${queryParams}`;
-                avatarPreview.parentElement.style.backgroundColor = 'transparent';
-            }
-
-            function createOption(value, text) {
-                const option = document.createElement('option');
-                option.value = value;
-                option.textContent = text;
-                return option;
-            }
-
-            function populateSelect(selectElement, featureArray) {
-                selectElement.innerHTML = '';
-                featureArray.forEach(value => {
-                    let text = value.replace(/([A-Z])/g, ' $1').replace(/([0-9])/, ' $1').trim();
-                    if (selectElement.id === 'skinColorSelect') {
-                        if (value === 'Pale') { text = 'Pale'; }
-                        else if (value === 'Yellow') { text = 'Light Tan'; }
-                        else if (value === 'Light') { text = 'Pale Beige'; }
-                    }
-                    selectElement.appendChild(createOption(value, text));
-                });
-            }
-
-            function handleConditionalAvatarFields() {
-                const topType = currentAvatarConfig.topType;
-                const hatTypes = ['Hat', 'Turban', 'WinterHat1', 'WinterHat2', 'WinterHat3', 'WinterHat4'];
-                const hijabType = 'Hijab';
-
-                // Show/Hide Top Color dropdown for Hats and Hijab
-                if (hatTypes.includes(topType) || topType === hijabType) {
-                    topColorGroup.classList.remove('hidden');
-                } else {
-                    topColorGroup.classList.add('hidden');
-                }
-
-                // Clean up config object based on topType
-                if (hatTypes.includes(topType)) {
-                    delete currentAvatarConfig.topColor; // Remove incorrect property
-                    if (!currentAvatarConfig.hatColor) {
-                        currentAvatarConfig.hatColor = topColorSelect.value;
-                    }
-                } else if (topType === hijabType) {
-                    delete currentAvatarConfig.hatColor; // Remove incorrect property
-                    if (!currentAvatarConfig.topColor) {
-                        currentAvatarConfig.topColor = topColorSelect.value;
-                    }
-                } else {
-                    // It's regular hair, so delete both
-                    delete currentAvatarConfig.hatColor;
-                    delete currentAvatarConfig.topColor;
-                }
-
-
-                // Show/Hide Facial Hair Color
-                if (currentAvatarConfig.facialHairType !== 'Blank') {
-                    facialHairColorGroup.classList.remove('hidden');
-                    if (!currentAvatarConfig.facialHairColor) {
-                        currentAvatarConfig.facialHairColor = facialHairColorSelect.value;
-                    }
-                } else {
-                    facialHairColorGroup.classList.add('hidden');
-                    delete currentAvatarConfig.facialHairColor;
-                }
-
-                // Show/Hide Graphic Type
-                if (currentAvatarConfig.clotheType === 'GraphicShirt') {
-                    graphicTypeGroup.classList.remove('hidden');
-                    if (!currentAvatarConfig.graphicType) {
-                        currentAvatarConfig.graphicType = graphicTypeSelect.value;
-                    }
-                } else {
-                    graphicTypeGroup.classList.add('hidden');
-                    delete currentAvatarConfig.graphicType;
-                }
-                updateAvatarPreview(currentAvatarConfig);
-            }
-
-
-            function initializeAvatarCreatorOptions() {
-                populateSelect(avatarStyleSelect, avatarFeatures.avatarStyle);
-                populateSelect(topTypeSelect, avatarFeatures.topType);
-                populateSelect(topColorSelect, avatarFeatures.topColor);
-                populateSelect(hairColorSelect, avatarFeatures.hairColor);
-                populateSelect(facialHairTypeSelect, avatarFeatures.facialHairType);
-                populateSelect(facialHairColorSelect, avatarFeatures.facialHairColor);
-                // Removed noseTypeSelect from here
-                populateSelect(eyeTypeSelect, avatarFeatures.eyeType);
-                populateSelect(eyebrowTypeSelect, avatarFeatures.eyebrowType);
-                populateSelect(mouthTypeSelect, avatarFeatures.mouthType);
-                populateSelect(skinColorSelect, avatarFeatures.skinColor);
-                populateSelect(clotheTypeSelect, avatarFeatures.clotheType);
-                populateSelect(clotheColorSelect, avatarFeatures.clotheColor);
-                populateSelect(graphicTypeSelect, avatarFeatures.graphicType);
-                populateSelect(accessoriesTypeSelect, avatarFeatures.accessoriesType);
-
-                avatarStyleSelect.addEventListener('change', (event) => { currentAvatarConfig.avatarStyle = event.target.value; handleConditionalAvatarFields(); });
-                topTypeSelect.addEventListener('change', (event) => { currentAvatarConfig.topType = event.target.value; handleConditionalAvatarFields(); });
-
-                // This listener now handles both hat and top colors
-                topColorSelect.addEventListener('change', (event) => {
-                    const selectedColor = event.target.value;
-                    const hatTypes = ['Hat', 'Turban', 'WinterHat1', 'WinterHat2', 'WinterHat3', 'WinterHat4'];
-                    if (hatTypes.includes(currentAvatarConfig.topType)) {
-                        currentAvatarConfig.hatColor = selectedColor;
-                    } else if (currentAvatarConfig.topType === 'Hijab') {
-                        currentAvatarConfig.topColor = selectedColor;
-                    }
-                    updateAvatarPreview(currentAvatarConfig);
-                });
-
-                hairColorSelect.addEventListener('change', (event) => { currentAvatarConfig.hairColor = event.target.value; updateAvatarPreview(currentAvatarConfig); });
-                facialHairTypeSelect.addEventListener('change', (event) => { currentAvatarConfig.facialHairType = event.target.value; handleConditionalAvatarFields(); });
-                facialHairColorSelect.addEventListener('change', (event) => { currentAvatarConfig.facialHairColor = event.target.value; updateAvatarPreview(currentAvatarConfig); });
-                // Removed noseTypeSelect listener from here
-                eyeTypeSelect.addEventListener('change', (event) => { currentAvatarConfig.eyeType = event.target.value; updateAvatarPreview(currentAvatarConfig); });
-                eyebrowTypeSelect.addEventListener('change', (event) => { currentAvatarConfig.eyebrowType = event.target.value; updateAvatarPreview(currentAvatarConfig); });
-                mouthTypeSelect.addEventListener('change', (event) => { currentAvatarConfig.mouthType = event.target.value; updateAvatarPreview(currentAvatarConfig); });
-                skinColorSelect.addEventListener('change', (event) => { currentAvatarConfig.skinColor = event.target.value; updateAvatarPreview(currentAvatarConfig); });
-                clotheTypeSelect.addEventListener('change', (event) => { currentAvatarConfig.clotheType = event.target.value; handleConditionalAvatarFields(); });
-                clotheColorSelect.addEventListener('change', (event) => { currentAvatarConfig.clotheColor = event.target.value; updateAvatarPreview(currentAvatarConfig); });
-                graphicTypeSelect.addEventListener('change', (event) => { currentAvatarConfig.graphicType = event.target.value; updateAvatarPreview(currentAvatarConfig); });
-                accessoriesTypeSelect.addEventListener('change', (event) => { currentAvatarConfig.accessoriesType = event.target.value; updateAvatarPreview(currentAvatarConfig); });
-            }
-
-            function setAvatarCreatorOptions(config) {
-                avatarStyleSelect.value = config.avatarStyle || avatarFeatures.avatarStyle[0];
-                topTypeSelect.value = config.topType || avatarFeatures.topType[0];
-
-                // Set the top color dropdown based on hatColor or topColor
-                const hatTypes = ['Hat', 'Turban', 'WinterHat1', 'WinterHat2', 'WinterHat3', 'WinterHat4'];
-                if(hatTypes.includes(config.topType)) {
-                    topColorSelect.value = config.hatColor || avatarFeatures.hatColor[0];
-                } else if (config.topType === 'Hijab') {
-                    topColorSelect.value = config.topColor || avatarFeatures.topColor[0];
-                }
-
-                hairColorSelect.value = config.hairColor || avatarFeatures.hairColor[0];
-                facialHairTypeSelect.value = config.facialHairType || avatarFeatures.facialHairType[0];
-                facialHairColorSelect.value = config.facialHairColor || avatarFeatures.facialHairColor[0];
-                // Removed noseTypeSelect.value from here
-                eyeTypeSelect.value = config.eyeType || avatarFeatures.eyeType[0];
-                eyebrowTypeSelect.value = config.eyebrowType || avatarFeatures.eyebrowType[0];
-                mouthTypeSelect.value = config.mouthType || avatarFeatures.mouthType[0];
-                skinColorSelect.value = config.skinColor || avatarFeatures.skinColor[0];
-                clotheTypeSelect.value = config.clotheType || avatarFeatures.clotheType[0];
-                clotheColorSelect.value = config.clotheColor || avatarFeatures.clotheColor[0];
-                graphicTypeSelect.value = config.graphicType || avatarFeatures.graphicType[0];
-                accessoriesTypeSelect.value = config.accessoriesType || avatarFeatures.accessoriesType[0];
-
-                handleConditionalAvatarFields();
-            }
-
-
-            loginBtn.addEventListener('click', () => {
-                playClickSound();
-                showLoginForm();
-                authModal.classList.remove('hidden');
-            });
-
-            signupBtn.addEventListener('click', () => {
-                playClickSound();
-                showSignupForm();
-                authModal.classList.remove('hidden');
-            });
-
-            profileBtn.addEventListener('click', () => {
-                playClickSound();
-                const user = JSON.parse(localStorage.getItem('user'));
-                console.log("User object from localStorage on profile click:", user);
-
-                authMessage.textContent = '';
-                authMessage.style.color = 'black';
-                submitAuthBtn.classList.add('hidden');
-                loginSignupFields.classList.add('hidden');
-                forgotPasswordFields.classList.add('hidden');
-                forgotPasswordLink.classList.add('hidden');
-                if (changeAvatarProfileBtn) changeAvatarProfileBtn.classList.add('hidden');
-                profileAvatarDisplay.classList.add('hidden');
-                logoutBtn.classList.add('hidden');
-                deleteAccountBtn.classList.add('hidden');
-                badgeDisplayContainer.classList.add('hidden'); // Hide badges by default
-
-                if (!user) {
-                    authMessage.textContent = 'Please log in to view your profile.';
-                    authMessage.style.color = 'red';
-                    authModal.classList.remove('hidden');
-                    showLoginForm();
-                    return;
-                }
-
-                if (user.has_created_avatar === false || user.has_created_avatar === undefined || user.has_created_avatar === null) {
-                    showAvatarCreatorModal(user.avatar_config || {});
-                } else {
-                    authTitle.textContent = 'User Profile';
-                    authMessage.textContent = `Welcome, ${user.username}!`;
-                    authModal.classList.remove('hidden');
-
-                    if (changeAvatarProfileBtn) changeAvatarProfileBtn.classList.remove('hidden');
-                    logoutBtn.classList.remove('hidden');
-                    deleteAccountBtn.classList.remove('hidden');
-
-                    if (user.avatar_config && Object.keys(user.avatar_config).length > 0) {
-                        const avatarUrl = `https://avataaars.io/?${new URLSearchParams(user.avatar_config).toString()}`;
-                        profileAvatarImg.src = avatarUrl;
-                        profileAvatarDisplay.classList.remove('hidden');
-                    }
-                    
-                    // --- NEW: LOGIC TO DISPLAY BADGES ---
-                    if (user.badges && user.badges.length > 0) {
-                        badgeGrid.innerHTML = ''; // Clear old badges
-                        user.badges.forEach(badgeName => {
-                            const badgeElement = document.createElement('div');
-                            // ADDED: text-center class to ensure text is centered
-                            badgeElement.className = 'flex flex-col items-center text-center'; 
-                            const displayName = badgeDetails[badgeName] || badgeName.replace(/_/g, ' ');
-                            badgeElement.innerHTML = `
-                                <img src="Badges/${badgeName}.png" alt="${displayName}" class="w-16 h-16" onerror="this.onerror=null; this.src='https://placehold.co/64x64/cccccc/000000?text=B';">
-                                <span class="text-xs text-gray-600 mt-1">${displayName}</span>
-                            `;
-                            badgeGrid.appendChild(badgeElement);
-                        });
-                        badgeDisplayContainer.classList.remove('hidden');
-                    }
-                }
-            });
-
-
-            forgotPasswordLink.addEventListener('click', (e) => {
-                e.preventDefault();
-                playClickSound();
-                showForgotPasswordForm();
-            });
-
-            closeModalBtn.addEventListener('click', () => {
-                playClickSound();
-                if (changeAvatarProfileBtn) changeAvatarProfileBtn.classList.add('hidden');
-                profileAvatarDisplay.classList.add('hidden');
-                logoutBtn.classList.add('hidden');
-                deleteAccountBtn.classList.add('hidden');
-                authModal.classList.add('hidden');
-                authMessage.textContent = '';
-                showLoginForm();
-            });
-
-            closeAvatarModalBtn.addEventListener('click', () => {
-                playClickSound();
-                hideAvatarCreatorModal();
-            });
-
-            generateRandomAvatarBtn.addEventListener('click', () => {
-                playClickSound();
+            if (userAvatarConfig && Object.keys(userAvatarConfig).length > 0) {
+                currentAvatarConfig = { ...userAvatarConfig };
+            } else {
                 currentAvatarConfig = generateRandomAvatarConfig();
+            }
+            updateAvatarPreview(currentAvatarConfig);
+            setAvatarCreatorOptions(currentAvatarConfig);
+            handleConditionalAvatarFields();
+        }
+
+        function hideAvatarCreatorModal() {
+            avatarModal.classList.add('hidden');
+        }
+
+        const avatarFeatures = {
+            avatarStyle: ['Circle', 'Transparent'],
+            topType: ['NoHair', 'Eyepatch', 'Hat', 'Hijab', 'Turban', 'WinterHat1', 'WinterHat2', 'WinterHat3', 'WinterHat4', 'LongHairBigHair', 'LongHairBob', 'LongHairBun', 'LongHairCurly', 'LongHairCurvy', 'LongHairDreads', 'LongHairFrida', 'LongHairFro', 'LongHairMiaWallace', 'LongHairStraight', 'LongHairStraight2', 'LongHairStraightStrand', 'ShortHairDreads01', 'ShortHairDreads02', 'ShortHairFrizzle', 'ShortHairShaggy', 'ShortHairShaggyMullet', 'ShortHairShortCurly', 'ShortHairShortFlat', 'ShortHairShortRound', 'ShortHairShortWaved', 'ShortHairSides', 'ShortHairTheCaesar', 'ShortHairTheCaesarSidePart'],
+            hairColor: ['Auburn', 'Black', 'Blonde', 'BlondeGolden', 'Brown', 'BrownDark', 'PastelPink', 'Platinum', 'Red', 'SilverGray'],
+            hatColor: ['Black', 'Blue01', 'Blue02', 'Blue03', 'Gray01', 'Gray02', 'Heather', 'PastelBlue', 'PastelGreen', 'PastelOrange', 'PastelRed', 'PastelYellow', 'Pink', 'Red', 'White'],
+            facialHairType: ['Blank', 'BeardLight', 'BeardMajestic', 'MoustacheFancy', 'MoustacheMagnum'],
+            facialHairColor: ['Auburn', 'Black', 'Blonde', 'BlondeGolden', 'Brown', 'BrownDark', 'PastelPink', 'Platinum', 'Red', 'SilverGray'],
+            noseType: ['Default'],
+            eyeType: ['Default', 'Close', 'Cry', 'Dizzy', 'EyeRoll', 'Happy', 'Hearts', 'Side', 'Squint', 'Surprised', 'Wink', 'WinkWacky'],
+            eyebrowType: ['Default', 'Angry', 'AngryNatural', 'FlatNatural', 'FrownNatural', 'RaisedExcited', 'RaisedExcitedNatural', 'SadConcerned', 'SadConcernedNatural', 'UnibrowNatural', 'Updown', 'UpDownNatural'],
+            mouthType: ['Default', 'Smile', 'Concerned', 'Disbelief', 'Eating', 'Grimace', 'Sad', 'Twinkle'],
+            skinColor: ['Tanned', 'Yellow', 'Pale', 'Light', 'Brown', 'DarkBrown', 'Black'],
+            clotheType: ['BlazerShirt', 'BlazerSweater', 'CollarSweater', 'GraphicShirt', 'Hoodie', 'Overall', 'ShirtCrewNeck', 'ShirtScoopNeck', 'ShirtVNeck'],
+            clotheColor: ['Black', 'Blue01', 'Blue02', 'Blue03', 'Gray01', 'Gray02', 'Heather', 'PastelBlue', 'PastelGreen', 'PastelOrange', 'PastelRed', 'PastelYellow', 'Pink', 'Red', 'White'],
+            graphicType: ['Bat', 'Cumbia', 'Deer', 'Diamond', 'Hola', 'Pizza', 'Resist', 'Selena', 'Bear', 'Skull', 'SkullOutline'],
+            accessoriesType: ['Blank', 'Prescription01', 'Prescription02', 'Round', 'Sunglasses', 'Wayfarers'],
+            topColor: ['Black', 'Blue01', 'Blue02', 'Blue03', 'Gray01', 'Gray02', 'Heather', 'PastelBlue', 'PastelGreen', 'PastelOrange', 'PastelRed', 'PastelYellow', 'Pink', 'Red', 'White'],
+        };
+
+        function generateRandomAvatarConfig() {
+            const randomConfig = {};
+            const hatTypes = ['Hat', 'Turban', 'WinterHat1', 'WinterHat2', 'WinterHat3', 'WinterHat4'];
+
+            for (const feature in avatarFeatures) {
+                const possibleValues = avatarFeatures[feature];
+                randomConfig[feature] = possibleValues[Math.floor(Math.random() * possibleValues.length)];
+            }
+
+            // Clean up conditional properties
+            if (hatTypes.includes(randomConfig.topType)) {
+                delete randomConfig.topColor; // Use hatColor instead
+            } else if (randomConfig.topType === 'Hijab') {
+                delete randomConfig.topColor; // Use topColor instead
+            } else {
+                // It's regular hair, so delete both hat and top colors
+                delete randomConfig.hatColor;
+                delete randomConfig.topColor;
+            }
+
+            if (randomConfig.facialHairType === 'Blank') {
+                delete randomConfig.facialHairColor;
+            }
+
+            if (randomConfig.clotheType !== 'GraphicShirt') {
+                delete randomConfig.graphicType;
+            }
+            return randomConfig;
+        }
+
+
+        function updateAvatarPreview(config) {
+            const queryParams = new URLSearchParams(config).toString();
+            avatarPreview.src = `https://avataaars.io/?${queryParams}`;
+            avatarPreview.parentElement.style.backgroundColor = 'transparent';
+        }
+
+        function createOption(value, text) {
+            const option = document.createElement('option');
+            option.value = value;
+            option.textContent = text;
+            return option;
+        }
+
+        function populateSelect(selectElement, featureArray) {
+            selectElement.innerHTML = '';
+            featureArray.forEach(value => {
+                let text = value.replace(/([A-Z])/g, ' $1').replace(/([0-9])/, ' $1').trim();
+                if (selectElement.id === 'skinColorSelect') {
+                    if (value === 'Pale') { text = 'Pale'; }
+                    else if (value === 'Yellow') { text = 'Light Tan'; }
+                    else if (value === 'Light') { text = 'Pale Beige'; }
+                }
+                selectElement.appendChild(createOption(value, text));
+            });
+        }
+
+        function handleConditionalAvatarFields() {
+            const topType = currentAvatarConfig.topType;
+            const hatTypes = ['Hat', 'Turban', 'WinterHat1', 'WinterHat2', 'WinterHat3', 'WinterHat4'];
+            const hijabType = 'Hijab';
+
+            // Show/Hide Top Color dropdown for Hats and Hijab
+            if (hatTypes.includes(topType) || topType === hijabType) {
+                topColorGroup.classList.remove('hidden');
+            } else {
+                topColorGroup.classList.add('hidden');
+            }
+
+            // Clean up config object based on topType
+            if (hatTypes.includes(topType)) {
+                delete currentAvatarConfig.topColor; // Remove incorrect property
+                if (!currentAvatarConfig.hatColor) {
+                    currentAvatarConfig.hatColor = topColorSelect.value;
+                }
+            } else if (topType === hijabType) {
+                delete currentAvatarConfig.hatColor; // Remove incorrect property
+                if (!currentAvatarConfig.topColor) {
+                    currentAvatarConfig.topColor = topColorSelect.value;
+                }
+            } else {
+                // It's regular hair, so delete both
+                delete currentAvatarConfig.hatColor;
+                delete currentAvatarConfig.topColor;
+            }
+
+
+            // Show/Hide Facial Hair Color
+            if (currentAvatarConfig.facialHairType !== 'Blank') {
+                facialHairColorGroup.classList.remove('hidden');
+                if (!currentAvatarConfig.facialHairColor) {
+                    currentAvatarConfig.facialHairColor = facialHairColorSelect.value;
+                }
+            } else {
+                facialHairColorGroup.classList.add('hidden');
+                delete currentAvatarConfig.facialHairColor;
+            }
+
+            // Show/Hide Graphic Type
+            if (currentAvatarConfig.clotheType === 'GraphicShirt') {
+                graphicTypeGroup.classList.remove('hidden');
+                if (!currentAvatarConfig.graphicType) {
+                    currentAvatarConfig.graphicType = graphicTypeSelect.value;
+                }
+            } else {
+                graphicTypeGroup.classList.add('hidden');
+                delete currentAvatarConfig.graphicType;
+            }
+            updateAvatarPreview(currentAvatarConfig);
+        }
+
+
+        function initializeAvatarCreatorOptions() {
+            populateSelect(avatarStyleSelect, avatarFeatures.avatarStyle);
+            populateSelect(topTypeSelect, avatarFeatures.topType);
+            populateSelect(topColorSelect, avatarFeatures.topColor);
+            populateSelect(hairColorSelect, avatarFeatures.hairColor);
+            populateSelect(facialHairTypeSelect, avatarFeatures.facialHairType);
+            populateSelect(facialHairColorSelect, avatarFeatures.facialHairColor);
+            // Removed noseTypeSelect from here
+            populateSelect(eyeTypeSelect, avatarFeatures.eyeType);
+            populateSelect(eyebrowTypeSelect, avatarFeatures.eyebrowType);
+            populateSelect(mouthTypeSelect, avatarFeatures.mouthType);
+            populateSelect(skinColorSelect, avatarFeatures.skinColor);
+            populateSelect(clotheTypeSelect, avatarFeatures.clotheType);
+            populateSelect(clotheColorSelect, avatarFeatures.clotheColor);
+            populateSelect(graphicTypeSelect, avatarFeatures.graphicType);
+            populateSelect(accessoriesTypeSelect, avatarFeatures.accessoriesType);
+
+            avatarStyleSelect.addEventListener('change', (event) => { currentAvatarConfig.avatarStyle = event.target.value; handleConditionalAvatarFields(); });
+            topTypeSelect.addEventListener('change', (event) => { currentAvatarConfig.topType = event.target.value; handleConditionalAvatarFields(); });
+
+            // This listener now handles both hat and top colors
+            topColorSelect.addEventListener('change', (event) => {
+                const selectedColor = event.target.value;
+                const hatTypes = ['Hat', 'Turban', 'WinterHat1', 'WinterHat2', 'WinterHat3', 'WinterHat4'];
+                if (hatTypes.includes(currentAvatarConfig.topType)) {
+                    currentAvatarConfig.hatColor = selectedColor;
+                } else if (currentAvatarConfig.topType === 'Hijab') {
+                    currentAvatarConfig.topColor = selectedColor;
+                }
                 updateAvatarPreview(currentAvatarConfig);
-                avatarMessage.textContent = 'New random avatar generated!';
-                avatarMessage.style.color = 'gray';
-                setAvatarCreatorOptions(currentAvatarConfig);
             });
 
-            saveAvatarBtn.addEventListener('click', async () => {
-                playClickSound();
-                avatarMessage.textContent = 'Saving avatar...';
-                avatarMessage.style.color = 'gray';
-                saveAvatarBtn.disabled = true;
+            hairColorSelect.addEventListener('change', (event) => { currentAvatarConfig.hairColor = event.target.value; updateAvatarPreview(currentAvatarConfig); });
+            facialHairTypeSelect.addEventListener('change', (event) => { currentAvatarConfig.facialHairType = event.target.value; handleConditionalAvatarFields(); });
+            facialHairColorSelect.addEventListener('change', (event) => { currentAvatarConfig.facialHairColor = event.target.value; updateAvatarPreview(currentAvatarConfig); });
+            // Removed noseTypeSelect listener from here
+            eyeTypeSelect.addEventListener('change', (event) => { currentAvatarConfig.eyeType = event.target.value; updateAvatarPreview(currentAvatarConfig); });
+            eyebrowTypeSelect.addEventListener('change', (event) => { currentAvatarConfig.eyebrowType = event.target.value; updateAvatarPreview(currentAvatarConfig); });
+            mouthTypeSelect.addEventListener('change', (event) => { currentAvatarConfig.mouthType = event.target.value; updateAvatarPreview(currentAvatarConfig); });
+            skinColorSelect.addEventListener('change', (event) => { currentAvatarConfig.skinColor = event.target.value; updateAvatarPreview(currentAvatarConfig); });
+            clotheTypeSelect.addEventListener('change', (event) => { currentAvatarConfig.clotheType = event.target.value; handleConditionalAvatarFields(); });
+            clotheColorSelect.addEventListener('change', (event) => { currentAvatarConfig.clotheColor = event.target.value; updateAvatarPreview(currentAvatarConfig); });
+            graphicTypeSelect.addEventListener('change', (event) => { currentAvatarConfig.graphicType = event.target.value; updateAvatarPreview(currentAvatarConfig); });
+            accessoriesTypeSelect.addEventListener('change', (event) => { currentAvatarConfig.accessoriesType = event.target.value; updateAvatarPreview(currentAvatarConfig); });
+        }
 
-                const user = JSON.parse(localStorage.getItem('user'));
-                console.log('Save Avatar: User from localStorage before saving:', user);
+        function setAvatarCreatorOptions(config) {
+            avatarStyleSelect.value = config.avatarStyle || avatarFeatures.avatarStyle[0];
+            topTypeSelect.value = config.topType || avatarFeatures.topType[0];
 
-                if (!user || !user._id) {
-                    avatarMessage.textContent = 'Error: User not logged in.';
-                    avatarMessage.style.color = 'red';
-                    saveAvatarBtn.disabled = false;
-                    hideAvatarCreatorModal();
-                    console.error('Save Avatar: User not found or _id missing. Hiding avatar modal.');
-                    return;
+            // Set the top color dropdown based on hatColor or topColor
+            const hatTypes = ['Hat', 'Turban', 'WinterHat1', 'WinterHat2', 'WinterHat3', 'WinterHat4'];
+            if(hatTypes.includes(config.topType)) {
+                topColorSelect.value = config.hatColor || avatarFeatures.hatColor[0];
+            } else if (config.topType === 'Hijab') {
+                topColorSelect.value = config.topColor || avatarFeatures.topColor[0];
+            }
+
+            hairColorSelect.value = config.hairColor || avatarFeatures.hairColor[0];
+            facialHairTypeSelect.value = config.facialHairType || avatarFeatures.facialHairType[0];
+            facialHairColorSelect.value = config.facialHairColor || avatarFeatures.facialHairColor[0];
+            // Removed noseTypeSelect.value from here
+            eyeTypeSelect.value = config.eyeType || avatarFeatures.eyeType[0];
+            eyebrowTypeSelect.value = config.eyebrowType || avatarFeatures.eyebrowType[0];
+            mouthTypeSelect.value = config.mouthType || avatarFeatures.mouthType[0];
+            skinColorSelect.value = config.skinColor || avatarFeatures.skinColor[0];
+            clotheTypeSelect.value = config.clotheType || avatarFeatures.clotheType[0];
+            clotheColorSelect.value = config.clotheColor || avatarFeatures.clotheColor[0];
+            graphicTypeSelect.value = config.graphicType || avatarFeatures.graphicType[0];
+            accessoriesTypeSelect.value = config.accessoriesType || avatarFeatures.accessoriesType[0];
+
+            handleConditionalAvatarFields();
+        }
+
+
+        loginBtn.addEventListener('click', () => {
+            playClickSound();
+            showLoginForm();
+            authModal.classList.remove('hidden');
+        });
+
+        signupBtn.addEventListener('click', () => {
+            playClickSound();
+            showSignupForm();
+            authModal.classList.remove('hidden');
+        });
+
+        profileBtn.addEventListener('click', () => {
+            playClickSound();
+            const user = JSON.parse(localStorage.getItem('user'));
+            console.log("User object from localStorage on profile click:", user);
+
+            authMessage.textContent = '';
+            authMessage.style.color = 'black';
+            submitAuthBtn.classList.add('hidden');
+            loginSignupFields.classList.add('hidden');
+            forgotPasswordFields.classList.add('hidden');
+            forgotPasswordLink.classList.add('hidden');
+            if (changeAvatarProfileBtn) changeAvatarProfileBtn.classList.add('hidden');
+            profileAvatarDisplay.classList.add('hidden');
+            logoutBtn.classList.add('hidden');
+            deleteAccountBtn.classList.add('hidden');
+            badgeDisplayContainer.classList.add('hidden'); // Hide badges by default
+
+            if (!user) {
+                authMessage.textContent = 'Please log in to view your profile.';
+                authMessage.style.color = 'red';
+                authModal.classList.remove('hidden');
+                showLoginForm();
+                return;
+            }
+
+            if (user.has_created_avatar === false || user.has_created_avatar === undefined || user.has_created_avatar === null) {
+                showAvatarCreatorModal(user.avatar_config || {});
+            } else {
+                authTitle.textContent = 'User Profile';
+                authMessage.textContent = `Welcome, ${user.username}!`;
+                authModal.classList.remove('hidden');
+
+                if (changeAvatarProfileBtn) changeAvatarProfileBtn.classList.remove('hidden');
+                logoutBtn.classList.remove('hidden');
+                deleteAccountBtn.classList.remove('hidden');
+
+                if (user.avatar_config && Object.keys(user.avatar_config).length > 0) {
+                    const avatarUrl = `https://avataaars.io/?${new URLSearchParams(user.avatar_config).toString()}`;
+                    profileAvatarImg.src = avatarUrl;
+                    profileAvatarDisplay.classList.remove('hidden');
                 }
-
-                console.log('Save Avatar: Current avatar config being sent:', currentAvatarConfig);
-                try {
-                    const response = await fetch(`${BACKEND_URL}/avatar/${user._id}`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify(currentAvatarConfig)
-                    });
-
-                    console.log('Save Avatar: Fetch response received. Status:', response.status, response.statusText);
-
-                    if (!response.ok) {
-                        const errorData = await response.json().catch(() => ({ message: 'Could not parse error response.' }));
-                        avatarMessage.textContent = errorData.message || `Error saving avatar: ${response.status} ${response.statusText}`;
-                        avatarMessage.style.color = 'red';
-                        console.error('Save Avatar: Server responded with error:', response.status, errorData);
-                        return;
-                    }
-
-                    const data = await response.json();
-                    console.log('Save Avatar: Parsed response data:', data);
-
-                    if (data.status === "Success") {
-                        avatarMessage.textContent = data.message;
-                        avatarMessage.style.color = 'green';
-
-                        // Get the full user object from storage
-                        const existingUser = JSON.parse(localStorage.getItem('user'));
-
-                        // Merge the updates from the server response into the existing user object
-                        const updatedUser = {
-                            ...existingUser, // Keeps old avatar_config if not explicitly returned
-                            ...data.data     // Overwrites with fresh data from the avatar save response
-                        };
-
-                        // Save the complete, merged user object back to localStorage
-                        localStorage.setItem('user', JSON.stringify(updatedUser));
-                        console.log('Save Avatar: User data updated in localStorage:', updatedUser);
-
-                        // Now, reliably update the UI by calling the main function
-                        updateAuthButtons();
-
-                        setTimeout(() => {
-                            hideAvatarCreatorModal();
-                        }, 1000);
-
-                    } else {
-                        avatarMessage.textContent = data.message || 'An application error occurred (backend status not Success).';
-                        avatarMessage.style.color = 'red';
-                    }
-                } catch (error) {
-                    console.error('Save Avatar: Network error or JSON parse error:', error);
-                    avatarMessage.textContent = 'Network error saving avatar. Please try again.';
-                    avatarMessage.style.color = 'red';
-                } finally {
-                    saveAvatarBtn.disabled = false;
-                }
-            });
-
-
-            function logoutUser(message) {
-                localStorage.removeItem('token');
-                localStorage.removeItem('user');
-                updateAuthButtons();
                 
-                // Hide all modals
-                authModal.classList.add('hidden');
-                deleteConfirmationModal.classList.add('hidden');
-                
-                // Show a final message
-                showMessageBox(message || "You have been logged out.");
-            }
-            
-            logoutBtn.addEventListener('click', () => {
-                playClickSound();
-                logoutUser();
-            });
-
-            async function handleAuthSubmission(e) {
-                if (e && e.preventDefault) {
-                    e.preventDefault();
-                }
-                playClickSound();
-
-                const action = authForm.dataset.currentAction;
-
-                authMessage.textContent = 'Processing...';
-                authMessage.style.color = 'gray';
-                submitAuthBtn.disabled = true;
-
-                let requestBody = {};
-                let endpoint = '';
-
-                if (action === 'login') {
-                    requestBody = { username: usernameInput.value, password: passwordInput.value };
-                    endpoint = `${BACKEND_URL}/login`;
-                } else if (action === 'signup') {
-                    requestBody = { username: usernameInput.value, email: emailInput.value, password: passwordInput.value };
-                    
-                    // --- NEW: Updated password validation ---
-                    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-
-                    if (!requestBody.email || !/^[\w-\.]+@([\w-]+\.)+[\w-\.]{2,4}$/.test(requestBody.email)) {
-                        authMessage.textContent = 'Please enter a valid email address.';
-                        authMessage.style.color = 'red';
-                        submitAuthBtn.disabled = false;
-                        return;
-                    }
-                    if (!passwordRegex.test(requestBody.password)) {
-                        authMessage.textContent = 'Password must be at least 8 characters long and contain one uppercase letter, one lowercase letter, one number, and one special character.';
-                        authMessage.style.color = 'red';
-                        submitAuthBtn.disabled = false;
-                        return;
-                    }
-                    if (!/^[a-zA-Z0-9]+$/.test(requestBody.username)) {
-                        authMessage.textContent = 'Invalid username. Only alphanumeric characters are allowed.';
-                        authMessage.style.color = 'red';
-                        submitAuthBtn.disabled = false;
-                        return;
-                    }
-                } else if (action === 'forgot-password') {
-                    requestBody = { email: forgotPasswordEmailInput.value };
-                    endpoint = `${BACKEND_URL}/reset-password-request`;
-                    if (!requestBody.email) {
-                        authMessage.textContent = 'Please enter your email address.';
-                        authMessage.style.color = 'red';
-                        submitAuthBtn.disabled = false;
-                        return;
-                    }
-                }
-
-                try {
-                    const response = await fetch(endpoint, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify(requestBody)
+                // --- NEW: LOGIC TO DISPLAY BADGES ---
+                if (user.badges && user.badges.length > 0) {
+                    badgeGrid.innerHTML = ''; // Clear old badges
+                    user.badges.forEach(badgeName => {
+                        const badgeElement = document.createElement('div');
+                        // ADDED: text-center class to ensure text is centered
+                        badgeElement.className = 'flex flex-col items-center text-center'; 
+                        const displayName = badgeDetails[badgeName] || badgeName.replace(/_/g, ' ');
+                        badgeElement.innerHTML = `
+                            <img src="Badges/${badgeName}.png" alt="${displayName}" class="w-16 h-16" onerror="this.onerror=null; this.src='https://placehold.co/64x64/cccccc/000000?text=B';">
+                            <span class="text-xs text-gray-600 mt-1">${displayName}</span>
+                        `;
+                        badgeGrid.appendChild(badgeElement);
                     });
-
-                    const data = await response.json();
-                    console.log('Auth Backend Response Status:', response.status);
-                    console.log('Auth Backend Response Data:', data);
-
-
-                    if (response.ok) {
-                        if (data.status === "Success") {
-                            // Crucial change: Always set the 'user' object from the backend response.
-                            // This 'data.data' should contain the username and other user details.
-                            localStorage.setItem('user', JSON.stringify(data.data));
-
-                            if (data.token) { // Only set token if it exists (on login)
-                                localStorage.setItem('token', data.token);
-                            }
-
-                            authMessage.textContent = data.message;
-                            authMessage.style.color = 'green';
-                            setTimeout(() => {
-                                authModal.classList.add('hidden');
-                                updateAuthButtons();
-                                const user = JSON.parse(localStorage.getItem('user'));
-                                
-                                // --- AWARD BADGE ON SIGNUP ---
-                                if (action === 'signup') {
-                                    awardBadge('smartystarter3', 'Smarty Starter');
-                                }
-                                
-                                if (action === 'signup' || (user && !user.has_created_avatar)) {
-                                    showAvatarCreatorModal(user.avatar_config || {});
-                                }
-                            }, 1000);
-                        } else {
-                            authMessage.textContent = data.message || 'An application error occurred.';
-                            authMessage.style.color = 'red';
-                        }
-                    } else {
-                        authMessage.textContent = data.message || `An HTTP error occurred: ${response.status}`;
-                        authMessage.style.color = 'red';
-                    }
-                } catch (error) {
-                    console.error('Fetch error (network or JSON parse):', error);
-                    authMessage.textContent = 'Network error or invalid response. Please check backend server and console for details.';
-                    authMessage.style.color = 'red';
-                } finally {
-                    submitAuthBtn.disabled = false;
-                }
-            }
-
-            authForm.addEventListener('submit', handleAuthSubmission);
-            submitAuthBtn.addEventListener('click', handleAuthSubmission);
-
-            // Add event listener for the Contact button with fallback to clipboard copy
-            contactBtn.addEventListener('click', () => {
-                playClickSound();
-                const emailAddress = 'sbloom@cnature.net';
-
-                // 1. Always copy to clipboard immediately on click for reliability.
-                copyEmailToClipboard(emailAddress);
-                showMessageBox("Email copied to clipboard. Attempting to open email client...");
-
-                // 2. Then, attempt to open the mailto link.
-                const mailtoLink = `mailto:${emailAddress}`;
-                try {
-                    // Creating a temporary anchor and clicking it is often more reliable than window.open for mailto.
-                    const tempLink = document.createElement('a');
-                    tempLink.href = mailtoLink;
-                    tempLink.style.display = 'none'; // Hide it
-                    document.body.appendChild(tempLink);
-                    tempLink.click(); // Programmatically click the link
-                    document.body.removeChild(tempLink); // Clean up
-
-                } catch (e) {
-                    console.error("Error attempting to open mailto link:", e);
-                    // If an error occurs during the mailto attempt, update message.
-                    showMessageBox("Email copied to clipboard. Could not open email client.");
-                }
-            });
-
-            /**
-             * Copies the given text to the clipboard and shows a temporary message.
-             * @param {string} text The text to copy.
-             */
-            function copyEmailToClipboard(text) {
-                const tempInput = document.createElement('textarea'); // Use textarea for better cross-browser support
-                tempInput.value = text;
-                document.body.appendChild(tempInput);
-                tempInput.select();
-                tempInput.setSelectionRange(0, 99999); // For mobile devices
-                try {
-                    document.execCommand('copy');
-                } catch (err) {
-                    console.error('Failed to copy email:', err);
-                    showMessageBox('Failed to copy email. Please copy it manually: ' + text);
-                } finally {
-                    document.body.removeChild(tempInput);
-                }
-            }
-
-            // NEW: Event listener for the Donate button
-            donateBtn.addEventListener('click', () => {
-                playClickSound();
-                // IMPORTANT: Replace 'YOUR_PAYPAL_DONATION_LINK_HERE' with your actual PayPal donation URL
-                const donationUrl = 'https://www.paypal.com/donate/?hosted_button_id=RSG7WDB322VBC';
-                window.open(donationUrl, '_blank'); // Open in a new tab
-            });
-            
-            // --- NEW: Badge Awarding Function ---
-            /**
-             * Awards a badge to the current user and shows a message.
-             * This function should be called from your game iframes or other parts of the app.
-             * @param {string} badgeName - The filename of the badge (e.g., 'smartystarter3').
-             * @param {string} badgeDisplayName - The display-friendly name (e.g., 'Smarty Starter').
-             */
-            async function awardBadge(badgeName, badgeDisplayName) {
-                const user = JSON.parse(localStorage.getItem('user'));
-                const token = localStorage.getItem('token');
-
-                if (!user || !token) {
-                    console.log("Badge Award: No user logged in.");
-                    return;
-                }
-
-                // Check if user already has the badge in localStorage to prevent unnecessary API calls
-                if (user.badges && user.badges.includes(badgeName)) {
-                    console.log(`Badge '${badgeName}' already awarded.`);
-                    return;
-                }
-
-                try {
-                    const response = await fetch(`${BACKEND_URL}/award-badge`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${token}` // Assuming you might add auth middleware later
-                        },
-                        body: JSON.stringify({ userId: user._id, badgeName: badgeName })
-                    });
-
-                    const result = await response.json();
-
-                    if (result.status === "Success" && !result.alreadyAwarded) {
-                        // Update the user object in localStorage with the new badge list
-                        user.badges = result.data.badges;
-                        localStorage.setItem('user', JSON.stringify(user));
-
-                        // Show a notification
-                        showBadgeNotification(badgeName, badgeDisplayName);
-                        
-                        // Optionally, update the profile view if it's open
-                        updateAuthButtons(); 
-                    }
-                } catch (error) {
-                    console.error("Error awarding badge:", error);
+                    badgeDisplayContainer.classList.remove('hidden');
                 }
             }
         });
+
+
+        forgotPasswordLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            playClickSound();
+            showForgotPasswordForm();
+        });
+
+        closeModalBtn.addEventListener('click', () => {
+            playClickSound();
+            if (changeAvatarProfileBtn) changeAvatarProfileBtn.classList.add('hidden');
+            profileAvatarDisplay.classList.add('hidden');
+            logoutBtn.classList.add('hidden');
+            deleteAccountBtn.classList.add('hidden');
+            authModal.classList.add('hidden');
+            authMessage.textContent = '';
+            showLoginForm();
+        });
+
+        closeAvatarModalBtn.addEventListener('click', () => {
+            playClickSound();
+            hideAvatarCreatorModal();
+        });
+
+        generateRandomAvatarBtn.addEventListener('click', () => {
+            playClickSound();
+            currentAvatarConfig = generateRandomAvatarConfig();
+            updateAvatarPreview(currentAvatarConfig);
+            avatarMessage.textContent = 'New random avatar generated!';
+            avatarMessage.style.color = 'gray';
+            setAvatarCreatorOptions(currentAvatarConfig);
+        });
+
+        saveAvatarBtn.addEventListener('click', async () => {
+            playClickSound();
+            avatarMessage.textContent = 'Saving avatar...';
+            avatarMessage.style.color = 'gray';
+            saveAvatarBtn.disabled = true;
+
+            const user = JSON.parse(localStorage.getItem('user'));
+            console.log('Save Avatar: User from localStorage before saving:', user);
+
+            if (!user || !user._id) {
+                avatarMessage.textContent = 'Error: User not logged in.';
+                avatarMessage.style.color = 'red';
+                saveAvatarBtn.disabled = false;
+                hideAvatarCreatorModal();
+                console.error('Save Avatar: User not found or _id missing. Hiding avatar modal.');
+                return;
+            }
+
+            console.log('Save Avatar: Current avatar config being sent:', currentAvatarConfig);
+            try {
+                const response = await fetch(`${BACKEND_URL}/avatar/${user._id}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(currentAvatarConfig)
+                });
+
+                console.log('Save Avatar: Fetch response received. Status:', response.status, response.statusText);
+
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({ message: 'Could not parse error response.' }));
+                    avatarMessage.textContent = errorData.message || `Error saving avatar: ${response.status} ${response.statusText}`;
+                    avatarMessage.style.color = 'red';
+                    console.error('Save Avatar: Server responded with error:', response.status, errorData);
+                    return;
+                }
+
+                const data = await response.json();
+                console.log('Save Avatar: Parsed response data:', data);
+
+                if (data.status === "Success") {
+                    avatarMessage.textContent = data.message;
+                    avatarMessage.style.color = 'green';
+
+                    // Get the full user object from storage
+                    const existingUser = JSON.parse(localStorage.getItem('user'));
+
+                    // Merge the updates from the server response into the existing user object
+                    const updatedUser = {
+                        ...existingUser, // Keeps old avatar_config if not explicitly returned
+                        ...data.data     // Overwrites with fresh data from the avatar save response
+                    };
+
+                    // Save the complete, merged user object back to localStorage
+                    localStorage.setItem('user', JSON.stringify(updatedUser));
+                    console.log('Save Avatar: User data updated in localStorage:', updatedUser);
+
+                    // Now, reliably update the UI by calling the main function
+                    updateAuthButtons();
+
+                    setTimeout(() => {
+                        hideAvatarCreatorModal();
+                    }, 1000);
+
+                } else {
+                    avatarMessage.textContent = data.message || 'An application error occurred (backend status not Success).';
+                    avatarMessage.style.color = 'red';
+                }
+            } catch (error) {
+                console.error('Save Avatar: Network error or JSON parse error:', error);
+                avatarMessage.textContent = 'Network error saving avatar. Please try again.';
+                avatarMessage.style.color = 'red';
+            } finally {
+                saveAvatarBtn.disabled = false;
+            }
+        });
+
+
+        function logoutUser(message) {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            updateAuthButtons();
+            
+            // Hide all modals
+            authModal.classList.add('hidden');
+            deleteConfirmationModal.classList.add('hidden');
+            
+            // Show a final message
+            showMessageBox(message || "You have been logged out.");
+        }
+        
+        logoutBtn.addEventListener('click', () => {
+            playClickSound();
+            logoutUser();
+        });
+
+        // Open confirmation modal when delete button is clicked
+        const deleteAccountBtn = document.getElementById('deleteAccountBtn');
+        deleteAccountBtn.addEventListener('click', () => {
+            authModal.classList.add('hidden'); // Hide the profile modal
+            deleteConfirmationModal.classList.remove('hidden');
+        });
+
+        // Close confirmation modal
+        const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
+        cancelDeleteBtn.addEventListener('click', () => {
+            deleteConfirmationModal.classList.add('hidden');
+        });
+
+        // Handle the final deletion
+        const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+        confirmDeleteBtn.addEventListener('click', async () => {
+            const user = JSON.parse(localStorage.getItem('user'));
+            if (!user) {
+                console.error("No user found in localStorage for delete request.");
+                return;
+            }
+            const token = localStorage.getItem('token');
+            if (!token) {
+                 console.error("No token found in localStorage for delete request.");
+                 return;
+            }
+
+            try {
+                const response = await fetch(`${BACKEND_URL}/delete/${user._id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${token}` // Correctly format the Authorization header
+                    }
+                });
+
+                const result = await response.json();
+
+                if (response.ok && result.status === "Success") {
+                    // Log the user out completely
+                    logoutUser("Account deleted successfully.");
+                } else {
+                    showMessageBox(result.message || "Failed to delete account. Please try again.");
+                }
+            } catch (error) {
+                console.error("Error deleting account:", error);
+                showMessageBox("An error occurred. Please try again.");
+            }
+        });
+
+        async function handleAuthSubmission(e) {
+            if (e && e.preventDefault) {
+                e.preventDefault();
+            }
+            playClickSound();
+
+            const action = authForm.dataset.currentAction;
+
+            authMessage.textContent = 'Processing...';
+            authMessage.style.color = 'gray';
+            submitAuthBtn.disabled = true;
+
+            let requestBody = {};
+            let endpoint = '';
+
+            if (action === 'login') {
+                requestBody = { username: usernameInput.value, password: passwordInput.value };
+                endpoint = `${BACKEND_URL}/login`;
+            } else if (action === 'signup') {
+                requestBody = { username: usernameInput.value, email: emailInput.value, password: passwordInput.value };
+                endpoint = `${BACKEND_URL}/signup`;
+                
+                // --- NEW: Updated password validation ---
+                const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+
+                if (!requestBody.email || !/^[\w-\.]+@([\w-]+\.)+[\w-\.]{2,4}$/.test(requestBody.email)) {
+                    authMessage.textContent = 'Please enter a valid email address.';
+                    authMessage.style.color = 'red';
+                    submitAuthBtn.disabled = false;
+                    return;
+                }
+                if (!passwordRegex.test(requestBody.password)) {
+                    authMessage.textContent = 'Password must be at least 8 characters long and contain one uppercase letter, one lowercase letter, one number, and one special character.';
+                    authMessage.style.color = 'red';
+                    submitAuthBtn.disabled = false;
+                    return;
+                }
+                if (!/^[a-zA-Z0-9]+$/.test(requestBody.username)) {
+                    authMessage.textContent = 'Invalid username. Only alphanumeric characters are allowed.';
+                    authMessage.style.color = 'red';
+                    submitAuthBtn.disabled = false;
+                    return;
+                }
+            } else if (action === 'forgot-password') {
+                requestBody = { email: forgotPasswordEmailInput.value };
+                endpoint = `${BACKEND_URL}/reset-password-request`;
+                if (!requestBody.email) {
+                    authMessage.textContent = 'Please enter your email address.';
+                    authMessage.style.color = 'red';
+                    submitAuthBtn.disabled = false;
+                    return;
+                }
+            }
+
+            try {
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(requestBody)
+                });
+
+                const data = await response.json();
+                console.log('Auth Backend Response Status:', response.status);
+                console.log('Auth Backend Response Data:', data);
+
+
+                if (response.ok) {
+                    if (data.status === "Success") {
+                        // Crucial change: Always set the 'user' object from the backend response.
+                        // This 'data.data' should contain the username and other user details.
+                        localStorage.setItem('user', JSON.stringify(data.data));
+
+                        if (data.token) { // Only set token if it exists (on login)
+                            localStorage.setItem('token', data.token);
+                        }
+
+                        authMessage.textContent = data.message;
+                        authMessage.style.color = 'green';
+                        setTimeout(() => {
+                            authModal.classList.add('hidden');
+                            updateAuthButtons();
+                            const user = JSON.parse(localStorage.getItem('user'));
+                            
+                            // --- AWARD BADGE ON SIGNUP ---
+                            if (action === 'signup') {
+                                awardBadge('smartystarter3', 'Smarty Starter');
+                            }
+                            
+                            if (action === 'signup' || (user && !user.has_created_avatar)) {
+                                showAvatarCreatorModal(user.avatar_config || {});
+                            }
+                        }, 1000);
+                    } else {
+                        authMessage.textContent = data.message || 'An application error occurred.';
+                        authMessage.style.color = 'red';
+                    }
+                } else {
+                    authMessage.textContent = data.message || `An HTTP error occurred: ${response.status}`;
+                    authMessage.style.color = 'red';
+                }
+            } catch (error) {
+                console.error('Fetch error (network or JSON parse):', error);
+                authMessage.textContent = 'Network error or invalid response. Please check backend server and console for details.';
+                authMessage.style.color = 'red';
+            } finally {
+                submitAuthBtn.disabled = false;
+            }
+        }
+
+        authForm.addEventListener('submit', handleAuthSubmission);
+        submitAuthBtn.addEventListener('click', handleAuthSubmission);
+
+        // Add event listener for the Contact button with fallback to clipboard copy
+        contactBtn.addEventListener('click', () => {
+            playClickSound();
+            const emailAddress = 'sbloom@cnature.net';
+
+            // 1. Always copy to clipboard immediately on click for reliability.
+            copyEmailToClipboard(emailAddress);
+            showMessageBox("Email copied to clipboard. Attempting to open email client...");
+
+            // 2. Then, attempt to open the mailto link.
+            const mailtoLink = `mailto:${emailAddress}`;
+            try {
+                // Creating a temporary anchor and clicking it is often more reliable than window.open for mailto.
+                const tempLink = document.createElement('a');
+                tempLink.href = mailtoLink;
+                tempLink.style.display = 'none'; // Hide it
+                document.body.appendChild(tempLink);
+                tempLink.click(); // Programmatically click the link
+                document.body.removeChild(tempLink); // Clean up
+
+            } catch (e) {
+                console.error("Error attempting to open mailto link:", e);
+                // If an error occurs during the mailto attempt, update message.
+                showMessageBox("Email copied to clipboard. Could not open email client.");
+            }
+        });
+
+        /**
+         * Copies the given text to the clipboard and shows a temporary message.
+         * @param {string} text The text to copy.
+         */
+        function copyEmailToClipboard(text) {
+            const tempInput = document.createElement('textarea'); // Use textarea for better cross-browser support
+            tempInput.value = text;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            tempInput.setSelectionRange(0, 99999); // For mobile devices
+            try {
+                document.execCommand('copy');
+            } catch (err) {
+                console.error('Failed to copy email:', err);
+                showMessageBox('Failed to copy email. Please copy it manually: ' + text);
+            } finally {
+                document.body.removeChild(tempInput);
+            }
+        }
+
+        // NEW: Event listener for the Donate button
+        donateBtn.addEventListener('click', () => {
+            playClickSound();
+            // IMPORTANT: Replace 'YOUR_PAYPAL_DONATION_LINK_HERE' with your actual PayPal donation URL
+            const donationUrl = 'https://www.paypal.com/donate/?hosted_button_id=RSG7WDB322VBC';
+            window.open(donationUrl, '_blank'); // Open in a new tab
+        });
+        
+        // --- NEW: Badge Awarding Function ---
+        /**
+         * Awards a badge to the current user and shows a message.
+         * This function should be called from your game iframes or other parts of the app.
+         * @param {string} badgeName - The filename of the badge (e.g., 'smartystarter3').
+         * @param {string} badgeDisplayName - The display-friendly name (e.g., 'Smarty Starter').
+         */
+        async function awardBadge(badgeName, badgeDisplayName) {
+            const user = JSON.parse(localStorage.getItem('user'));
+            const token = localStorage.getItem('token');
+
+            if (!user || !token) {
+                console.log("Badge Award: No user logged in.");
+                return;
+            }
+
+            // Check if user already has the badge in localStorage to prevent unnecessary API calls
+            if (user.badges && user.badges.includes(badgeName)) {
+                console.log(`Badge '${badgeName}' already awarded.`);
+                return;
+            }
+
+            try {
+                const response = await fetch(`${BACKEND_URL}/award-badge`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}` // Assuming you might add auth middleware later
+                    },
+                    body: JSON.stringify({ userId: user._id, badgeName: badgeName })
+                });
+
+                const result = await response.json();
+
+                if (result.status === "Success" && !result.alreadyAwarded) {
+                    // Update the user object in localStorage with the new badge list
+                    user.badges = result.data.badges;
+                    localStorage.setItem('user', JSON.stringify(user));
+
+                    // Show a notification
+                    showBadgeNotification(badgeName, badgeDisplayName);
+                    
+                    // Optionally, update the profile view if it's open
+                    updateAuthButtons(); 
+                }
+            } catch (error) {
+                console.error("Error awarding badge:", error);
+            }
+        }
     </script>
 </body>
 </html>
