@@ -6,6 +6,8 @@
     <title>SMARTY PANTS Online</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap" rel="stylesheet">
+    <!-- Confetti.js library -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
     <style>
         body {
             margin: 0;
@@ -299,17 +301,9 @@
             text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000, 2px 2px 4px #000; /* Black outline, Black shadow */
         }
 
-        .play-game-button {
-            background-color: #ff4081;
-        }
-
         .play-game-button:hover {
             background-color: #f50057;
             transform: scale(1.05);
-        }
-
-        .play-game-button-new-window {
-            background-color: #0288d1;
         }
 
         .play-game-button-new-window:hover {
@@ -1196,6 +1190,13 @@
                 });
             }
             initializeAvatarCreatorOptions();
+
+            // Open confirmation modal when delete button is clicked
+            const deleteAccountBtn = document.getElementById('deleteAccountBtn');
+            deleteAccountBtn.addEventListener('click', () => {
+                authModal.classList.add('hidden'); // Hide the profile modal
+                deleteConfirmationModal.classList.remove('hidden');
+            });
         });
 
         const loginBtn = document.getElementById('loginBtn');
@@ -1304,7 +1305,9 @@
             'halfwayhero8thgradealgebra': 'Halfway Hero 8th Grade Algebra',
             'halfwayhero9thgradealgebra': 'Halfway Hero 9th Grade Algebra',
             'halfwayhero10thgradealgebra': 'Halfway Hero 10th Grade Algebra',
-            'halfwayhero11thgradealgebra': 'Halfway Hero 11th Grade Algebra'
+            'halfwayhero11thgradealgebra': 'Halfway Hero 11th Grade Algebra',
+            'wordweaver50points': 'Word Weaver 50 Points', // Existing badge
+            'wordweaver100points': 'Word Weaver 100 Points' // Existing badge
         };
 
         /**
@@ -1326,10 +1329,17 @@
          * @param {string} badgeDisplayName - The display-friendly name (e.g., 'Smarty Starter').
          */
         function showBadgeNotification(badgeName, badgeDisplayName) {
+            // Trigger confetti effect
+            confetti({
+                particleCount: 100,
+                spread: 70,
+                origin: { y: 0.6 }
+            });
+
             badgeNotificationImg.src = `Badges/${badgeName}.png`;
             badgeNotificationName.textContent = badgeDisplayName;
             badgeNotification.classList.remove('hidden');
-            badgeNotification.classList.add('flex'); // Use flex to center content
+            badgeNotification.classList.add('flex');
             
             // Trigger the animation
             setTimeout(() => {
@@ -1853,36 +1863,47 @@
         });
 
         // Open confirmation modal when delete button is clicked
+        const deleteAccountBtn = document.getElementById('deleteAccountBtn');
         deleteAccountBtn.addEventListener('click', () => {
             authModal.classList.add('hidden'); // Hide the profile modal
             deleteConfirmationModal.classList.remove('hidden');
         });
 
         // Close confirmation modal
+        const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
         cancelDeleteBtn.addEventListener('click', () => {
             deleteConfirmationModal.classList.add('hidden');
         });
 
         // Handle the final deletion
+        const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
         confirmDeleteBtn.addEventListener('click', async () => {
             const user = JSON.parse(localStorage.getItem('user'));
-            if (!user) return;
+            if (!user) {
+                console.error("No user found in localStorage for delete request.");
+                return;
+            }
+            const token = localStorage.getItem('token');
+            if (!token) {
+                 console.error("No token found in localStorage for delete request.");
+                 return;
+            }
 
             try {
                 const response = await fetch(`${BACKEND_URL}/delete/${user._id}`, {
                     method: 'DELETE',
                     headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                        'Authorization': `Bearer ${token}` // Correctly format the Authorization header
                     }
                 });
 
                 const result = await response.json();
 
-                if (result.status === "Success") {
+                if (response.ok && result.status === "Success") {
                     // Log the user out completely
                     logoutUser("Account deleted successfully.");
                 } else {
-                    showMessageBox(result.message || "Failed to delete account.");
+                    showMessageBox(result.message || "Failed to delete account. Please try again.");
                 }
             } catch (error) {
                 console.error("Error deleting account:", error);
