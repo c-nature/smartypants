@@ -858,6 +858,10 @@
         <source src="click.ogg" type="audio/ogg">
         <source src="click.wav" type="audio/wav"> Your browser does not support the audio element.
     </audio>
+    <audio id="badgeSoundElement" preload="auto">
+        <source src="badge.wav" type="audio/wav">
+        <source src="badge.mp3" type="audio/mpeg">
+    </audio>
 
     <div id="authModal" class="auth-modal hidden">
         <div class="auth-modal-content">
@@ -1033,6 +1037,7 @@
         const plantExplorerGameIframe = document.getElementById('plant-explorer-game-iframe'); // NEW Plant Explorer game iframe
 
         const mainClickSoundElement = document.getElementById('mainClickSoundElement');
+        const badgeSoundElement = document.getElementById('badgeSoundElement');
 
         function playClickSound() {
             if (mainClickSoundElement) {
@@ -1044,6 +1049,18 @@
                 console.warn("mainClickSoundElement not found. Click sound may not work.");
             }
         }
+        
+        function playBadgeSound() {
+            if (badgeSoundElement) {
+                badgeSoundElement.currentTime = 0;
+                badgeSoundElement.play().catch(e => {
+                    console.warn("Error playing badge sound:", e);
+                });
+            } else {
+                console.warn("badgeSoundElement not found. Badge sound may not work.");
+            }
+        }
+
 
         // --- View Management Functions ---
 
@@ -1365,6 +1382,9 @@
          * @param {string} badgeDisplayName - The display-friendly name (e.g., 'Smarty Starter').
          */
         function showBadgeNotification(badgeName, badgeDisplayName) {
+            // Play the badge sound
+            playBadgeSound();
+
             // Trigger confetti effect
             confetti({
                 particleCount: 100,
@@ -2034,7 +2054,7 @@
                             
                             // AWARDS BADGE ON SIGNUP IS NOW HANDLED BY THE BACKEND,
                             // but we trigger the frontend animation manually here.
-                            if (action === 'signup' && data.data.badges && data.data.badges.includes('smartystarter3')) {
+                            if (action === 'signup' && user.badges && user.badges.includes('smartystarter3')) {
                                 showBadgeNotification('smartystarter3', 'Smarty Starter');
                             }
                             
