@@ -515,8 +515,9 @@
             transition: border-color 0.2s;
         }
         .avatar-option-select:focus {
-            box-shadow: 0 0 0 2px rgba(66, 153, 225, 0.3);
+            border-color: #4299e1;
             outline: none;
+            box-shadow: 0 0 0 2px rgba(66, 153, 225, 0.3);
         }
 
         .avatar-btn-group {
@@ -756,7 +757,7 @@
         <div class="game-list-layout">
             <!-- NASA Explorer Game Card -->
             <div class="game-list-card" style="background-image: url('space.png'); background-size: cover; background-position: center;">
-                <h3>Space Explorer </h3>
+                <h3>Space Explorer</h3>
                 <p>Explore photos from space!</p>
                 <div class="game-card-buttons">
                     <button class="play-game-button" onclick="playClickSound(); showNasaGame();">Open Here</button>
@@ -1256,7 +1257,6 @@
                     showMessageBox("An error occurred while deleting the account. Please try again.");
                 }
             });
-
             const loginBtn = document.getElementById('loginBtn');
             const signupBtn = document.getElementById('signupBtn');
             const profileBtn = document.getElementById('profileBtn');
@@ -1351,7 +1351,7 @@
                 '1ststep8thgradealgebra': '1st Step 8th Grade Algebra',
                 '1ststep9thgradealgebra': '1st Step 9th Grade Algebra',
                 '1ststep10thgradealgebra': '1st Step 10th Grade Algebra',
-                '1ststep11thgradealgebra': '11th Grade Algebra',
+                '1ststep11thgradealgebra': '1st Step 11th Grade Algebra',
                 // NEW Algebra Halfway Hero Badges
                 'halfwayhero7thgradealgebra': 'Halfway Hero 7th Grade Algebra',
                 'halfwayhero8thgradealgebra': 'Halfway Hero 8th Grade Algebra',
@@ -1661,7 +1661,7 @@
                 topColorSelect.addEventListener('change', (event) => {
                     const selectedColor = event.target.value;
                     const hatTypes = ['Hat', 'Turban', 'WinterHat1', 'WinterHat2', 'WinterHat3', 'WinterHat4'];
-                    if(hatTypes.includes(currentAvatarConfig.topType)) {
+                    if (hatTypes.includes(currentAvatarConfig.topType)) {
                         currentAvatarConfig.hatColor = selectedColor;
                     } else if (currentAvatarConfig.topType === 'Hijab') {
                         currentAvatarConfig.topColor = selectedColor;
