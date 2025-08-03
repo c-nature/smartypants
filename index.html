@@ -890,7 +890,7 @@
             </form>
             <p id="authMessage" class="auth-message"></p>
             
-            <!-- --- NEW BADGE CONTAINER --- -->
+            <!-- NEW BADGE CONTAINER -->
             <div id="badgeDisplayContainer" class="mt-4 hidden">
                 <h3 class="text-lg font-semibold text-gray-700 text-center">Your Badges</h3>
                 <div id="badgeGrid" class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-4 mt-2 p-2 bg-gray-100 rounded-lg">
@@ -906,7 +906,7 @@
         </div>
     </div>
 
-    <!-- --- NEW: Confirmation Modal for Deleting Account --- -->
+    <!-- NEW: Confirmation Modal for Deleting Account -->
     <div id="deleteConfirmationModal" class="confirmation-modal hidden">
         <div class="confirmation-modal-content">
             <h2 class="confirmation-modal-title">Are you sure?</h2>
@@ -994,7 +994,7 @@
     
     <!-- --- NEW: Badge Notification Pop-up --- -->
     <div id="badge-notification" class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-black bg-opacity-75 p-8 rounded-2xl shadow-2xl text-center z-[2000] hidden flex-col items-center">
-        <h2 class="text-3xl font-bold text-yellow-300 mb-4" style="text-shadow: 2px 2px 4px #000;">New Badge Unlocked!</h2>
+        <h2 class="text-3xl font-bold text-yellow-300 mb-4" style="text-shadow: 2px 2px 4px #000;">New Badge Unlocked! </h2>
         <img id="badge-notification-img" src="" alt="New Badge" class="w-48 h-48 mb-4">
         <p id="badge-notification-name" class="text-2xl text-white font-semibold" style="text-shadow: 1px 1px 2px #000;"></p>
     </div>
@@ -1059,6 +1059,7 @@
             subnetCalculatorGameView.style.display = 'none'; // Hide Subnet Calculator game view
             wordwiseGameView.style.display = 'none'; // Hide WordWise game view
             plantExplorerGameView.style.display = 'none'; // Hide Plant Explorer game view
+            document.body.style.overflow = 'auto';
         }
 
         function showMainMenu() {
@@ -1212,8 +1213,8 @@
                 }
                 const token = localStorage.getItem('token');
                 if (!token) {
-                     console.error("No token found in localStorage for delete request.");
-                     return;
+                    console.error("No token found in localStorage for delete request.");
+                    return;
                 }
 
                 try {
@@ -1282,7 +1283,6 @@
         const clotheColorSelect = document.getElementById('clotheColorSelect');
         const graphicTypeSelect = document.getElementById('graphicTypeSelect');
         const accessoriesTypeSelect = document.getElementById('accessoriesTypeSelect');
-        // Removed noseTypeSelect from here
 
         const topColorGroup = document.getElementById('topColorGroup');
         const facialHairColorGroup = document.getElementById('facialHairColorGroup');
@@ -1292,7 +1292,7 @@
         const headerAvatarContainer = document.getElementById('header-avatar-container');
         const messageBox = document.getElementById('messageBox'); // Get the message box element
         
-        // --- NEW: Badge display elements ---
+        // NEW: Badge display elements
         const badgeDisplayContainer = document.getElementById('badgeDisplayContainer');
         const badgeGrid = document.getElementById('badgeGrid');
         const badgeNotification = document.getElementById('badge-notification');
@@ -1301,11 +1301,11 @@
         
         const BACKEND_URL = 'https://smartypantsbe.onrender.com/api/user';
 
-        // --- NEW: Badge Details Map ---
+        // NEW: Badge Details Map
         const badgeDetails = {
             'smartystarter3': 'Smarty Starter',
-            '1ststep1stgrademath': '1st Step 1st Grade Math', 
-            'halfwayhero1stgrademath': 'Halfway Hero 1st Grade Math', 
+            '1ststep1stgrademath': '1st Step 1st Grade Math',
+            'halfwayhero1stgrademath': 'Halfway Hero 1st Grade Math',
             '1stgrademathwinner': '1st Grade Math Winner',
             '1ststep2ndgrademath': '1st Step 2nd Grade Math', // New badge
             '1ststep3rdgrademath': '1st Step 3rd Grade Math', // New badge
@@ -1317,10 +1317,10 @@
             'halfwayhero4thgrademath': 'Halfway Hero 4th Grade Math', // New badge
             'halfwayhero5thgrademath': 'Halfway Hero 5th Grade Math', // New badge
             'halfwayhero6thgrademath': 'Halfway Hero 6th Grade Math', // New badge
-            '2ndgrademathwinner': '2nd Grade Math Winner', 
-            '3rdgrademathwinner': '3rd Grade Math Winner', 
-            '4thgrademathwinner': '4th Grade Math Winner', 
-            '5thgrademathwinner': '5th Grade Math Winner', 
+            '2ndgrademathwinner': '2nd Grade Math Winner',
+            '3rdgrademathwinner': '3rd Grade Math Winner',
+            '4thgrademathwinner': '4th Grade Math Winner',
+            '5thgrademathwinner': '5th Grade Math Winner',
             '6thgrademathwinner': '6th Grade Math Winner',
             // Algebra Winner Badges
             '7thgradealgebrawinner': '7th Grade Algebra Winner',
@@ -1643,7 +1643,7 @@
             topColorSelect.addEventListener('change', (event) => {
                 const selectedColor = event.target.value;
                 const hatTypes = ['Hat', 'Turban', 'WinterHat1', 'WinterHat2', 'WinterHat3', 'WinterHat4'];
-                if (hatTypes.includes(currentAvatarConfig.topType)) {
+                if(hatTypes.includes(currentAvatarConfig.topType)) {
                     currentAvatarConfig.hatColor = selectedColor;
                 } else if (currentAvatarConfig.topType === 'Hijab') {
                     currentAvatarConfig.topColor = selectedColor;
@@ -1919,8 +1919,8 @@
             }
             const token = localStorage.getItem('token');
             if (!token) {
-                 console.error("No token found in localStorage for delete request.");
-                 return;
+                console.error("No token found in localStorage for delete request.");
+                return;
             }
 
             try {
@@ -1967,7 +1967,7 @@
                 requestBody = { username: usernameInput.value, email: emailInput.value, password: passwordInput.value };
                 endpoint = `${BACKEND_URL}/signup`;
                 
-                // --- NEW: Updated password validation ---
+                // NEW: Updated password validation
                 const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
 
                 if (!requestBody.email || !/^[\w-\.]+@([\w-]+\.)+[\w-\.]{2,4}$/.test(requestBody.email)) {
@@ -2030,12 +2030,8 @@
                             updateAuthButtons();
                             const user = JSON.parse(localStorage.getItem('user'));
                             
-                            // --- AWARD BADGE ON SIGNUP ---
-                            if (action === 'signup') {
-                                awardBadge('smartystarter3', 'Smarty Starter');
-                            }
-                            
-                            if (action === 'signup' || (user && !user.has_created_avatar)) {
+                            // AWARDS BADGE ON SIGNUP IS NOW HANDLED BY THE BACKEND
+                            if (user && !user.has_created_avatar) {
                                 showAvatarCreatorModal(user.avatar_config || {});
                             }
                         }, 1000);
