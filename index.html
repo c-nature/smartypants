@@ -571,11 +571,13 @@
         
         /* --- Styles for the badge notification pop-up --- */
         #badge-notification {
-            transition: opacity 0.5s, transform 0.5s;
+            position: fixed;
+            top: 50%;
+            left: 50%;
             transform: translate(-50%, -50%) scale(0.5);
             opacity: 0;
             pointer-events: none;
-            /* FIX: Remove background color and padding for a transparent look */
+            transition: opacity 0.5s, transform 0.5s;
             background-color: transparent;
             padding: 0;
         }
@@ -994,7 +996,7 @@
     
     <!-- --- NEW: Badge Notification Pop-up --- -->
     <div id="badge-notification" class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-black bg-opacity-75 p-8 rounded-2xl shadow-2xl text-center z-[2000] hidden flex-col items-center">
-        <h2 class="text-3xl font-bold text-yellow-300 mb-4" style="text-shadow: 2px 2px 4px #000;">New Badge Unlocked! </h2>
+        <h2 class="text-3xl font-bold text-yellow-300 mb-4" style="text-shadow: 2px 2px 4px #000;">New Badge Unlocked! </h2>
         <img id="badge-notification-img" src="" alt="New Badge" class="w-48 h-48 mb-4">
         <p id="badge-notification-name" class="text-2xl text-white font-semibold" style="text-shadow: 1px 1px 2px #000;"></p>
     </div>
@@ -2030,7 +2032,12 @@
                             updateAuthButtons();
                             const user = JSON.parse(localStorage.getItem('user'));
                             
-                            // AWARDS BADGE ON SIGNUP IS NOW HANDLED BY THE BACKEND
+                            // AWARDS BADGE ON SIGNUP IS NOW HANDLED BY THE BACKEND,
+                            // but we trigger the frontend animation manually here.
+                            if (action === 'signup' && data.data.badges && data.data.badges.includes('smartystarter3')) {
+                                showBadgeNotification('smartystarter3', 'Smarty Starter');
+                            }
+                            
                             if (user && !user.has_created_avatar) {
                                 showAvatarCreatorModal(user.avatar_config || {});
                             }
@@ -2129,6 +2136,8 @@
             // Check if user already has the badge in localStorage to prevent unnecessary API calls
             if (user.badges && user.badges.includes(badgeName)) {
                 console.log(`Badge '${badgeName}' already awarded.`);
+                // If the user has it, just show the animation and don't make the API call.
+                showBadgeNotification(badgeName, badgeDisplayName);
                 return;
             }
 
