@@ -1190,6 +1190,13 @@
                 });
             }
             initializeAvatarCreatorOptions();
+
+            // Open confirmation modal when delete button is clicked
+            const deleteAccountBtn = document.getElementById('deleteAccountBtn');
+            deleteAccountBtn.addEventListener('click', () => {
+                authModal.classList.add('hidden'); // Hide the profile modal
+                deleteConfirmationModal.classList.remove('hidden');
+            });
         });
 
         const loginBtn = document.getElementById('loginBtn');
@@ -1854,36 +1861,47 @@
         });
 
         // Open confirmation modal when delete button is clicked
+        const deleteAccountBtn = document.getElementById('deleteAccountBtn');
         deleteAccountBtn.addEventListener('click', () => {
             authModal.classList.add('hidden'); // Hide the profile modal
             deleteConfirmationModal.classList.remove('hidden');
         });
 
         // Close confirmation modal
+        const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
         cancelDeleteBtn.addEventListener('click', () => {
             deleteConfirmationModal.classList.add('hidden');
         });
 
         // Handle the final deletion
+        const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
         confirmDeleteBtn.addEventListener('click', async () => {
             const user = JSON.parse(localStorage.getItem('user'));
-            if (!user) return;
+            if (!user) {
+                console.error("No user found in localStorage for delete request.");
+                return;
+            }
+            const token = localStorage.getItem('token');
+            if (!token) {
+                 console.error("No token found in localStorage for delete request.");
+                 return;
+            }
 
             try {
                 const response = await fetch(`${BACKEND_URL}/delete/${user._id}`, {
                     method: 'DELETE',
                     headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                        'Authorization': `Bearer ${token}` // Correctly format the Authorization header
                     }
                 });
 
                 const result = await response.json();
 
-                if (result.status === "Success") {
+                if (response.ok && result.status === "Success") {
                     // Log the user out completely
                     logoutUser("Account deleted successfully.");
                 } else {
-                    showMessageBox(result.message || "Failed to delete account.");
+                    showMessageBox(result.message || "Failed to delete account. Please try again.");
                 }
             } catch (error) {
                 console.error("Error deleting account:", error);
