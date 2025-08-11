@@ -781,7 +781,7 @@
                 <h3>Mystic Runes</h3>
                 <p>Forge Words, Conquer Runes!</p>
                 <div class="game-card-buttons">
-                    <button class="play-game-button" onclick="playClickSound(); showWordWiseGame();">Open Here</button>
+                    <button class="play-game-button" onclick="playClickSound(); showMysticRunesGame();">Open Here</button>
                     <button class="play-game-button-new-window" onclick="playClickSound(); openGameInNewWindow('https://c-nature.github.io/mysticrunes/');">Open in New Window</button>
                 </div>
             </div>
@@ -1186,6 +1186,13 @@
             hideAllViews();
             wordwiseGameView.style.display = 'flex';
             wordwiseGameIframe.src = 'https://c-nature.github.io/dictionary/'; // Path to the dictionary HTML file
+            document.body.style.overflow = 'hidden';
+        }
+        // Mystic Runes Game
+        function showMysticRunesGame() {
+            hideAllViews();
+            wordwiseGameView.style.display = 'flex';
+            wordwiseGameIframe.src = 'https://c-nature.github.io/mysticrunes/'; // Path to the dictionary HTML file
             document.body.style.overflow = 'hidden';
         }
 
