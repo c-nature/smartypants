@@ -799,6 +799,14 @@
                     <button class="play-game-button" onclick="playClickSound(); openGameInNewWindow('https://presidentialpong.vercel.app/');">Play Now</button>
                 </div>
             </div>
+            <!-- Chess Challenge Game Card -->
+             <div class="game-list-card" style="background-image: url('modeSelectScreen.png'); background-size: cover; background-position: center;">
+                <h3>Chess Challenge</h3>
+                <p>The Ultimate Chess Engine Test!</p>
+                <div class="game-card-buttons">
+                    <button class="play-game-button" onclick="playClickSound(); openGameInNewWindow('https://c-nature.github.io/chess/');">Play Now</button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -1196,11 +1204,18 @@
             document.body.style.overflow = 'hidden';
         }
 
-        // NEW: Function to show Plant Explorer game
+        // Plant Explorer 
         function showPlantExplorerGame() {
             hideAllViews();
             plantExplorerGameView.style.display = 'flex';
             plantExplorerGameIframe.src = 'https://c-nature.github.io/plantexplorer/';
+            document.body.style.overflow = 'hidden';
+        }
+        // Chess game
+        function ShowChessGame() {
+            hideAllViews();
+            plantExplorerGameView.style.display = 'flex';
+            plantExplorerGameIframe.src = 'https://c-nature.github.io/chess/';
             document.body.style.overflow = 'hidden';
         }
 
