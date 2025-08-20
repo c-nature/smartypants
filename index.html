@@ -1218,11 +1218,24 @@
             document.body.style.overflow = 'hidden';
         }
 
-        // Function to open a game in a new window
-        function openGameInNewWindow(gameUrl) {
-            window.open(gameUrl, '_blank');
-        }
+// Replace the old function on your MAIN website with this one.
+function openGameInNewWindow(gameUrl) {
+    const token = localStorage.getItem('token');
+    const userString = localStorage.getItem('user');
+    let urlToOpen = gameUrl;
 
+    if (token && userString) {
+        // Create URL parameters to pass the login data
+        const params = new URLSearchParams();
+        params.append('authToken', token);
+        params.append('userData', userString);
+        
+        // Add the parameters to the game's URL
+        urlToOpen += `?${params.toString()}`;
+    }
+    
+    window.open(urlToOpen, '_blank');
+}
         // --- DOMContentLoaded and Auth Logic ---
         document.addEventListener('DOMContentLoaded', () => {
             showMainMenu();
