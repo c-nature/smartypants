@@ -9,18 +9,22 @@
     <!-- Confetti.js library -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
     <style>
-        body {
-            margin: 0;
-            font-family: 'Fredoka One', cursive;
-            background: linear-gradient(to bottom right, #e0b0ff, #a0d9ff, #98fb98);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            padding: 2rem;
-            overflow-y: auto;
-            overflow-x: hidden; /* Keep horizontal overflow hidden unless specified */
-        }
+body {
+  margin: 0;
+  font-family: 'Fredoka One', cursive;
+  
+  /* This one line does it all! */
+  background: url('smartypantsBG.png') no-repeat top center;
+  background-size: cover; /* This should be on its own line for compatibility */
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 2rem;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
 
         .main-container, .category-view {
             padding: 0;
