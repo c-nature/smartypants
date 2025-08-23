@@ -1248,7 +1248,7 @@ function openGameInNewWindow(gameUrl) {
                 }
                 const config = await configResponse.json();
                 if (config.backendUrl) {
-                    // Set the global BACKEND_URL variable
+                    // CORRECTED: Set the global BACKEND_URL variable to the base URL plus /api/user
                     window.BACKEND_URL = `${config.backendUrl}/api/user`;
                     console.log("Backend URL configured:", window.BACKEND_URL);
                 } else {
