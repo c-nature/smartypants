@@ -1237,29 +1237,7 @@ function openGameInNewWindow(gameUrl) {
     window.open(urlToOpen, '_blank');
 }
         // --- DOMContentLoaded and Auth Logic ---
-        document.addEventListener('DOMContentLoaded', async () => {
-            // Fetch backend configuration first
-            try {
-                // This is the single URL the frontend needs to know to contact the backend's config endpoint.
-                const configApiUrl = 'https://smartypantsbe.onrender.com/api/config';
-                const configResponse = await fetch(configApiUrl);
-                if (!configResponse.ok) {
-                    throw new Error(`Configuration fetch failed with status: ${configResponse.status}`);
-                }
-                const config = await configResponse.json();
-                if (config.backendUrl) {
-                    // CORRECTED: Set the global BACKEND_URL variable to the base URL plus /api/user
-                    window.BACKEND_URL = `${config.backendUrl}/api/user`;
-                    console.log("Backend URL configured:", window.BACKEND_URL);
-                } else {
-                    throw new Error("Backend URL not provided in server config.");
-                }
-            } catch (error) {
-                console.error("CRITICAL: Could not configure backend URL. Auth and badge features will fail.", error);
-                // Display an error to the user in the UI
-                showMessageBox("Error connecting to server. Login and badges are disabled.", 5000);
-            }
-
+        document.addEventListener('DOMContentLoaded', () => {
             showMainMenu();
             // IMPORTANT FIX: Initialize the avatar creator options on page load
             // so the dropdowns are populated correctly before the modal is opened.
@@ -1294,10 +1272,6 @@ function openGameInNewWindow(gameUrl) {
 
             // Handle the final deletion
             confirmDeleteBtn.addEventListener('click', async () => {
-                if (!window.BACKEND_URL) {
-                    showMessageBox("Cannot delete account: Server connection failed.");
-                    return;
-                }
                 const user = JSON.parse(localStorage.getItem('user'));
                 if (!user) {
                     console.error("No user found in localStorage for delete request.");
@@ -1310,7 +1284,7 @@ function openGameInNewWindow(gameUrl) {
                 }
 
                 try {
-                    const response = await fetch(`${window.BACKEND_URL}/delete/${user._id}`, {
+                    const response = await fetch(`${BACKEND_URL}/delete/${user._id}`, {
                         method: 'DELETE',
                         headers: {
                             'Authorization': `Bearer ${token}` // Correctly format the Authorization header
@@ -1391,8 +1365,7 @@ function openGameInNewWindow(gameUrl) {
         const badgeNotificationImg = document.getElementById('badge-notification-img');
         const badgeNotificationName = document.getElementById('badge-notification-name');
         
-        // This is now a global variable, set dynamically on page load.
-        let BACKEND_URL;
+        const BACKEND_URL = 'https://smartypantsbe.onrender.com/api/user';
 
         // NEW: Badge Details Map
         const badgeDetails = {
@@ -1956,11 +1929,6 @@ function openGameInNewWindow(gameUrl) {
 
         saveAvatarBtn.addEventListener('click', async () => {
             playClickSound();
-            if (!window.BACKEND_URL) {
-                avatarMessage.textContent = "Cannot save avatar: Server connection failed.";
-                avatarMessage.style.color = 'red';
-                return;
-            }
             avatarMessage.textContent = 'Saving avatar...';
             avatarMessage.style.color = 'gray';
             saveAvatarBtn.disabled = true;
@@ -1979,7 +1947,7 @@ function openGameInNewWindow(gameUrl) {
 
             console.log('Save Avatar: Current avatar config being sent:', currentAvatarConfig);
             try {
-                const response = await fetch(`${window.BACKEND_URL}/avatar/${user._id}`, {
+                const response = await fetch(`${BACKEND_URL}/avatar/${user._id}`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -2010,7 +1978,7 @@ function openGameInNewWindow(gameUrl) {
                     // Merge the updates from the server response into the existing user object
                     const updatedUser = {
                         ...existingUser, // Keeps old avatar_config if not explicitly returned
-                        ...data.data     // Overwrites with fresh data from the avatar save response
+                        ...data.data    // Overwrites with fresh data from the avatar save response
                     };
 
                     // Save the complete, merged user object back to localStorage
@@ -2072,10 +2040,6 @@ function openGameInNewWindow(gameUrl) {
         // Handle the final deletion
         const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
         confirmDeleteBtn.addEventListener('click', async () => {
-            if (!window.BACKEND_URL) {
-                showMessageBox("Cannot delete account: Server connection failed.");
-                return;
-            }
             const user = JSON.parse(localStorage.getItem('user'));
             if (!user) {
                 console.error("No user found in localStorage for delete request.");
@@ -2088,7 +2052,7 @@ function openGameInNewWindow(gameUrl) {
             }
 
             try {
-                const response = await fetch(`${window.BACKEND_URL}/delete/${user._id}`, {
+                const response = await fetch(`${BACKEND_URL}/delete/${user._id}`, {
                     method: 'DELETE',
                     headers: {
                         'Authorization': `Bearer ${token}` // Correctly format the Authorization header
@@ -2114,12 +2078,6 @@ function openGameInNewWindow(gameUrl) {
                 e.preventDefault();
             }
             playClickSound();
-            
-            if (!window.BACKEND_URL) {
-                authMessage.textContent = "Cannot connect to the server. Please try again later.";
-                authMessage.style.color = 'red';
-                return;
-            }
 
             const action = authForm.dataset.currentAction;
 
@@ -2132,10 +2090,10 @@ function openGameInNewWindow(gameUrl) {
 
             if (action === 'login') {
                 requestBody = { username: usernameInput.value, password: passwordInput.value };
-                endpoint = `${window.BACKEND_URL}/login`;
+                endpoint = `${BACKEND_URL}/login`;
             } else if (action === 'signup') {
                 requestBody = { username: usernameInput.value, email: emailInput.value, password: passwordInput.value };
-                endpoint = `${window.BACKEND_URL}/signup`;
+                endpoint = `${BACKEND_URL}/signup`;
                 
                 // NEW: Updated password validation
                 const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
@@ -2160,7 +2118,7 @@ function openGameInNewWindow(gameUrl) {
                 }
             } else if (action === 'forgot-password') {
                 requestBody = { email: forgotPasswordEmailInput.value };
-                endpoint = `${window.BACKEND_URL}/reset-password-request`;
+                endpoint = `${BACKEND_URL}/reset-password-request`;
                 if (!requestBody.email) {
                     authMessage.textContent = 'Please enter your email address.';
                     authMessage.style.color = 'red';
@@ -2293,10 +2251,6 @@ function openGameInNewWindow(gameUrl) {
          * @param {string} badgeDisplayName - The display-friendly name (e.g., 'Smarty Starter').
          */
         async function awardBadge(badgeName, badgeDisplayName) {
-            if (!window.BACKEND_URL) {
-                console.error("Cannot award badge: Server connection failed.");
-                return;
-            }
             const user = JSON.parse(localStorage.getItem('user'));
             const token = localStorage.getItem('token');
 
@@ -2314,7 +2268,7 @@ function openGameInNewWindow(gameUrl) {
             }
 
             try {
-                const response = await fetch(`${window.BACKEND_URL}/award-badge`, {
+                const response = await fetch(`${BACKEND_URL}/award-badge`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
