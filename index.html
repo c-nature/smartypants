@@ -714,8 +714,10 @@ body {
                 <h3>Animal Kingdom Explorer</h3>
                 <p>Learn about amazing animals!</p>
                 <div class="game-card-buttons">
-                    <button class="play-game-button" onclick="playClickSound(); showScienceGame();">Open Here</button>
-                    <button class="play-game-button-new-window" onclick="playClickSound(); openGameInNewWindow('https://c-nature.github.io/animalsearch');">Open in New Window</button>
+                    <!-- CORRECTED: The button now calls showScienceGame with the correct new URL -->
+                    <button class="play-game-button" onclick="playClickSound(); showScienceGame('https://www.smartypantsonline.com/animalsearch.html');">Open Here</button>
+                    <!-- CORRECTED: The button now calls openGameInNewWindow with the correct new URL -->
+                    <button class="play-game-button-new-window" onclick="playClickSound(); openGameInNewWindow('https://www.smartypantsonline.com/animalsearch.html');">Open in New Window</button>
                 </div>
             </div>
             <!-- Plant Explorer Game Card -->
@@ -1151,11 +1153,25 @@ body {
             mathGameIframe.src = 'https://c-nature.github.io/mathchallenge/'; 
             document.body.style.overflow = 'hidden';
         }
-
-        function showScienceGame() {
+        
+        // CORRECTED: showScienceGame now takes the URL as a parameter
+        function showScienceGame(gameUrl) {
             hideAllViews();
             scienceGameView.style.display = 'flex';
-            scienceGameIframe.src = 'https://c-nature.github.io/animalsearch/';
+            // Add backend URL to the iframe's source URL
+            const url = new URL(gameUrl);
+            const params = new URLSearchParams();
+            if (window.BACKEND_URL) {
+                params.append('backendUrl', window.BACKEND_URL);
+            }
+            if (localStorage.getItem('token')) {
+                params.append('authToken', localStorage.getItem('token'));
+            }
+            if (localStorage.getItem('user')) {
+                params.append('userData', localStorage.getItem('user'));
+            }
+            url.search = params.toString();
+            scienceGameIframe.src = url.toString();
             document.body.style.overflow = 'hidden';
         }
 
@@ -1226,19 +1242,18 @@ body {
 function openGameInNewWindow(gameUrl) {
     const token = localStorage.getItem('token');
     const userString = localStorage.getItem('user');
-    let urlToOpen = gameUrl;
+    const urlToOpen = new URL(gameUrl);
 
+    // Pass auth and backend data as URL parameters
     if (token && userString) {
-        // Create URL parameters to pass the login data
-        const params = new URLSearchParams();
-        params.append('authToken', token);
-        params.append('userData', userString);
-        
-        // Add the parameters to the game's URL
-        urlToOpen += `?${params.toString()}`;
+        urlToOpen.searchParams.append('authToken', token);
+        urlToOpen.searchParams.append('userData', userString);
+    }
+    if (window.BACKEND_URL) {
+        urlToOpen.searchParams.append('backendUrl', window.BACKEND_URL);
     }
     
-    window.open(urlToOpen, '_blank');
+    window.open(urlToOpen.toString(), '_blank');
 }
         // --- DOMContentLoaded and Auth Logic ---
         document.addEventListener('DOMContentLoaded', async () => {
@@ -1462,6 +1477,7 @@ function openGameInNewWindow(gameUrl) {
             'firstplantaddedtocollection': 'First Plant Added to Collection',
             // Animal Explorer Badges
             'firstsearchanimalexplorer': 'First Search Animal Explorer',
+            'firstanimaladdedtocollection': 'First Animal Added to Collection',
         };
 
         /**
@@ -2014,7 +2030,7 @@ function openGameInNewWindow(gameUrl) {
                     // Merge the updates from the server response into the existing user object
                     const updatedUser = {
                         ...existingUser, // Keeps old avatar_config if not explicitly returned
-                        ...data.data     // Overwrites with fresh data from the avatar save response
+                        ...data.data      // Overwrites with fresh data from the avatar save response
                     };
 
                     // Save the complete, merged user object back to localStorage
