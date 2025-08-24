@@ -363,6 +363,10 @@ body {
             .category-description {
                 font-size: 1rem;
             }
+            .explore-button {
+                padding: 0.6rem 1.5rem;
+                font-size: 1rem;
+            }
             .game-iframe-container {
                 padding: 0.5rem;
                 top: 5rem;
@@ -651,9 +655,67 @@ body {
                 <img src="science.png" alt="Science Icon" class="category-icon" onerror="this.onerror=null; this.src='https://placehold.co/80x80/81C784/000000?text=Science';" />
                 <h2 class="category-title">Science Games</h2>
                 <p class="category-description">Discover the world around you!</p>
+                <button class="explore-button" onclick="playClickSound(); showScienceCategoryView();">
+                    Explore <span style="margin-left: 0.5rem;">&#x276F;</span> </button>
+            </div>
+
+            <div class="category-card ela">
+                <img src="abc.png" alt="ELA Icon" class="category-icon" onerror="this.onerror=null; this.src='https://placehold.co/80x80/EF9A9A/000000?text=ABC';" />
+                <h2 class="category-title">ELA Games </h2>
+                <p class="category-description">Read, write, and communicate!</p>
+                <button class="explore-button" onclick="playClickSound(); showElaCategoryView();"> Explore <span style="margin-left: 0.5rem;">&#x276F;</span> </button>
+            </div>
+
+            <div class="category-card social-studies">
+                <img src="socialstudies.png" alt="Social Studies Icon" class="category-icon" onerror="this.onerror=null; this.src='https://placehold.co/80x80/FFA500/000000?text=History';" />
+                <h2 class="category-title">Social Studies</h2>
+                <p class="category-description">Explore history and cultures!</p>
+                <button class="explore-button" onclick="playClickSound(); showSocialStudiesCategoryView();"> Explore <span style="margin-left: 0.5rem;">&#x276F;</span> </button>
+            </div>
+        </div>
+
+        <p class="footer-text">
+            (More games and apps comings soon!!!)
+        </p>
+    </div>
+
+    <div id="math-category-view" class="category-view hidden">
+        <button onclick="playClickSound(); showMainMenu();" class="back-button"> &larr; Back to Main Menu </button>
+        <h1 class="header-title">MATH</h1>
+        <div class="game-list-layout">
+            <div class="game-list-card" style="background-image: url('mathland.png'); background-size: cover; background-position: center;">
+                <h3>Math Challenge</h3>
+                <p>Test your arithmetic skills!</p>
                 <div class="game-card-buttons">
-                    <button class="play-game-button" onclick="playClickSound(); showScienceGame('https://c-nature.github.io/animalsearch/');">Open Here</button>
-                    <button class="play-game-button-new-window" onclick="playClickSound(); openGameInNewWindow('https://c-nature.github.io/animalsearch/');">Open in New Window</button>
+                    <button class="play-game-button" onclick="playClickSound(); showMathGame();">Play Here</button>
+                    <button class="play-game-button-new-window" onclick="playClickSound(); openGameInNewWindow('https://c-nature.github.io/mathchallenge/');">Open in New Window</button>
+                </div>
+            </div>
+            <!-- NEW: Multi-Grade Math Challenge Game Card -->
+            <div class="game-list-card" style="background-image: url('algebraland.png'); background-size: cover; background-position: center;">
+                <h3>Algebra Challenge</h3>
+                <p>Solve linear and quadratic equations!</p>
+                <div class="game-card-buttons">
+                    <button class="play-game-button" onclick="playClickSound(); showAlgebraGame();">Play Here</button>
+                    <button class="play-game-button-new-window" onclick="playClickSound(); openGameInNewWindow('https://c-nature.github.io/algebrachallenge/');">Open in New Window</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="science-category-view" class="category-view hidden">
+        <button onclick="playClickSound(); showMainMenu();" class="back-button"> &larr; Back to Main Menu </button>
+        <h1 class="header-title">SCIENCE</h1>
+
+        <!-- Earth Science Section -->
+        <h2 class="text-3xl font-bold text-gray-800 mt-8 mb-4 text-center">Earth Science</h2>
+        <div class="game-list-layout">
+            <div class="game-list-card" style="background-image: url('akexplorer.png'); background-size: cover; background-position: center;">
+                <h3>Animal Kingdom Explorer</h3>
+                <p>Learn about amazing animals!</p>
+                <div class="game-card-buttons">
+                    <button class="play-game-button" onclick="playClickSound(); showScienceGame();">Open Here</button>
+                    <button class="play-game-button-new-window" onclick="playClickSound(); openGameInNewWindow('https://c-nature.github.io/animalsearch');">Open in New Window</button>
                 </div>
             </div>
             <!-- Plant Explorer Game Card -->
@@ -661,7 +723,9 @@ body {
                 <h3>Plant Explorer</h3>
                 <p>Discover the world of plants!</p>
                 <div class="game-card-buttons">
+                    <!-- UPDATED: "Open Here" now calls showPlantExplorerGame() -->
                     <button class="play-game-button" onclick="playClickSound(); showPlantExplorerGame();">Open Here</button>
+                    <!-- UPDATED: "Open in New Window" now uses the correct full URL -->
                     <button class="play-game-button-new-window" onclick="playClickSound(); openGameInNewWindow('https://c-nature.github.io/plantexplorer/');">Open in New Window</button>
                 </div>
             </div>
@@ -1015,7 +1079,7 @@ body {
                     console.warn("Error playing badge sound:", e);
                 });
             } else {
-                console.warn("badgeSoundElement not found. Click sound may not work.");
+                console.warn("badgeSoundElement not found. Badge sound may not work.");
             }
         }
 
@@ -1087,25 +1151,11 @@ body {
             mathGameIframe.src = 'https://c-nature.github.io/mathchallenge/'; 
             document.body.style.overflow = 'hidden';
         }
-        
-        // CORRECTED: showScienceGame now takes the URL as a parameter
-        function showScienceGame(gameUrl) {
+
+        function showScienceGame() {
             hideAllViews();
             scienceGameView.style.display = 'flex';
-            // Add backend URL to the iframe's source URL
-            const url = new URL(gameUrl);
-            const params = new URLSearchParams();
-            if (window.BACKEND_URL) {
-                params.append('backendUrl', window.BACKEND_URL);
-            }
-            if (localStorage.getItem('token')) {
-                params.append('authToken', localStorage.getItem('token'));
-            }
-            if (localStorage.getItem('user')) {
-                params.append('userData', localStorage.getItem('user'));
-            }
-            url.search = params.toString();
-            scienceGameIframe.src = url.toString();
+            scienceGameIframe.src = 'https://c-nature.github.io/animalsearch/';
             document.body.style.overflow = 'hidden';
         }
 
@@ -1176,18 +1226,19 @@ body {
 function openGameInNewWindow(gameUrl) {
     const token = localStorage.getItem('token');
     const userString = localStorage.getItem('user');
-    const urlToOpen = new URL(gameUrl);
+    let urlToOpen = gameUrl;
 
-    // Pass auth and backend data as URL parameters
     if (token && userString) {
-        urlToOpen.searchParams.append('authToken', token);
-        urlToOpen.searchParams.append('userData', userString);
-    }
-    if (window.BACKEND_URL) {
-        urlToOpen.searchParams.append('backendUrl', window.BACKEND_URL);
+        // Create URL parameters to pass the login data
+        const params = new URLSearchParams();
+        params.append('authToken', token);
+        params.append('userData', userString);
+        
+        // Add the parameters to the game's URL
+        urlToOpen += `?${params.toString()}`;
     }
     
-    window.open(urlToOpen.toString(), '_blank');
+    window.open(urlToOpen, '_blank');
 }
         // --- DOMContentLoaded and Auth Logic ---
         document.addEventListener('DOMContentLoaded', async () => {
@@ -1411,7 +1462,6 @@ function openGameInNewWindow(gameUrl) {
             'firstplantaddedtocollection': 'First Plant Added to Collection',
             // Animal Explorer Badges
             'firstsearchanimalexplorer': 'First Search Animal Explorer',
-            'firstanimaladdedtocollection': 'First Animal Added to Collection',
         };
 
         /**
@@ -1964,7 +2014,7 @@ function openGameInNewWindow(gameUrl) {
                     // Merge the updates from the server response into the existing user object
                     const updatedUser = {
                         ...existingUser, // Keeps old avatar_config if not explicitly returned
-                        ...data.data      // Overwrites with fresh data from the avatar save response
+                        ...data.data     // Overwrites with fresh data from the avatar save response
                     };
 
                     // Save the complete, merged user object back to localStorage
